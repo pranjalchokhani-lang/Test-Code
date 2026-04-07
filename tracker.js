@@ -16,10 +16,7 @@ function sendData() {
         breakdown: JSON.stringify(districtData) 
     };
 
-    // FIX: Disguise the data as text/plain to bypass browser security blocks (CORS)
     const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
-    
-    // sendBeacon guarantees the data is sent even if the page is currently refreshing
     navigator.sendBeacon(scriptUrl, blob); 
     
     totalClicks = 0; districtData = {}; startTime = null;
@@ -30,7 +27,6 @@ function resetIdleTimer() {
     idleTimer = setTimeout(() => {
         if (totalClicks > 0) { 
             sendData(); 
-            // Give the browser 200 milliseconds to fire the beacon before reloading
             setTimeout(() => { window.location.reload(); }, 200);
         }
     }, 60000); 
@@ -39,8 +35,18 @@ function resetIdleTimer() {
 document.addEventListener('click', function(e) {
     if (!startTime) { startTime = Date.now(); }
     totalClicks++;
-    let id = e.target.id || e.target.innerText?.substring(0, 15).trim() || e.target.tagName;
-    districtData[id] = (districtData[id] || 0) + 1;
+
+    // SMART IDENTIFICATION:
+    // 1. Checks for an ID (e.g., id="Ajmer")
+    // 2. Checks for a Title tag (common in maps)
+    // 3. Checks for text inside the element
+    let label = e.target.id || 
+                e.target.getAttribute('title') || 
+                e.target.querySelector('title')?.textContent || 
+                e.target.innerText?.substring(0, 15).trim() || 
+                "Unknown Region";
+
+    districtData[label] = (districtData[label] || 0) + 1;
     resetIdleTimer();
 });
 
