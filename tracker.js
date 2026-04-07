@@ -1,4 +1,4 @@
-const scriptUrl = "https://script.google.com/macros/s/AKfycbwdsN7ykAZ81yiVIYZKawdfIj3WHtAzrEG9O2Ojpgv3cO02D_cCdvtXgl9HCfpW1OON/exec";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";
 const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
 let totalClicks = 0;
