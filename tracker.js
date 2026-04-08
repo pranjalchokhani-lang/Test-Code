@@ -1,13 +1,12 @@
-const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
+const scriptUrl = "YOUR_APPS_SCRIPT_URL"; 
 const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
-let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer;
-let homeDistrictName = ""; 
+let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
+let homeDistrict = ""; 
 
-// DYNAMIC DISCOVERY: Find the starting district name on page load
 window.addEventListener('load', () => {
     const label = document.querySelector('.title, #selected-name, .district-label'); 
-    if (label) homeDistrictName = label.innerText.trim();
+    if (label) homeDistrict = label.innerText.trim();
 });
 
 function finalizeSession() {
@@ -16,18 +15,12 @@ function finalizeSession() {
             location: KIOSK_LOCATION,
             clicks: totalClicks,
             duration: startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0,
-            breakdown: JSON.stringify(districtData) 
+            breakdown: JSON.stringify(rawData) 
         };
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
-    
-    // RESET INTERNALS
-    totalClicks = 0; districtData = {}; startTime = null; lastInteractionTime = null;
-    
-    // SILENT SNAP-BACK: No page reload
-    if (typeof select === "function" && homeDistrictName) {
-        select(homeDistrictName); 
-    }
+    totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
+    if (typeof select === "function" && homeDistrict) select(homeDistrict); 
 }
 
 function startSession() {
@@ -40,22 +33,12 @@ function startSession() {
 document.addEventListener('mousedown', function(e) {
     const target = e.target.closest('path, polygon, circle, rect');
     startSession(); 
-    
     if (!target) return;
 
-    // Only count if the click changes the district name label
-    const label = document.querySelector('.title, #selected-name, .district-label');
-    if (label) {
-        const currentName = label.innerText.trim();
-        // Delay slightly to allow the map's own click handler to update the label
-        setTimeout(() => {
-            const newName = label.innerText.trim();
-            if (newName && newName !== homeDistrictName) {
-                totalClicks++;
-                districtData[newName] = (districtData[newName] || 0) + 1;
-            }
-        }, 50);
-    }
+    totalClicks++;
+    const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
+    const rawIndex = allShapes.indexOf(target);
+    rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
 ['wheel', 'touchmove', 'touchstart'].forEach(ev => {
