@@ -1,165 +1,156 @@
-// CAPTURE THE EXACT URL ON BOOT UP (Before anyone clicks anything)
-
-// --- ENHANCED LOCATION PROFILING ---
-// Pulls from every available address source and picks the best one
+// ─── LOCATION PROFILING ───────────────────────────────────────────────────────
 function detectKioskLocation() {
-    const sources = [];
+    const generic = new Set(['index','home','main','default','page','app','www','']);
+    const candidates = [];
 
-    // 1. Filename (last path segment, no extension)
-    const filename = window.location.pathname.split("/").pop().split(".")[0].trim();
-    if (filename) sources.push(filename);
+    // 1. Query params (?location=HALL_A, ?kiosk=ROOM2, etc.)
+    new URLSearchParams(window.location.search).forEach((val) => {
+        if (val.trim()) candidates.push(val.trim());
+    });
 
-    // 2. All URL path segments (folder names, directory names)
-    const pathSegments = window.location.pathname
-        .split("/")
-        .map(s => s.trim())
-        .filter(s => s.length > 0 && s !== filename); // exclude filename already captured
-    sources.push(...pathSegments);
+    // 2. Hash (#KIOSK_B)
+    const hash = window.location.hash.replace('#','').trim();
+    if (hash) candidates.push(hash);
 
-    // 3. URL query params (e.g. ?location=HALL_A or ?kiosk=ROOM2)
-    const params = new URLSearchParams(window.location.search);
-    for (const [, val] of params.entries()) {
-        if (val.trim()) sources.push(val.trim());
-    }
+    // 3. Filename (last path segment, no extension)
+    const filename = window.location.pathname.split('/').pop().split('.')[0].trim();
+    if (filename) candidates.push(filename);
 
-    // 4. URL hash (e.g. #KIOSK_B)
-    const hash = window.location.hash.replace('#', '').trim();
-    if (hash) sources.push(hash);
+    // 4. All folder/directory segments in the path
+    window.location.pathname.split('/').slice(0,-1).forEach(seg => {
+        if (seg.trim()) candidates.push(seg.trim());
+    });
 
-    // 5. Page title
-    if (document.title) sources.push(document.title.trim());
+    // 5. <meta name="kiosk-location" content="...">
+    const meta = document.querySelector('meta[name="kiosk-location"]');
+    if (meta?.content) candidates.push(meta.content.trim());
 
-    // 6. <meta name="kiosk-location" content="..."> tag
-    const metaTag = document.querySelector('meta[name="kiosk-location"]');
-    if (metaTag) sources.push(metaTag.getAttribute('content').trim());
+    // 6. data-location on <body>
+    const bodyLoc = document.body.getAttribute('data-location');
+    if (bodyLoc) candidates.push(bodyLoc.trim());
 
-    // 7. data-location attribute on <body>
-    const bodyAttr = document.body.getAttribute('data-location');
-    if (bodyAttr) sources.push(bodyAttr.trim());
+    // 7. Page title (last resort)
+    if (document.title) candidates.push(document.title.trim());
 
-    // Pick the first source that isn't a generic/meaningless value
-    const genericValues = new Set(['index', 'home', 'main', 'default', 'page', 'app', 'www', '']);
-    for (const src of sources) {
+    for (const src of candidates) {
         const normalized = src.toUpperCase().replace(/[^A-Z0-9_\-]/g, '_');
-        if (!genericValues.has(src.toLowerCase()) && normalized.length > 0) {
-            return normalized;
-        }
+        if (!generic.has(src.toLowerCase()) && normalized.length > 0) return normalized;
     }
-    return "UNKNOWN";
+    return 'UNKNOWN';
 }
 
-const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const scriptUrl   = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";
 const KIOSK_LOCATION = detectKioskLocation();
+const IDLE_MS     = 10000;
 
-let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
+// ─── SESSION STATE ────────────────────────────────────────────────────────────
+let totalClicks        = 0;
+let rawData            = {};
+let startTime          = null;
+let lastInteractionTime= null;
+let idleTimer          = null;
 
-// 1. ENGAGE SOFTWARE SHIELD ON BOOT (Ignores all tracking)
-let isResetting = true;
+// ─── SHIELDS ──────────────────────────────────────────────────────────────────
+let isResetting = true;                      // software shield  (ignores events)
+document.body.style.pointerEvents = 'none';  // physical shield  (blocks touches)
 
-// 2. ENGAGE PHYSICAL SHIELD ON BOOT (Blocks all human touches)
-document.body.style.pointerEvents = 'none';
-
-// --- STATE MEMORY VAULT ---
-let homeDistrictName = "";
-let mapSvg = null;
-let mapGroup = null;
-let initialViewBox = null;
+// ─── 0th STATE VAULT ─────────────────────────────────────────────────────────
+let homeDistrictName = '';
+let mapSvg           = null;
+let mapGroup         = null;
+let initialViewBox   = null;
 let initialTransform = null;
 
-// 3. RAPID-FIRE 0th STATE SCANNER
+// ─── BOOT SCANNER ─────────────────────────────────────────────────────────────
+// Waits for the map to settle into its default state, then locks everything.
 const bootScan = setInterval(() => {
     const activePath = document.querySelector('path.on');
+    if (!activePath) return;
 
-    if (activePath) {
-        homeDistrictName = activePath.getAttribute('data-n');
+    homeDistrictName = activePath.getAttribute('data-n');
+    mapSvg           = activePath.closest('svg')   || document.querySelector('svg');
+    mapGroup         = activePath.closest('g')     || document.querySelector('svg > g');
+    if (mapSvg)   initialViewBox   = mapSvg.getAttribute('viewBox');
+    if (mapGroup) initialTransform = mapGroup.getAttribute('transform');
 
-        mapSvg = activePath.closest('svg') || document.querySelector('svg');
-        mapGroup = activePath.closest('g') || document.querySelector('svg > g');
+    console.log(`Tracker: 0th state locked | district="${homeDistrictName}" | location="${KIOSK_LOCATION}"`);
 
-        if (mapSvg) initialViewBox = mapSvg.getAttribute('viewBox');
-        if (mapGroup) initialTransform = mapGroup.getAttribute('transform');
-
-        console.log("Tracker: 0th state locked ->", homeDistrictName, "| Location:", KIOSK_LOCATION);
-
-        // 4. DROP BOTH SHIELDS
-        clearInterval(bootScan);
-        document.body.style.pointerEvents = 'auto';
-        isResetting = false;
-    }
+    clearInterval(bootScan);
+    document.body.style.pointerEvents = 'auto';
+    isResetting = false;
 }, 100);
 
-function finalizeSession() {
-    // 1. SEND DATA (before wiping it)
-    if (totalClicks > 0 && !isResetting) {
-        const payload = {
-            location: KIOSK_LOCATION,
-            clicks: totalClicks,
-            duration: startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0,
-            breakdown: JSON.stringify(rawData)
-        };
-        navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
-    }
-
-    // 2. ENGAGE BLINDFOLD + FULL DATA RESET (all tracking state wiped)
-    isResetting = true;
-    totalClicks = 0;
-    rawData = {};
-    startTime = null;
-    lastInteractionTime = null;
-    clearTimeout(idleTimer); // cancel any pending idle timer
-
-    console.log("Tracker: 10s idle. Executing zero-reload align & reset...");
-
-    // 3. TRIGGER NATIVE ZOOM-OUT (unclick the open district)
-    const currentlyActivePath = document.querySelector('path.on');
-    if (currentlyActivePath) {
-        const opt = { bubbles: true, cancelable: true, view: window };
-        currentlyActivePath.dispatchEvent(new MouseEvent('pointerdown', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('mousedown', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('pointerup', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('mouseup', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('click', opt));
-    }
-
-    // 4. FORCE VISUAL ALIGNMENT
-    if (mapSvg && initialViewBox) {
-        mapSvg.style.transition = "all 0.5s ease-in-out";
-        mapSvg.setAttribute('viewBox', initialViewBox);
-    }
-    if (mapGroup && initialTransform) {
-        mapGroup.style.transition = "transform 0.5s ease-in-out";
-        mapGroup.setAttribute('transform', initialTransform);
-    }
-
-    // 5. SILENT CSS HIGHLIGHT (paint 0th district without triggering zoom)
-    setTimeout(() => {
-        document.querySelectorAll('path.on').forEach(p => p.classList.remove('on'));
-
-        if (homeDistrictName) {
-            const targetShape = document.querySelector(`path[data-n="${homeDistrictName}"]`);
-            if (targetShape) targetShape.classList.add('on');
-        }
-
-        setTimeout(() => {
-            if (mapSvg) mapSvg.style.transition = "";
-            if (mapGroup) mapGroup.style.transition = "";
-            isResetting = false; // DROP BLINDFOLD — kiosk ready for next student
-            console.log("Tracker: Reset complete. Ready.");
-        }, 500);
-
-    }, 600);
-}
-
+// ─── SESSION ──────────────────────────────────────────────────────────────────
 function startSession() {
     if (isResetting) return;
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(finalizeSession, 10000);
+    idleTimer = setTimeout(finalizeSession, IDLE_MS);
 }
 
-// CAPTURE CLICKS (shape-specific, increments rawData)
-document.addEventListener('mousedown', function(e) {
+// ─── RESET ────────────────────────────────────────────────────────────────────
+function finalizeSession() {
+    // 1. Transmit data before wiping
+    if (totalClicks > 0) {
+        const payload = {
+            location : KIOSK_LOCATION,
+            clicks   : totalClicks,
+            duration : startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0,
+            breakdown: JSON.stringify(rawData)
+        };
+        navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
+    }
+
+    // 2. Wipe ALL session data + engage blindfold
+    isResetting         = true;
+    totalClicks         = 0;
+    rawData             = {};
+    startTime           = null;
+    lastInteractionTime = null;
+    clearTimeout(idleTimer);
+    idleTimer           = null;
+
+    console.log('Tracker: idle timeout — resetting...');
+
+    // 3. Restore map zoom / pan / viewBox to original state
+    //    NO synthetic clicks — those bubble into the map's router and cause reloads.
+    //    We manipulate the SVG attributes directly instead.
+    if (mapSvg && initialViewBox) {
+        mapSvg.style.transition = 'all 0.5s ease-in-out';
+        mapSvg.setAttribute('viewBox', initialViewBox);
+    }
+    if (mapGroup && initialTransform) {
+        mapGroup.style.transition = 'transform 0.5s ease-in-out';
+        mapGroup.setAttribute('transform', initialTransform);
+    }
+
+    // 4. After zoom animation settles, swap the .on class silently
+    setTimeout(() => {
+        // Strip highlight from whatever district the student left on
+        document.querySelectorAll('path.on').forEach(p => p.classList.remove('on'));
+
+        // Re-paint the home district WITHOUT dispatching any events
+        if (homeDistrictName) {
+            const home = document.querySelector(`path[data-n="${homeDistrictName}"]`);
+            if (home) home.classList.add('on');
+        }
+
+        // 5. Clean up transitions so next student's zoom works normally
+        setTimeout(() => {
+            if (mapSvg)   mapSvg.style.transition   = '';
+            if (mapGroup) mapGroup.style.transition  = '';
+            isResetting = false;
+            console.log('Tracker: reset complete — ready for next user.');
+        }, 500);
+
+    }, 600);
+}
+
+// ─── CLICK TRACKING ───────────────────────────────────────────────────────────
+// Records which shape was clicked and increments the counter.
+document.addEventListener('mousedown', (e) => {
     if (isResetting) return;
     const target = e.target.closest('path, polygon, circle, rect');
     if (!target) return;
@@ -168,14 +159,13 @@ document.addEventListener('mousedown', function(e) {
     totalClicks++;
 
     const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
-    const rawIndex = allShapes.indexOf(target);
-    rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
+    const idx = allShapes.indexOf(target);
+    rawData[idx] = (rawData[idx] || 0) + 1;
 });
 
-// SESSION KEEPALIVE — any interaction after 10s idle restarts the session
-// This covers taps, scrolls, drags, pointer movement, and touch gestures
+// ─── SESSION KEEPALIVE ────────────────────────────────────────────────────────
+// Any touch/gesture/scroll after 10 s of inactivity restarts the session timer.
+// This covers taps, drags, pinch-zoom, scroll wheel — not just shape clicks.
 ['touchstart', 'pointerdown', 'wheel', 'touchmove', 'mousemove'].forEach(ev => {
-    document.addEventListener(ev, () => {
-        if (!isResetting) startSession();
-    }, { passive: true });
+    document.addEventListener(ev, () => { if (!isResetting) startSession(); }, { passive: true });
 });
