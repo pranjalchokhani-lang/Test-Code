@@ -1,11 +1,11 @@
-// 1. CAPTURE THE FULL URL FOR THE APPS SCRIPT
+// --- CONFIGURATION ---
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";  
-const FULL_URL_PATH = window.location.href; 
+
+// CHANGE 1: Capture Full URL Path for Folder/File extraction
+const KIOSK_LOCATION = window.location.href; 
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let isResetting = true; 
-
-// PHYSICAL SHIELD ON BOOT
 document.body.style.pointerEvents = 'none'; 
 
 // --- STATE MEMORY VAULT ---
@@ -14,15 +14,15 @@ let mapSvg = null;
 let mapGroup = null;        
 let initialViewBox = null;  
 let initialTransform = null;
-let homeElement = null; 
+let homeElement = null; // Captured to trigger functional reset
 
-// 3. BOOT SCANNER (Locks the starting state)
+// 3. RAPID-FIRE 0th STATE SCANNER
 const bootScan = setInterval(() => {
     const activePath = document.querySelector('path.on'); 
     
     if (activePath) {
         homeDistrictName = activePath.getAttribute('data-n');
-        homeElement = activePath; // THIS IS THE RESET ANCHOR
+        homeElement = activePath; // Lock the physical home element
         mapSvg = activePath.closest('svg') || document.querySelector('svg');
         mapGroup = activePath.closest('g') || document.querySelector('svg > g');
         
@@ -38,10 +38,9 @@ const bootScan = setInterval(() => {
 }, 100); 
 
 function finalizeSession() {
-    // 1. SEND DATA
     if (totalClicks > 0 && !isResetting) {
         const payload = { 
-            location: FULL_URL_PATH, // Pulls full directory structure
+            location: KIOSK_LOCATION, 
             clicks: totalClicks, 
             duration: startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0, 
             breakdown: JSON.stringify(rawData) 
@@ -49,34 +48,29 @@ function finalizeSession() {
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
     
-    // 2. ENGAGE RESET
     isResetting = true;
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    console.log("Tracker: 10s Idle. Executing UI & Data Reset...");
+    console.log("Tracker: 10s Idle. Executing UI, Data & Ripple Reset...");
 
-    // 3. FORCE FUNCTIONAL RESET (Syncs Text Panel & Ripples)
+    // CHANGE 2: RESET DATA AND RIPPLES
+    // Instead of just painting CSS, we trigger a programmatic click on the Home Element.
+    // This forces your map's internal logic to update ripples and text panels.
     if (homeElement) {
-        // We use a broader event dispatch to ensure the Map's logic catches the click
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        });
-        homeElement.dispatchEvent(clickEvent);
+        const resetEvent = { bubbles: true, cancelable: true, view: window };
+        homeElement.dispatchEvent(new MouseEvent('click', resetEvent));
     }
 
-    // 4. FORCE VISUAL ALIGNMENT (Zoom out)
+    // VISUAL ALIGNMENT
     if (mapSvg && initialViewBox) {
-        mapSvg.style.transition = "all 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
+        mapSvg.style.transition = "all 0.5s ease-in-out";
         mapSvg.setAttribute('viewBox', initialViewBox);
     }
     if (mapGroup && initialTransform) {
-        mapGroup.style.transition = "transform 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95)";
+        mapGroup.style.transition = "transform 0.5s ease-in-out";
         mapGroup.setAttribute('transform', initialTransform);
     }
 
-    // 5. CLEANUP CLASSES
     setTimeout(() => {
         document.querySelectorAll('path.on').forEach(p => p.classList.remove('on'));
         if (homeElement) homeElement.classList.add('on');
@@ -85,19 +79,19 @@ function finalizeSession() {
             if (mapSvg) mapSvg.style.transition = "";
             if (mapGroup) mapGroup.style.transition = "";
             isResetting = false; 
-            console.log("Tracker: Reset successful.");
+            console.log("Tracker: Reset complete.");
         }, 500);
     }, 600); 
 }
 
-// 6. SESSION STARTS ON ANY TOUCH
+// CHANGE 3: START SESSION ON TOUCH
 function startSession() {
     if (isResetting) return; 
     
-    // Lock startTime on the very first touch/interaction
+    // session starts on the first interaction (touch or click)
     if (!startTime) {
         startTime = Date.now();
-        console.log("Tracker: Session initiated via interaction.");
+        console.log("Tracker: Session Started via Touch/Interaction");
     }
     
     lastInteractionTime = Date.now();
@@ -109,18 +103,19 @@ function startSession() {
 document.addEventListener('mousedown', function(e) {
     if (isResetting) return;
     
+    // Ensure session starts even if the click is on a non-district area
+    startSession(); 
+
     const target = e.target.closest('path, polygon, circle, rect');
     if (!target) return;
 
-    startSession(); 
     totalClicks++;
-    
     const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
     const rawIndex = allShapes.indexOf(target);
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-// START SESSION & KEEP ALIVE ON ALL TOUCH/SCROLL
+// CHANGE 3: START & KEEP ALIVE ON ALL TOUCH/SCROLL
 ['wheel', 'touchmove', 'touchstart', 'scroll'].forEach(ev => {
     document.addEventListener(ev, () => { 
         if(!isResetting) startSession(); 
