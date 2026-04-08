@@ -33,22 +33,20 @@ let lastInteractionTime = null;
 let isResetting         = true;
 let HOME_DISTRICT       = null;
 const mover             = document.getElementById('map-mover');
+const viewport          = document.getElementById('map-viewport');
 
-// ─── IDLE DETECTION VIA RAF — never throttled by browser ─────────────────────
-// Instead of setTimeout (which browser throttles 10x on idle tabs),
-// we use requestAnimationFrame to poll Date.now() continuously.
-// rAF runs at screen refresh rate and is never throttled for idle detection.
+// ─── RAF IDLE DETECTION — never throttled by browser ─────────────────────────
 let rafId = null;
 
 function startRAF() {
-    if (rafId) return; // already running
+    if (rafId) return;
     function tick() {
         if (!isResetting && lastInteractionTime !== null) {
             const elapsed = Date.now() - lastInteractionTime;
             if (elapsed >= IDLE_MS) {
-                lastInteractionTime = null; // prevent double-fire
+                lastInteractionTime = null;
                 finalizeSession();
-                return; // stop RAF during reset — armRAF() restarts it after
+                return;
             }
         }
         rafId = requestAnimationFrame(tick);
@@ -70,7 +68,6 @@ function startSession() {
     if (isResetting) return;
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
-    // RAF loop is already running — it will detect idleness automatically
 }
 
 // ─── BOOT WATCH ───────────────────────────────────────────────────────────────
@@ -84,20 +81,46 @@ const bootWatch = setInterval(() => {
     clearInterval(bootWatch);
     console.log('Tracker: HOME locked ->', HOME_DISTRICT);
 
-    setTimeout(() => {
-        // Wrap mapApply so every zoom/pan registers as activity
-        const _origApply = window.mapApply;
-        window.mapApply = function() {
-            _origApply();
-            if (!isResetting) startSession();
-        };
+    // Wrap mapApply so every zoom/pan registers as activity
+    const _origApply = window.mapApply;
+    window.mapApply = function() {
+        _origApply();
+        if (!isResetting) startSession();
+    };
 
+    setTimeout(() => {
         isResetting = false;
-        lastInteractionTime = Date.now(); // start idle clock from boot
+        lastInteractionTime = Date.now();
         startRAF();
-        console.log('Tracker: boot complete. RAF idle detection running.');
+        console.log('Tracker: boot complete. Idle detection running.');
     }, 1500);
 }, 50);
+
+// ─── ACTIVITY WATCHER ─────────────────────────────────────────────────────────
+// MutationObserver watches DOM directly — catches zoom/pan/clicks
+// on both touchscreen and laptop without relying on event bubbling
+function startActivityWatcher() {
+    // Watch map-mover transform — catches all zoom and pan
+    if (mover) {
+        new MutationObserver(() => {
+            if (!isResetting) startSession();
+        }).observe(mover, { attributes: true, attributeFilter: ['style'] });
+    }
+    // Watch SVG paths — catches district clicks
+    const svg = document.getElementById('rj');
+    if (svg) {
+        new MutationObserver(() => {
+            if (!isResetting) startSession();
+        }).observe(svg, { attributes: true, subtree: true, attributeFilter: ['class'] });
+    }
+    // Watch right panel — catches data loading
+    const rightPanel = document.querySelector('.right-panel');
+    if (rightPanel) {
+        new MutationObserver(() => {
+            if (!isResetting) startSession();
+        }).observe(rightPanel, { childList: true, subtree: true, characterData: true });
+    }
+}
 
 // ─── RESET ────────────────────────────────────────────────────────────────────
 function finalizeSession() {
@@ -108,42 +131,51 @@ function finalizeSession() {
 
     console.log('Tracker: resetting...');
 
-    // 1. Send data
-    if (totalClicks > 0) {
+    // 1. Capture duration BEFORE wiping anything
+    var sessionDuration = (startTime && lastInteractionTime)
+        ? Math.floor((lastInteractionTime - startTime) / 1000)
+        : 0;
+    if (sessionDuration < 0) sessionDuration = 0;
+
+    console.log('Tracker: duration ->', sessionDuration, 'sec | clicks ->', totalClicks);
+
+    // 2. Send data — send even if zero clicks as long as there was time
+    if (totalClicks > 0 || sessionDuration > 0) {
         const payload = {
             location : KIOSK_LOCATION,
             clicks   : totalClicks,
-            duration : startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0,
+            duration : sessionDuration,
             breakdown: JSON.stringify(rawData)
         };
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
+        console.log('Tracker: beacon sent ->', payload);
     }
 
-    // 2. Wipe session counters
+    // 3. Wipe counters AFTER sending
     totalClicks         = 0;
     rawData             = {};
     startTime           = null;
     lastInteractionTime = null;
 
-    // 3. Kill any in-flight stream instantly
+    // 4. Kill any in-flight stream instantly
     currentToken++;
 
-    // 4. Reset zoom silently
+    // 5. Reset zoom silently
     zoomSfx.volume = 0;
     window._mapReset();
     window.mapApply();
     zoomSfx.volume = 0.15;
 
-    // 5. Reset district/data silently
+    // 6. Reset district silently
     revealSfx.volume = 0;
     select(HOME_DISTRICT);
     revealSfx.volume = 0.4;
 
-    // 6. Release immediately — no setTimeout needed
+    // 7. Release immediately
     isResetting = false;
     console.log('Tracker: reset complete — ready.');
 
-    // 7. Restart RAF for next session
+    // 8. Restart RAF for next session
     lastInteractionTime = Date.now();
     startRAF();
 }
@@ -160,21 +192,29 @@ document.addEventListener('mousedown', (e) => {
     rawData[idx] = (rawData[idx] || 0) + 1;
 });
 
-// ─── ALL INTERACTION TYPES ────────────────────────────────────────────────────
-// touchstart  — any finger contact on touchscreen (tap, drag, pinch)
-// mousemove   — laptop mouse movement
-// wheel       — laptop scroll/zoom
-// pointerdown — covers both mouse and touch pointer events
-document.addEventListener('touchstart',  () => { if (!isResetting) startSession(); }, { passive: true });
-document.addEventListener('mousemove',   () => { if (!isResetting) startSession(); }, { passive: true });
-document.addEventListener('wheel',       () => { if (!isResetting) startSession(); }, { passive: true });
-document.addEventListener('pointerdown', () => { if (!isResetting) startSession(); }, { passive: true });
+// Touchscreen taps
+document.addEventListener('touchstart', (e) => {
+    if (isResetting) return;
+    const target = e.target.closest('path, polygon, circle, rect');
+    if (target) {
+        totalClicks++;
+        const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
+        const idx = allShapes.indexOf(target);
+        rawData[idx] = (rawData[idx] || 0) + 1;
+    }
+    startSession();
+}, { passive: true });
 
-// Also attach directly to viewport — IIFE uses preventDefault which
-// can stop events reaching document on some browsers
-const _vp = document.getElementById('map-viewport');
-if (_vp) {
-    _vp.addEventListener('touchstart',  () => { if (!isResetting) startSession(); }, { passive: true });
-    _vp.addEventListener('wheel',       () => { if (!isResetting) startSession(); }, { passive: true });
-    _vp.addEventListener('pointerdown', () => { if (!isResetting) startSession(); }, { passive: true });
+// Laptop interactions
+document.addEventListener('mousemove', () => { if (!isResetting) startSession(); }, { passive: true });
+document.addEventListener('wheel',     () => { if (!isResetting) startSession(); }, { passive: true });
+
+// Viewport level — catches events IIFE may have stopped from bubbling
+if (viewport) {
+    viewport.addEventListener('touchstart',  () => { if (!isResetting) startSession(); }, { passive: true });
+    viewport.addEventListener('wheel',       () => { if (!isResetting) startSession(); }, { passive: true });
+    viewport.addEventListener('pointerdown', () => { if (!isResetting) startSession(); }, { passive: true });
 }
+
+// Start activity watcher after a short delay to let map fully render
+setTimeout(startActivityWatcher, 2000);
