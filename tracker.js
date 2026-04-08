@@ -1,220 +1,123 @@
-// ─── LOCATION PROFILING ───────────────────────────────────────────────────────
-function detectKioskLocation() {
-    const generic = new Set(['index','home','main','default','page','app','www','']);
-    const candidates = [];
-    new URLSearchParams(window.location.search).forEach((val) => { if (val.trim()) candidates.push(val.trim()); });
-    const hash = window.location.hash.replace('#','').trim();
-    if (hash) candidates.push(hash);
-    const filename = window.location.pathname.split('/').pop().split('.')[0].trim();
-    if (filename) candidates.push(filename);
-    window.location.pathname.split('/').slice(0,-1).forEach(seg => { if (seg.trim()) candidates.push(seg.trim()); });
-    const meta = document.querySelector('meta[name="kiosk-location"]');
-    if (meta?.content) candidates.push(meta.content.trim());
-    const bodyLoc = document.body.getAttribute('data-location');
-    if (bodyLoc) candidates.push(bodyLoc.trim());
-    if (document.title) candidates.push(document.title.trim());
-    for (const src of candidates) {
-        const normalized = src.toUpperCase().replace(/[^A-Z0-9_\-]/g, '_');
-        if (!generic.has(src.toLowerCase()) && normalized.length > 0) return normalized;
-    }
-    return 'UNKNOWN';
-}
+// CAPTURE THE EXACT URL ON BOOT UP (Before anyone clicks anything)
+// =========================================================================
+// KIOSK TELEMETRY: MASTER TRACKER (V3 - With Zero-Click Logic)
+// =========================================================================
+(function() {
+    // --- CONFIGURATION ---
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
+    const IDLE_TIMEOUT = 10000; // 10s inactivity = Reset
+    const HOME_DISTRICT_ID = "1"; // Change to your Home/Rajkot ID
 
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-const scriptUrl      = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";
-const KIOSK_LOCATION = detectKioskLocation();
-const IDLE_MS        = 10000;
+    // Clean up location path (e.g., "/jaipur.html" becomes "JAIPUR")
+    let rawLocation = window.location.pathname.split('/').pop().replace('.html', '').toUpperCase();
 
-// ─── STATE ────────────────────────────────────────────────────────────────────
-let totalClicks         = 0;
-let rawData             = {};
-let startTime           = null;
-let lastInteractionTime = null;
-let isResetting         = true;
-let HOME_DISTRICT       = null;
-const mover             = document.getElementById('map-mover');
-const viewport          = document.getElementById('map-viewport');
-
-// ─── RAF IDLE DETECTION — never throttled by browser ─────────────────────────
-let rafId = null;
-
-function startRAF() {
-    if (rafId) return;
-    function tick() {
-        if (!isResetting && lastInteractionTime !== null) {
-            const elapsed = Date.now() - lastInteractionTime;
-            if (elapsed >= IDLE_MS) {
-                lastInteractionTime = null;
-                finalizeSession();
-                return;
-            }
-        }
-        rafId = requestAnimationFrame(tick);
-    }
-    rafId = requestAnimationFrame(tick);
-}
-
-function stopRAF() {
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-}
-
-function armRAF() {
-    stopRAF();
-    startRAF();
-}
-
-// ─── SESSION ──────────────────────────────────────────────────────────────────
-function startSession() {
-    if (isResetting) return;
-    if (!startTime) startTime = Date.now();
-    lastInteractionTime = Date.now();
-}
-
-// ─── BOOT WATCH ───────────────────────────────────────────────────────────────
-const bootWatch = setInterval(() => {
-    if (typeof window._mapReset !== 'function') return;
-    if (typeof window.mapApply  !== 'function') return;
-    const activePath = document.querySelector('path.on');
-    if (!activePath) return;
-
-    HOME_DISTRICT = activePath.getAttribute('data-n');
-    clearInterval(bootWatch);
-    console.log('Tracker: HOME locked ->', HOME_DISTRICT);
-
-    // Wrap mapApply so every zoom/pan registers as activity
-    const _origApply = window.mapApply;
-    window.mapApply = function() {
-        _origApply();
-        if (!isResetting) startSession();
+    // --- SESSION STATE ---
+    let sessionData = {
+        location: rawLocation || "UNKNOWN", 
+        clicks: 0,
+        duration: 0,
+        breakdown: {}
     };
 
-    setTimeout(() => {
-        isResetting = false;
+    let startTime = null;
+    let lastInteractionTime = null;
+    let idleTimer = null;
+    let sessionActive = false;
+
+    // --- SESSION CONTROL ---
+
+    function startNewSession() {
+        sessionActive = true;
+        startTime = Date.now();
+        lastInteractionTime = startTime;
+        sessionData.clicks = 0;
+        sessionData.breakdown = {};
+        console.log("🚀 Session Started (Interaction Detected)");
+    }
+
+    function resetIdleTimer() {
+        if (!sessionActive) return;
+        
         lastInteractionTime = Date.now();
-        startRAF();
-        console.log('Tracker: boot complete. Idle detection running.');
-    }, 1500);
-}, 50);
-
-// ─── ACTIVITY WATCHER ─────────────────────────────────────────────────────────
-// MutationObserver watches DOM directly — catches zoom/pan/clicks
-// on both touchscreen and laptop without relying on event bubbling
-function startActivityWatcher() {
-    // Watch map-mover transform — catches all zoom and pan
-    if (mover) {
-        new MutationObserver(() => {
-            if (!isResetting) startSession();
-        }).observe(mover, { attributes: true, attributeFilter: ['style'] });
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(finalizeSession, IDLE_TIMEOUT);
     }
-    // Watch SVG paths — catches district clicks
-    const svg = document.getElementById('rj');
-    if (svg) {
-        new MutationObserver(() => {
-            if (!isResetting) startSession();
-        }).observe(svg, { attributes: true, subtree: true, attributeFilter: ['class'] });
-    }
-    // Watch right panel — catches data loading
-    const rightPanel = document.querySelector('.right-panel');
-    if (rightPanel) {
-        new MutationObserver(() => {
-            if (!isResetting) startSession();
-        }).observe(rightPanel, { childList: true, subtree: true, characterData: true });
-    }
-}
 
-// ─── RESET ────────────────────────────────────────────────────────────────────
-function finalizeSession() {
-    console.log('finalizeSession fired — isResetting:', isResetting);
-    if (isResetting) return;
-    isResetting = true;
-    stopRAF();
+    function finalizeSession() {
+        if (!sessionActive) return;
 
-    console.log('Tracker: resetting...');
+        // Actual Interaction Time (Last Touch - First Touch). 
+        // Forced to at least 1 second so a quick single tap doesn't record as 0 seconds.
+        sessionData.duration = Math.max(1, Math.round((lastInteractionTime - startTime) / 1000));
 
-    // 1. Capture duration BEFORE wiping anything
-    var sessionDuration = (startTime && lastInteractionTime)
-        ? Math.floor((lastInteractionTime - startTime) / 1000)
-        : 0;
-    if (sessionDuration < 0) sessionDuration = 0;
-
-    console.log('Tracker: duration ->', sessionDuration, 'sec | clicks ->', totalClicks);
-
-    // 2. Send data — send even if zero clicks as long as there was time
-    if (totalClicks > 0 || sessionDuration > 0) {
-        const payload = {
-            location : KIOSK_LOCATION,
-            clicks   : totalClicks,
-            duration : sessionDuration,
-            breakdown: JSON.stringify(rawData)
+        // CREATE FINAL PAYLOAD
+        // CRITICAL FIX: 'breakdown' must be converted to a string before sending, 
+        // otherwise Google Sheets writes "[object Object]" and breaks your formulas.
+        const finalPayload = {
+            location: sessionData.location,
+            clicks: sessionData.clicks,
+            duration: sessionData.duration,
+            breakdown: JSON.stringify(sessionData.breakdown) 
         };
-        navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
-        console.log('Tracker: beacon sent ->', payload);
+
+        console.log("📦 Sending Data:", finalPayload);
+
+        // Send Data to Master Vault (9-Column Script)
+        fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            cache: "no-cache",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(finalPayload)
+        });
+
+        console.log("✅ Data Transmitted. Cleaning UI...");
+
+        // Perform Functional Reset (Clears ghost data)
+        performUIReset();
+
+        sessionActive = false;
+        startTime = null;
     }
 
-    // 3. Wipe counters AFTER sending
-    totalClicks         = 0;
-    rawData             = {};
-    startTime           = null;
-    lastInteractionTime = null;
+    function performUIReset() {
+        // Target the SVG Home element
+        const homeElement = document.querySelector(`[data-id="${HOME_DISTRICT_ID}"]`) || 
+                            document.getElementById(`district-${HOME_DISTRICT_ID}`);
 
-    // 4. Kill any in-flight stream instantly
-    currentToken++;
-
-    // 5. Reset zoom silently
-    zoomSfx.volume = 0;
-    window._mapReset();
-    window.mapApply();
-    zoomSfx.volume = 0.15;
-
-    // 6. Reset district silently
-    revealSfx.volume = 0;
-    select(HOME_DISTRICT);
-    revealSfx.volume = 0.4;
-
-    // 7. Release immediately
-    isResetting = false;
-    console.log('Tracker: reset complete — ready.');
-
-    // 8. Restart RAF for next session
-    lastInteractionTime = Date.now();
-    startRAF();
-}
-
-// ─── CLICK TRACKING ───────────────────────────────────────────────────────────
-document.addEventListener('mousedown', (e) => {
-    if (isResetting) return;
-    const target = e.target.closest('path, polygon, circle, rect');
-    if (!target) return;
-    startSession();
-    totalClicks++;
-    const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
-    const idx = allShapes.indexOf(target);
-    rawData[idx] = (rawData[idx] || 0) + 1;
-});
-
-// Touchscreen taps
-document.addEventListener('touchstart', (e) => {
-    if (isResetting) return;
-    const target = e.target.closest('path, polygon, circle, rect');
-    if (target) {
-        totalClicks++;
-        const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
-        const idx = allShapes.indexOf(target);
-        rawData[idx] = (rawData[idx] || 0) + 1;
+        if (homeElement) {
+            // Simulated Click to force text panels and ripples to sync
+            homeElement.dispatchEvent(new Event('click', { bubbles: true }));
+        }
     }
-    startSession();
-}, { passive: true });
 
-// Laptop interactions
-document.addEventListener('mousemove', () => { if (!isResetting) startSession(); }, { passive: true });
-document.addEventListener('wheel',     () => { if (!isResetting) startSession(); }, { passive: true });
+    // --- EVENT LISTENERS (TOUCH & CLICK) ---
 
-// Viewport level — catches events IIFE may have stopped from bubbling
-if (viewport) {
-    viewport.addEventListener('touchstart',  () => { if (!isResetting) startSession(); }, { passive: true });
-    viewport.addEventListener('wheel',       () => { if (!isResetting) startSession(); }, { passive: true });
-    viewport.addEventListener('pointerdown', () => { if (!isResetting) startSession(); }, { passive: true });
-}
+    // 1. Map Interaction (Specific District Clicks)
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('path, polygon');
+        if (!target) return; // Ignores empty space clicks (Event Listener #2 catches those)
 
-// Start activity watcher after a short delay to let map fully render
-setTimeout(startActivityWatcher, 2000);
+        if (!sessionActive) startNewSession();
+
+        const districtId = target.getAttribute('data-id') || target.id;
+        if (districtId) {
+            sessionData.clicks++;
+            sessionData.breakdown[districtId] = (sessionData.breakdown[districtId] || 0) + 1;
+        }
+        resetIdleTimer();
+    });
+
+    // 2. Physical Activity (Scroll/Zoom/Touch/Empty space clicks)
+    // THE ZERO-TOUCH PIECE: This guarantees a session starts and stays active
+    // even if a student pans around the map for 3 minutes but never taps a shape.
+    const activeEvents = ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel', 'scroll'];
+    
+    activeEvents.forEach(event => {
+        window.addEventListener(event, function() {
+            if (!sessionActive) startNewSession();
+            resetIdleTimer();
+        }, { passive: true });
+    });
+
+})();
