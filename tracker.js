@@ -21,13 +21,15 @@ function startSession() {
 }
 
 function sendData() {
-    // Session is only valid if it lasted at least 2 seconds or had a click
-    if (!startTime || (totalClicks === 0 && (Date.now() - startTime < 2000))) return;
+    let duration = startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0;
+    
+    // SACROSANCT FILTER: Do not record if there are 0 clicks and duration < 10s
+    if (totalClicks === 0 && duration < 10) return;
     
     const payload = {
         location: KIOSK_LOCATION,
         clicks: totalClicks,
-        duration: Math.floor((lastInteractionTime - startTime) / 1000),
+        duration: duration,
         breakdown: JSON.stringify(districtData) 
     };
 
@@ -44,7 +46,7 @@ function resetIdleTimer() {
             sendData(); 
             setTimeout(() => { window.location.reload(); }, 500);
         }
-    }, 20000); // SET TO 20 SECONDS AS REQUESTED
+    }, 20000); 
 }
 
 document.addEventListener('click', function(e) {
@@ -53,20 +55,21 @@ document.addEventListener('click', function(e) {
     if (!target) return;
 
     totalClicks++;
+    // Get ALL interactive elements to determine index
     const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
     const index = allShapes.indexOf(target);
     
-    // Fallback for TRI-CITY filename to use CHANDIGARH list
-    let listKey = KIOSK_LOCATION;
-    if (listKey === "TRI-CITY") listKey = "CHANDIGARH";
-    
+    let listKey = KIOSK_LOCATION === "CHANDIGARH" || KIOSK_LOCATION === "TRI-CITY" ? "CHANDIGARH" : KIOSK_LOCATION;
     const currentMapNames = regionNames[listKey] || [];
     let name = currentMapNames[index] || `Region-${index + 1}`;
+
+    // DEBUG: This helps you fix the list order
+    console.log(`Clicked Index: ${index} | Assigned Name: ${name}`);
 
     districtData[name] = (districtData[name] || 0) + 1;
 });
 
-// Capture absolutely any interaction to keep session alive
+// Capture all forms of interaction for Duration
 document.addEventListener('wheel', startSession, { passive: true });
 document.addEventListener('touchmove', startSession, { passive: true });
 document.addEventListener('touchstart', startSession, { passive: true });
