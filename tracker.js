@@ -1,7 +1,7 @@
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
 const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
-// THE MARRIAGE OFFSET: Corrects the shift so Jaisalmer flows as Jaisalmer, not Kurukshetra.
+// OFFSETS: Verified as 3 for Sikar and Gujarat.
 const offsets = { "SIKAR": 3, "GUJARAT": 3, "JAIPUR": 3, "CHANDIGARH": 3 };
 
 const regionNames = {
@@ -13,6 +13,15 @@ const regionNames = {
 
 let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 
+// This function wipes data without sending to Excel (Reinitialise)
+function reinitialiseSession() {
+    totalClicks = 0;
+    districtData = {};
+    startTime = null;
+    lastInteractionTime = null;
+    console.log("Session Timeout (10s): Silent Reset without recording.");
+}
+
 function startSession() {
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
@@ -21,6 +30,8 @@ function startSession() {
 
 function sendData() {
     let dur = startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0;
+    
+    // SACROSANCT RULE: Only record if someone actually clicked something.
     if (totalClicks > 0) {
         const payload = {
             location: KIOSK_LOCATION,
@@ -28,21 +39,32 @@ function sendData() {
             duration: dur,
             breakdown: JSON.stringify(districtData) 
         };
-        navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
+        // Using fetch with no-cors to ensure it clears browser security
+        fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(payload)
+        });
+        console.log("Data Pushed to Sheet.");
     }
-    // RESET FOR NEW USER WITHOUT RELOADING
-    totalClicks = 0; 
-    districtData = {}; 
-    startTime = null; 
-    lastInteractionTime = null;
-    console.log("Session Pushed Silently. Music/Page Unaffected.");
+    reinitialiseSession();
 }
 
 function resetIdleTimer() {
     clearTimeout(idleTimer);
+    
+    // Logic: 10s of inactivity = Reset. 20s of inactivity = Send data then Reset.
+    // We adjust this to 10 seconds as per your request.
     idleTimer = setTimeout(() => {
-        if (startTime) { sendData(); }
-    }, 20000); 
+        if (startTime) {
+            // If they clicked something, send it. If they just stared, reinitialise.
+            if (totalClicks > 0) {
+                sendData();
+            } else {
+                reinitialiseSession();
+            }
+        }
+    }, 10000); // Changed to 10 seconds
 }
 
 document.addEventListener('mousedown', function(e) {
@@ -53,11 +75,16 @@ document.addEventListener('mousedown', function(e) {
     totalClicks++;
     const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
     const rawIndex = allShapes.indexOf(target);
-    const correctedIndex = rawIndex - (offsets[KIOSK_LOCATION] || 0);
-    let name = regionNames[KIOSK_LOCATION][correctedIndex] || "Unknown (" + rawIndex + ")";
+    
+    // Fix for Chandigarh/Tri-City logic
+    let listKey = (KIOSK_LOCATION === "CHANDIGARH" || KIOSK_LOCATION === "TRI-CITY") ? "CHANDIGARH" : KIOSK_LOCATION;
+    const currentMapNames = regionNames[listKey] || [];
+    
+    const correctedIndex = rawIndex - (offsets[listKey] || 0);
+    let name = currentMapNames[correctedIndex] || "Unknown (" + rawIndex + ")";
 
     districtData[name] = (districtData[name] || 0) + 1;
-    console.log(`Matched: ${name}`);
+    console.log(`Matched: ${name} at Raw Index: ${rawIndex}`);
 });
 
 ['wheel', 'touchmove', 'touchstart', 'mousemove'].forEach(ev => {
