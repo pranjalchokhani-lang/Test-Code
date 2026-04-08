@@ -1,7 +1,7 @@
 // --- CONFIGURATION ---
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";  
 
-// CHANGE 1: Capture Full URL Path for Folder/File extraction
+// 1. Capture Full URL Path for Folder/File extraction
 const KIOSK_LOCATION = window.location.href; 
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
@@ -14,7 +14,7 @@ let mapSvg = null;
 let mapGroup = null;        
 let initialViewBox = null;  
 let initialTransform = null;
-let homeElement = null; // Captured to trigger functional reset
+let homeElement = null; 
 
 // 3. RAPID-FIRE 0th STATE SCANNER
 const bootScan = setInterval(() => {
@@ -22,7 +22,7 @@ const bootScan = setInterval(() => {
     
     if (activePath) {
         homeDistrictName = activePath.getAttribute('data-n');
-        homeElement = activePath; // Lock the physical home element
+        homeElement = activePath; 
         mapSvg = activePath.closest('svg') || document.querySelector('svg');
         mapGroup = activePath.closest('g') || document.querySelector('svg > g');
         
@@ -49,28 +49,33 @@ function finalizeSession() {
     }
     
     isResetting = true;
-    totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
     console.log("Tracker: 10s Idle. Executing UI, Data & Ripple Reset...");
 
-    // CHANGE 2: RESET DATA AND RIPPLES
-    // Instead of just painting CSS, we trigger a programmatic click on the Home Element.
-    // This forces your map's internal logic to update ripples and text panels.
-    if (homeElement) {
+    // --- STEP 1: TRIGGER FUNCTIONAL RESET (Ripples & Data) ---
+    // We target the CURRENTLY active path to "unclick" it. 
+    // This triggers the map's native "go back to home" logic.
+    const activePath = document.querySelector('path.on');
+    if (activePath) {
         const resetEvent = { bubbles: true, cancelable: true, view: window };
-        homeElement.dispatchEvent(new MouseEvent('click', resetEvent));
+        // Dispatching both pointer and click ensures the data panel hears it
+        activePath.dispatchEvent(new MouseEvent('click', resetEvent));
     }
 
-    // VISUAL ALIGNMENT
-    if (mapSvg && initialViewBox) {
-        mapSvg.style.transition = "all 0.5s ease-in-out";
-        mapSvg.setAttribute('viewBox', initialViewBox);
-    }
-    if (mapGroup && initialTransform) {
-        mapGroup.style.transition = "transform 0.5s ease-in-out";
-        mapGroup.setAttribute('transform', initialTransform);
-    }
+    // --- STEP 2: FORCE VISUAL ALIGNMENT ---
+    // We delay this slightly so it doesn't conflict with the 'click' zoom-out
+    setTimeout(() => {
+        if (mapSvg && initialViewBox) {
+            mapSvg.style.transition = "all 0.8s ease-in-out";
+            mapSvg.setAttribute('viewBox', initialViewBox);
+        }
+        if (mapGroup && initialTransform) {
+            mapGroup.style.transition = "transform 0.8s ease-in-out";
+            mapGroup.setAttribute('transform', initialTransform);
+        }
+    }, 50);
 
+    // --- STEP 3: CLEANUP CSS CLASSES ---
     setTimeout(() => {
         document.querySelectorAll('path.on').forEach(p => p.classList.remove('on'));
         if (homeElement) homeElement.classList.add('on');
@@ -78,20 +83,24 @@ function finalizeSession() {
         setTimeout(() => {
             if (mapSvg) mapSvg.style.transition = "";
             if (mapGroup) mapGroup.style.transition = "";
+            
+            // Final Clear for next session
+            totalClicks = 0; 
+            rawData = {}; 
+            startTime = null; 
+            lastInteractionTime = null;
             isResetting = false; 
             console.log("Tracker: Reset complete.");
         }, 500);
-    }, 600); 
+    }, 700); 
 }
 
-// CHANGE 3: START SESSION ON TOUCH
 function startSession() {
     if (isResetting) return; 
     
-    // session starts on the first interaction (touch or click)
     if (!startTime) {
         startTime = Date.now();
-        console.log("Tracker: Session Started via Touch/Interaction");
+        console.log("Tracker: Session Started via Interaction");
     }
     
     lastInteractionTime = Date.now();
@@ -102,8 +111,6 @@ function startSession() {
 // CAPTURE CLICKS
 document.addEventListener('mousedown', function(e) {
     if (isResetting) return;
-    
-    // Ensure session starts even if the click is on a non-district area
     startSession(); 
 
     const target = e.target.closest('path, polygon, circle, rect');
@@ -115,7 +122,7 @@ document.addEventListener('mousedown', function(e) {
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-// CHANGE 3: START & KEEP ALIVE ON ALL TOUCH/SCROLL
+// START & KEEP ALIVE ON TOUCH/SCROLL
 ['wheel', 'touchmove', 'touchstart', 'scroll'].forEach(ev => {
     document.addEventListener(ev, () => { 
         if(!isResetting) startSession(); 
