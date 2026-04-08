@@ -3,35 +3,21 @@ const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].t
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let isResetting = false; 
-let homeNode = null; // Will dynamically store the exact SVG shape of the home district
 
-// 1. DYNAMICALLY LEARN THE HOME STATE ON LOAD
+// 1. INJECT FADE CSS FOR SEAMLESS RELOAD
+const style = document.createElement('style');
+style.innerHTML = `
+    body { transition: opacity 0.4s ease-in-out; opacity: 0; }
+    body.ready { opacity: 1; }
+`;
+document.head.appendChild(style);
+
 window.addEventListener('load', () => {
-    // Give the map 1.5 seconds to finish drawing
-    setTimeout(() => {
-        // Find whichever shape has the 'active' or 'selected' class when the kiosk boots up
-        homeNode = document.querySelector('path.active, path.selected, path[fill="#yourHighlightColor"]');
-        
-        // Generic fallback: If no active class, assume the first major clickable path is the home base
-        if (!homeNode) {
-            const allPaths = document.querySelectorAll('path');
-            if (allPaths.length > 3) homeNode = allPaths[3]; // Typical offset for map layers
-        }
-        console.log("Tracker: Home state learned generically.");
-    }, 1500);
+    document.body.classList.add('ready'); // Fade in on load
 });
 
-// A function that fakes a deep, physical human touch to bypass React/D3 security
-function forceReactClick(element) {
-    if (!element) return;
-    const events = ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'];
-    events.forEach(ev => {
-        element.dispatchEvent(new MouseEvent(ev, { bubbles: true, cancelable: true, view: window, buttons: 1 }));
-    });
-}
-
 function finalizeSession() {
-    // 1. Send data ONLY if valid and we aren't resetting
+    // 1. Send data only if valid clicks exist and we are NOT resetting
     if (totalClicks > 0 && !isResetting) {
         const payload = { 
             location: KIOSK_LOCATION, 
@@ -42,41 +28,32 @@ function finalizeSession() {
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
     
-    // 2. ENGAGE THE BLINDFOLD
+    // 2. ENGAGE LOCK
     isResetting = true;
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    console.log("Tracker: 10s Idle. Reinitializing to home state...");
+    console.log("Tracker: 10s Idle. Executing Seamless Soft Reload...");
 
-    // 3. FORCE THE RESET WITHOUT RELOADING
-    // First, try clicking the map background to force a generic "deselect all" zoom-out
-    const mapBackground = document.querySelector('svg');
-    if (mapBackground) forceReactClick(mapBackground);
-
-    // Second, forcefully click the exact Home Node we saved when the page loaded
+    // 3. FADE OUT AND RELOAD
+    document.body.classList.remove('ready'); // Triggers the 0.4s fade to white
+    
     setTimeout(() => {
-        if (homeNode) forceReactClick(homeNode);
-    }, 300); // 300ms delay lets the background deselect register first
-
-    // 4. REMOVE BLINDFOLD AFTER MAP SETTLES
-    setTimeout(() => { 
-        isResetting = false; 
-        console.log("Tracker: Reset complete. Ready.");
-    }, 1500);
+        // location.replace pulls from cache and doesn't add to browser history
+        window.location.replace(window.location.pathname); 
+    }, 400); // Wait for fade to finish before snapping the cache
 }
 
 function startSession() {
-    if (isResetting) return; // Do not start a session during the auto-reset
-    
+    if (isResetting) return; 
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(finalizeSession, 10000); // 10-second idle window
+    idleTimer = setTimeout(finalizeSession, 10000); // 10-Second timeout
 }
 
-// CAPTURE HUMAN CLICKS
+// CAPTURE CLICKS
 document.addEventListener('mousedown', function(e) {
-    if (isResetting) return; // Ignore clicks while blindfolded
+    if (isResetting) return;
     const target = e.target.closest('path, polygon, circle, rect');
     if (!target) return;
 
@@ -88,12 +65,7 @@ document.addEventListener('mousedown', function(e) {
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-// KEEP ALIVE ON SCROLL/ZOOM
-['wheel', 'touchmove', 'touchstart'].forEach(ev => {
-    document.addEventListener(ev, () => { if(!isResetting) startSession(); }, { passive: true });
-});
-
-// KEEP ALIVE ON SCROLL/ZOOM
+// KEEP ALIVE
 ['wheel', 'touchmove', 'touchstart'].forEach(ev => {
     document.addEventListener(ev, () => { if(!isResetting) startSession(); }, { passive: true });
 });
