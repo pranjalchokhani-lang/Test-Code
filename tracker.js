@@ -25,21 +25,6 @@ const scriptUrl      = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQq
 const KIOSK_LOCATION = detectKioskLocation();
 const IDLE_MS        = 10000;
 
-// ─── CAPTURE HOME DISTRICT + BOOT TRANSFORM DYNAMICALLY ──────────────────────
-let HOME_DISTRICT = null;
-const mover = document.getElementById('map-mover');
-
-const bootWatch = setInterval(() => {
-    const activePath = document.querySelector('path.on');
-    if (activePath && mover && mover.style.transform) {
-        setTimeout(() => {
-            HOME_DISTRICT = activePath.getAttribute('data-n');
-            console.log('Tracker: home district ->', HOME_DISTRICT);
-            clearInterval(bootWatch);
-        }, 1200);
-    }
-}, 50);
-
 // ─── SESSION STATE ────────────────────────────────────────────────────────────
 let totalClicks         = 0;
 let rawData             = {};
@@ -47,6 +32,27 @@ let startTime           = null;
 let lastInteractionTime = null;
 let idleTimer           = null;
 let isResetting         = false;
+let HOME_DISTRICT       = null;
+const mover             = document.getElementById('map-mover');
+
+// ─── BOOT WATCH — waits for HTML script to finish, locks home once only ───────
+const bootWatch = setInterval(() => {
+    // Wait until _mapReset AND mapApply AND an active path all exist
+    if (typeof window._mapReset !== 'function') return;
+    if (typeof window.mapApply  !== 'function') return;
+    const activePath = document.querySelector('path.on');
+    if (!activePath) return;
+
+    // Everything ready — stop watching immediately
+    clearInterval(bootWatch);
+
+    // Grace period for select() boot animation to finish
+    setTimeout(() => {
+        HOME_DISTRICT = activePath.getAttribute('data-n');
+        console.log('Tracker: home district LOCKED ->', HOME_DISTRICT);
+        console.log('Tracker: _mapReset ready ->', typeof window._mapReset);
+    }, 1200);
+}, 50);
 
 // ─── SESSION ──────────────────────────────────────────────────────────────────
 function startSession() {
@@ -83,14 +89,13 @@ async function finalizeSession() {
     startTime           = null;
     lastInteractionTime = null;
 
-    // 3. Reset internal scale/tx/ty to zero then call apply() to sync DOM
-    //    _mapReset is the one line added to the HTML IIFE
+    // 3. Reset internal scale/tx/ty then sync DOM — muted
     zoomSfx.volume = 0;
-    if (window._mapReset) window._mapReset();
-    if (window.mapApply)  window.mapApply();
+    window._mapReset();  // sets scale=1, tx=0, ty=0 inside the closure
+    window.mapApply();   // writes translate(0px,0px) scale(1) to DOM
     setTimeout(() => { zoomSfx.volume = 0.15; }, 200);
 
-    // 4. Reset data/labels/lists via select() with reveal sound muted
+    // 4. Reset data/labels/lists via select() — reveal sound muted
     revealSfx.volume = 0;
     select(HOME_DISTRICT);
     setTimeout(() => { revealSfx.volume = 0.4; }, 200);
