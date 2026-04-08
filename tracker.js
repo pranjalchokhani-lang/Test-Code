@@ -1,5 +1,4 @@
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
-const scriptUrl = "YOUR_APPS_SCRIPT_URL_HERE"; 
 const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
 // THE MARRIAGE OFFSET: Corrects the shift so Jaisalmer flows as Jaisalmer, not Kurukshetra.
