@@ -1,10 +1,12 @@
-const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
+// CAPTURE THE EXACT URL ON BOOT UP (Before anyone clicks anything)
+const PRISTINE_URL = window.location.href; 
+const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";  
 const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let isResetting = false; 
 
-// 1. INJECT FADE CSS FOR SEAMLESS RELOAD
+// INJECT FADE CSS FOR SEAMLESS RELOAD
 const style = document.createElement('style');
 style.innerHTML = `
     body { transition: opacity 0.4s ease-in-out; opacity: 0; }
@@ -13,7 +15,7 @@ style.innerHTML = `
 document.head.appendChild(style);
 
 window.addEventListener('load', () => {
-    document.body.classList.add('ready'); // Fade in on load
+    document.body.classList.add('ready'); // Fade in smoothly on load
 });
 
 function finalizeSession() {
@@ -32,15 +34,18 @@ function finalizeSession() {
     isResetting = true;
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    console.log("Tracker: 10s Idle. Executing Seamless Soft Reload...");
+    console.log("Tracker: 10s Idle. Executing Pristine Reload...");
 
-    // 3. FADE OUT AND RELOAD
-    document.body.classList.remove('ready'); // Triggers the 0.4s fade to white
+    // 3. FADE OUT
+    document.body.classList.remove('ready'); 
     
     setTimeout(() => {
-        // location.replace pulls from cache and doesn't add to browser history
-        window.location.replace(window.location.pathname); 
-    }, 400); // Wait for fade to finish before snapping the cache
+        // Clear short-term memory so the map doesn't try to "remember" the last click
+        sessionStorage.clear(); 
+        
+        // Reload using the EXACT URL we captured when the machine first turned on
+        window.location.replace(PRISTINE_URL); 
+    }, 400); // Wait for the fade out to finish
 }
 
 function startSession() {
