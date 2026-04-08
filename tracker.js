@@ -8,11 +8,7 @@ const regionNames = {
     "GUJARAT": ["Mahesana", "Patan", "Sabarkantha", "Dahod", "Gandhinagar", "Kheda", "Panchmahal", "Vadodara", "Narmada", "Surat", "Dang", "Valsad", "Surendranagar", "Ahmedabad", "Rajkot", "Anand", "Gir Somnath", "Junagadh", "Bhavnagar", "Devbhumi Dwaraka", "Porbandar", "Navsari", "Morbi", "Kutch", "Bharuch", "Chhota Udaipur", "Botad", "Amreli", "Aravalli", "Tapi", "Mahisagar", "Jamnagar", "Banaskantha", "Vav-Tharad"]
 };
 
-let totalClicks = 0;
-let districtData = {}; 
-let startTime = null; 
-let lastInteractionTime = null;
-let idleTimer;
+let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 
 function startSession() {
     if (!startTime) startTime = Date.now();
@@ -21,31 +17,25 @@ function startSession() {
 }
 
 function sendData() {
-    let duration = startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0;
-    
-    // SACROSANCT FILTER: Do not record if there are 0 clicks and duration < 10s
-    if (totalClicks === 0 && duration < 10) return;
+    let dur = startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0;
+    // SACROSANCT FILTER: No data if 0 clicks and < 10s engagement
+    if (totalClicks === 0 && dur < 10) return;
     
     const payload = {
         location: KIOSK_LOCATION,
         clicks: totalClicks,
-        duration: duration,
+        duration: dur,
         breakdown: JSON.stringify(districtData) 
     };
 
-    const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
-    navigator.sendBeacon(scriptUrl, blob); 
-    
-    totalClicks = 0; districtData = {}; startTime = null; lastInteractionTime = null;
+    navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
+    totalClicks = 0; districtData = {}; startTime = null;
 }
 
 function resetIdleTimer() {
     clearTimeout(idleTimer);
     idleTimer = setTimeout(() => {
-        if (startTime) { 
-            sendData(); 
-            setTimeout(() => { window.location.reload(); }, 500);
-        }
+        if (startTime) { sendData(); setTimeout(() => window.location.reload(), 500); }
     }, 20000); 
 }
 
@@ -55,24 +45,20 @@ document.addEventListener('click', function(e) {
     if (!target) return;
 
     totalClicks++;
-    // Get ALL interactive elements to determine index
     const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
     const index = allShapes.indexOf(target);
     
-    let listKey = KIOSK_LOCATION === "CHANDIGARH" || KIOSK_LOCATION === "TRI-CITY" ? "CHANDIGARH" : KIOSK_LOCATION;
+    let listKey = (KIOSK_LOCATION === "CHANDIGARH" || KIOSK_LOCATION === "TRI-CITY") ? "CHANDIGARH" : KIOSK_LOCATION;
     const currentMapNames = regionNames[listKey] || [];
-    let name = currentMapNames[index] || `Region-${index + 1}`;
-
-    // DEBUG: This helps you fix the list order
-    console.log(`Clicked Index: ${index} | Assigned Name: ${name}`);
+    
+    // FORMAT: "0. Mahesana"
+    let name = index + ". " + (currentMapNames[index] || "Unknown");
 
     districtData[name] = (districtData[name] || 0) + 1;
 });
 
-// Capture all forms of interaction for Duration
-document.addEventListener('wheel', startSession, { passive: true });
-document.addEventListener('touchmove', startSession, { passive: true });
-document.addEventListener('touchstart', startSession, { passive: true });
-document.addEventListener('mousemove', startSession, { passive: true });
+['wheel', 'touchmove', 'touchstart', 'mousemove'].forEach(ev => {
+    document.addEventListener(ev, startSession, { passive: true });
+});
 
 window.addEventListener('pagehide', sendData);
