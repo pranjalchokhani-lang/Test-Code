@@ -2,31 +2,13 @@ const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-
 const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
 let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer;
-let homeDistrict = ""; 
+let homeDistrictName = ""; 
 
-// DYNAMIC DISCOVERY: Find the home district name on page load
+// DYNAMIC DISCOVERY: Find the starting district name on page load
 window.addEventListener('load', () => {
     const label = document.querySelector('.title, #selected-name, .district-label'); 
-    if (label) {
-        homeDistrict = label.innerText.trim();
-        
-        const observer = new MutationObserver(() => {
-            const currentName = label.innerText.trim();
-            if (currentName && currentName !== homeDistrict) {
-                totalClicks++;
-                districtData[currentName] = (districtData[currentName] || 0) + 1;
-            }
-        });
-        observer.observe(label, { childList: true, characterData: true, subtree: true });
-    }
+    if (label) homeDistrictName = label.innerText.trim();
 });
-
-function startSession() {
-    if (!startTime) startTime = Date.now();
-    lastInteractionTime = Date.now();
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(finalizeSession, 10000); // 10s idle window
-}
 
 function finalizeSession() {
     if (totalClicks > 0) {
@@ -36,20 +18,46 @@ function finalizeSession() {
             duration: startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0,
             breakdown: JSON.stringify(districtData) 
         };
-        // sendBeacon works silently in the background
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
     
-    // RESET INTERNALS - NO RELOAD
+    // RESET INTERNALS
     totalClicks = 0; districtData = {}; startTime = null; lastInteractionTime = null;
     
-    // SNAP BACK TO HOME
-    if (typeof select === "function" && homeDistrict) {
-        select(homeDistrict); 
+    // SILENT SNAP-BACK: No page reload
+    if (typeof select === "function" && homeDistrictName) {
+        select(homeDistrictName); 
     }
 }
 
-// Track engagement (scrolling, zooming, etc.)
-['mousedown', 'wheel', 'touchmove', 'touchstart'].forEach(ev => {
+function startSession() {
+    if (!startTime) startTime = Date.now();
+    lastInteractionTime = Date.now();
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(finalizeSession, 10000); 
+}
+
+document.addEventListener('mousedown', function(e) {
+    const target = e.target.closest('path, polygon, circle, rect');
+    startSession(); 
+    
+    if (!target) return;
+
+    // Only count if the click changes the district name label
+    const label = document.querySelector('.title, #selected-name, .district-label');
+    if (label) {
+        const currentName = label.innerText.trim();
+        // Delay slightly to allow the map's own click handler to update the label
+        setTimeout(() => {
+            const newName = label.innerText.trim();
+            if (newName && newName !== homeDistrictName) {
+                totalClicks++;
+                districtData[newName] = (districtData[newName] || 0) + 1;
+            }
+        }, 50);
+    }
+});
+
+['wheel', 'touchmove', 'touchstart'].forEach(ev => {
     document.addEventListener(ev, startSession, { passive: true });
 });
