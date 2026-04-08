@@ -1,5 +1,5 @@
 // =========================================================================
-// KIOSK TELEMETRY: MASTER TRACKER (THE OMNI-CLICK BRUTE FORCE)
+// KIOSK TELEMETRY: ZERO-RELOAD OMNI-CLICK TRACKER
 // =========================================================================
 
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";  
@@ -13,7 +13,7 @@ document.body.style.pointerEvents = 'none';
 let homeDistrictName = "";  
 let homeElement = null; 
 
-// 1. BOOT SCANNER (Finds Jhunjhunu)
+// 1. BOOT SCANNER (Finds Jhunjhunu automatically)
 const bootScan = setInterval(() => {
     const activePath = document.querySelector('path.on'); 
     if (activePath) {
@@ -28,20 +28,20 @@ const bootScan = setInterval(() => {
 }, 100); 
 
 // --- THE OMNI-CLICK WEAPON ---
-// Fires every type of interaction event to guarantee the map hears it
+// Fires every type of interaction event to guarantee the map hears it WITHOUT reloading
 function forceInteraction(element) {
     if (!element) return;
-    const opt = { bubbles: true, cancelable: true, view: window, buttons: 1 };
+    const opt = { bubbles: true, cancelable: true, view: window, buttons: 1, isPrimary: true };
     
-    // 1. Touch Events (For Mobile Frameworks)
+    // 1. Touch Events 
     try { element.dispatchEvent(new Event('touchstart', opt)); } catch(e){}
     try { element.dispatchEvent(new Event('touchend', opt)); } catch(e){}
     
-    // 2. Pointer Events (For Modern WebGL/SVG Maps)
+    // 2. Pointer Events 
     try { element.dispatchEvent(new PointerEvent('pointerdown', opt)); } catch(e){}
     try { element.dispatchEvent(new PointerEvent('pointerup', opt)); } catch(e){}
     
-    // 3. Mouse Events (For Legacy Fallbacks)
+    // 3. Mouse Events 
     element.dispatchEvent(new MouseEvent('mousedown', opt));
     element.dispatchEvent(new MouseEvent('mouseup', opt));
     element.dispatchEvent(new MouseEvent('click', opt));
@@ -64,20 +64,20 @@ function finalizeSession() {
     
     console.log("Tracker: 10s Idle. Executing Omni-Click Reset...");
 
-    // 3. THE BRUTE FORCE RESET SEQUENCE
+    // 3. THE BRUTE FORCE RESET SEQUENCE (NO PAGE RELOADS HERE)
     
-    // Target A: "Un-click" the currently open district (Forces most maps to close sidebars)
+    // Target A: "Un-click" the currently open district
     const activePath = document.querySelector('path.on');
     if (activePath && activePath !== homeElement) {
         forceInteraction(activePath);
     }
 
-    // Target B: Click the background (Forces most maps to clear selection)
+    // Target B: Click the background SVG (Forces most maps to clear selection)
     setTimeout(() => {
         const mapBackground = document.querySelector('svg');
         if (mapBackground) forceInteraction(mapBackground);
         
-        // Target C: Force-click Jhunjhunu (Re-establishes the default state)
+        // Target C: Force-click Jhunjhunu
         setTimeout(() => {
             if (homeElement) {
                 forceInteraction(homeElement);
