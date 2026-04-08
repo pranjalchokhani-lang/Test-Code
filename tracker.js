@@ -4,26 +4,31 @@ const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].t
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let isResetting = false; 
-let homeDistrictName = ""; // We will store "Sabarkantha" (or whatever city) here
 
-// 1. LEARN THE HOME STATE ON BOOT UP
+// Memory Vault for Initial State
+let homeDistrictName = ""; 
+let mapGroup = null;       // The SVG layer that controls zoom/pan
+let initialTransform = ""; // The exact coordinates/zoom level
+
+// 1. MEMORIZE DISTRICT & ZOOM COORDINATES ON BOOT UP
 window.addEventListener('load', () => {
-    // Wait 1.5 seconds for the map to finish drawing
     setTimeout(() => {
-        // Look for the exact shape that has the "on" class
         const homePath = document.querySelector('path.on'); 
         if (homePath) {
-            // Extract the secret name (e.g., "Sabarkantha")
             homeDistrictName = homePath.getAttribute('data-n');
-            console.log("Tracker: Success! Home is locked to [" + homeDistrictName + "]");
-        } else {
-            console.warn("Tracker: Could not find a path with the 'on' class.");
+            
+            // Find the main map layer that holds the zoom/pan coordinates
+            mapGroup = homePath.closest('g') || document.querySelector('svg g');
+            if (mapGroup) {
+                initialTransform = mapGroup.getAttribute('transform') || "";
+            }
+            console.log("Tracker: Locked Home District [" + homeDistrictName + "] and Initial Zoom coordinates.");
         }
-    }, 1500);
+    }, 1500); // Wait 1.5s for map to settle before memorizing
 });
 
 function finalizeSession() {
-    // 1. SEND DATA (Only if clicks exist and we are not resetting)
+    // 1. Send Data
     if (totalClicks > 0 && !isResetting) {
         const payload = { 
             location: KIOSK_LOCATION, 
@@ -34,29 +39,41 @@ function finalizeSession() {
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
     
-    // 2. PUT ON THE BLINDFOLD
+    // 2. Engage Blindfold
     isResetting = true;
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    console.log("Tracker: 10s Idle. Returning to " + homeDistrictName);
+    console.log("Tracker: 10s Idle. Zooming out and resetting...");
 
-    // 3. ZERO-RELOAD PHYSICAL CLICK
-    if (homeDistrictName !== "") {
-        // Find the exact shape on the map that matches the home name
-        const targetShape = document.querySelector(`path[data-n="${homeDistrictName}"]`);
+    // 3. ZERO-RELOAD VISUAL ALIGNMENT (Zoom & Pan Reset)
+    if (mapGroup) {
+        // Apply a smooth half-second transition so the map glides back into place
+        mapGroup.style.transition = "transform 0.5s ease-in-out";
         
-        if (targetShape) {
-            // Simulate a flawless physical human click directly on the shape
-            const opt = { bubbles: true, cancelable: true, view: window };
-            targetShape.dispatchEvent(new MouseEvent('pointerdown', opt));
-            targetShape.dispatchEvent(new MouseEvent('mousedown', opt));
-            targetShape.dispatchEvent(new MouseEvent('pointerup', opt));
-            targetShape.dispatchEvent(new MouseEvent('mouseup', opt));
-            targetShape.dispatchEvent(new MouseEvent('click', opt));
-        }
+        // Force the map back to its exact starting size and alignment
+        mapGroup.setAttribute('transform', initialTransform);
+        
+        // Remove the transition rule after it finishes so the next student can drag it normally
+        setTimeout(() => { mapGroup.style.transition = ""; }, 600);
     }
 
-    // 4. REMOVE BLINDFOLD AFTER 1 SECOND
+    // 4. CLICK THE HOME DISTRICT
+    // We add a tiny 300ms delay to let the zoom-out animation start before clicking the district
+    setTimeout(() => {
+        if (homeDistrictName !== "") {
+            const targetShape = document.querySelector(`path[data-n="${homeDistrictName}"]`);
+            if (targetShape) {
+                const opt = { bubbles: true, cancelable: true, view: window };
+                targetShape.dispatchEvent(new MouseEvent('pointerdown', opt));
+                targetShape.dispatchEvent(new MouseEvent('mousedown', opt));
+                targetShape.dispatchEvent(new MouseEvent('pointerup', opt));
+                targetShape.dispatchEvent(new MouseEvent('mouseup', opt));
+                targetShape.dispatchEvent(new MouseEvent('click', opt));
+            }
+        }
+    }, 300);
+
+    // 5. Remove Blindfold
     setTimeout(() => { 
         isResetting = false; 
     }, 1000);
@@ -67,7 +84,7 @@ function startSession() {
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(finalizeSession, 10000); // 10-Second timeout
+    idleTimer = setTimeout(finalizeSession, 10000); // 10-second timeout
 }
 
 // CAPTURE CLICKS
@@ -84,12 +101,7 @@ document.addEventListener('mousedown', function(e) {
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-// KEEP ALIVE
-['wheel', 'touchmove', 'touchstart'].forEach(ev => {
-    document.addEventListener(ev, () => { if(!isResetting) startSession(); }, { passive: true });
-});
-
-// KEEP ALIVE
+// KEEP ALIVE ON DRAG/ZOOM
 ['wheel', 'touchmove', 'touchstart'].forEach(ev => {
     document.addEventListener(ev, () => { if(!isResetting) startSession(); }, { passive: true });
 });
