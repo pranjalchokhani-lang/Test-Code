@@ -1,10 +1,9 @@
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
-
 const CURRENT_PAGE = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
 let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 
-// GRABS NAME DIRECTLY FROM SVG
+// GRABS NAME DIRECTLY FROM SVG ATTRIBUTES
 function getDistrictName(element) {
     return element.getAttribute('title') || 
            element.getAttribute('data-name') || 
@@ -12,8 +11,8 @@ function getDistrictName(element) {
            "Unknown Region";
 }
 
-function sendDataAndReload() {
-    // Only send if there was a real interaction
+function finalizeSession() {
+    // Only send data if the student actually clicked a district
     if (totalClicks > 0) {
         const payload = {
             location: CURRENT_PAGE,
@@ -22,11 +21,11 @@ function sendDataAndReload() {
             breakdown: JSON.stringify(districtData) 
         };
         
-        // navigator.sendBeacon is best for reloads as it finishes the request even after page closes
+        // sendBeacon ensures the data hits Google even as the page reloads
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
 
-    // This ensures the map is 100% reset to its original scale, position, and district
+    // RELOAD: The only 100% way to reset scale, position, and the home district
     window.location.reload();
 }
 
@@ -34,28 +33,29 @@ function startSession() {
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
-    // 10-second window
-    idleTimer = setTimeout(sendDataAndReload, 10000); 
+    // 10-second idle window before reset
+    idleTimer = setTimeout(finalizeSession, 10000); 
 }
 
 document.addEventListener('mousedown', function(e) {
-    // Look strictly for the map shapes (path, polygon, etc.)
+    // 1. Reset the idle timer for ANY touch (even background)
+    startSession(); 
+
+    // 2. Look STRICTLY for the map shapes (path, polygon, etc.)
     const target = e.target.closest('path, polygon, circle, rect');
     
-    // If the click is on the background or UI, it resets the timer but DOES NOT count a click
-    startSession(); 
-    
+    // 3. If it's not a district shape, do not count the click
     if (!target) return;
 
-    // Only count if it's a valid district shape
+    // 4. Record the District Click
     totalClicks++;
     let name = getDistrictName(target);
     districtData[name] = (districtData[name] || 0) + 1;
     
-    console.log(`District Clicked: ${name} | Total: ${totalClicks}`);
+    console.log(`District Click: ${name} | Session Total: ${totalClicks}`);
 });
 
-// Track engagement like scrolling or zooming
+// Capture navigation (zoom/scroll) to keep the session alive
 ['wheel', 'touchmove', 'touchstart', 'mousemove'].forEach(ev => {
     document.addEventListener(ev, startSession, { passive: true });
 });
