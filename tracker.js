@@ -70,28 +70,40 @@ const bootWatch = setInterval(() => {
 }, 50);
 
 // ─── ACTIVITY WATCHER ─────────────────────────────────────────────────────────
+// MutationObserver watches DOM changes directly — works on both
+// touchscreen and laptop without relying on event bubbling
 function startActivityWatcher() {
+    // Watch map-mover transform — catches all zoom and pan
     if (mover) {
         new MutationObserver(() => {
             if (!isResetting) startSession();
         }).observe(mover, { attributes: true, attributeFilter: ['style'] });
     }
+
+    // Watch SVG paths — catches district clicks
     const svg = document.getElementById('rj');
     if (svg) {
         new MutationObserver(() => {
             if (!isResetting) startSession();
         }).observe(svg, { attributes: true, subtree: true, attributeFilter: ['class'] });
     }
+
+    // Watch right panel — catches data loading
     const rightPanel = document.querySelector('.right-panel');
     if (rightPanel) {
         new MutationObserver(() => {
             if (!isResetting) startSession();
         }).observe(rightPanel, { childList: true, subtree: true, characterData: true });
     }
+
     console.log('Tracker: activity watcher running.');
 }
 
-// ─── RESET — no async/await, plain setTimeout chain ──────────────────────────
+// ─── RESET ────────────────────────────────────────────────────────────────────
+// Plain synchronous function — no async/await, no setTimeout for release.
+// Browser throttles setTimeout on idle tabs causing 10x delays.
+// select() fires synchronously up to its first await so lists/ctag
+// are cleared instantly. Stream runs in background, killed by currentToken++.
 function finalizeSession() {
     console.log('finalizeSession fired — isResetting:', isResetting);
     if (isResetting) return;
@@ -118,30 +130,29 @@ function finalizeSession() {
     startTime           = null;
     lastInteractionTime = null;
 
-    // 3. Kill in-flight stream
+    // 3. Kill any in-flight stream instantly
     currentToken++;
 
-    // 4. Reset zoom silently
+    // 4. Reset zoom — silence zoom sound, reset vars, sync DOM
     zoomSfx.volume = 0;
     window._mapReset();
     window.mapApply();
+    zoomSfx.volume = 0.15;
 
-    // 5. Reset district/data — reveal sound muted
+    // 5. Reset district/data — silence reveal sound
     revealSfx.volume = 0;
     select(HOME_DISTRICT);
+    revealSfx.volume = 0.4;
 
-    // 6. After 300ms restore sounds
-    setTimeout(() => {
-        zoomSfx.volume   = 0.15;
-        revealSfx.volume = 0.4;
-    }, 300);
+    // 6. Release shield immediately — no setTimeout
+    //    select() has synchronously cleared lists + ctag + started
+    //    loading animation before its first await. Stream is already
+    //    killed. Nothing left to wait for.
+    isResetting = false;
+    console.log('Tracker: reset complete — ready.');
 
-    // 7. After 1400ms release shield + re-arm — plain setTimeout, no await
-    setTimeout(() => {
-        isResetting = false;
-        console.log('Tracker: reset complete — ready.');
-        armIdleTimer();
-    }, 1400);
+    // 7. Re-arm idle timer for next session
+    armIdleTimer();
 }
 
 // ─── CLICK TRACKING ───────────────────────────────────────────────────────────
@@ -156,6 +167,7 @@ document.addEventListener('mousedown', (e) => {
     rawData[idx] = (rawData[idx] || 0) + 1;
 });
 
+// Touchscreen district taps
 document.addEventListener('touchstart', (e) => {
     if (isResetting) return;
     const target = e.target.closest('path, polygon, circle, rect');
@@ -168,6 +180,7 @@ document.addEventListener('touchstart', (e) => {
     startSession();
 }, { passive: true });
 
+// Laptop — mouse movement or scroll
 document.addEventListener('mousemove', () => {
     if (!isResetting) startSession();
 }, { passive: true });
