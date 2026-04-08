@@ -4,18 +4,35 @@ const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].t
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let isResetting = false; 
-let homeDistrictName = ""; 
 
-// 1. MEMORIZE THE HOME NAME ON BOOT
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const homePath = document.querySelector('path.on'); 
-        if (homePath) {
-            homeDistrictName = homePath.getAttribute('data-n');
-            console.log("Tracker: Locked Initial State ->", homeDistrictName);
-        }
-    }, 1500); 
-});
+// --- STATE MEMORY VAULT ---
+let homeElement = null;     // Stores the exact physical SVG shape
+let mapSvg = null;          // Stores the main SVG canvas
+let mapGroup = null;        // Stores the zooming layer
+let initialViewBox = null;  // Memorizes the zoom scale
+let initialTransform = null;// Memorizes the pan alignment
+
+// 1. RAPID-FIRE SCANNER (Locks home state instantly before anyone can touch it)
+const bootScan = setInterval(() => {
+    // Look for the active district
+    const activePath = document.querySelector('path.on'); 
+    
+    if (activePath) {
+        homeElement = activePath;
+        
+        // Find the map layers and memorize their exact zoom/pan coordinates
+        mapSvg = activePath.closest('svg') || document.querySelector('svg');
+        mapGroup = activePath.closest('g') || document.querySelector('svg > g');
+        
+        if (mapSvg) initialViewBox = mapSvg.getAttribute('viewBox');
+        if (mapGroup) initialTransform = mapGroup.getAttribute('transform');
+
+        console.log("Tracker: Initial state locked instantly ->", homeElement.getAttribute('data-n'));
+        
+        // Stop scanning once we have the data
+        clearInterval(bootScan); 
+    }
+}, 100); // Scans every 1/10th of a second
 
 function finalizeSession() {
     // 1. SEND DATA
@@ -33,42 +50,41 @@ function finalizeSession() {
     isResetting = true;
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    console.log("Tracker: 10s Idle. Zooming out and silently highlighting home...");
+    console.log("Tracker: 10s Idle. Executing Zero-Reload Align & Reset...");
 
-    // 3. TRIGGER NATIVE ZOOM-OUT / RE-ALIGN
-    // In most frameworks, clicking the *currently open* district again toggles it off and zooms out.
-    const currentlyActivePath = document.querySelector('path.on');
-    if (currentlyActivePath) {
-        const opt = { bubbles: true, cancelable: true, view: window };
-        currentlyActivePath.dispatchEvent(new MouseEvent('pointerdown', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('mousedown', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('pointerup', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('mouseup', opt));
-        currentlyActivePath.dispatchEvent(new MouseEvent('click', opt));
+    // 3. FORCE VISUAL ZOOM-OUT & RE-ALIGN
+    if (mapSvg && initialViewBox) {
+        mapSvg.style.transition = "all 0.5s ease-in-out";
+        mapSvg.setAttribute('viewBox', initialViewBox);
+    }
+    if (mapGroup && initialTransform) {
+        mapGroup.style.transition = "transform 0.5s ease-in-out";
+        mapGroup.setAttribute('transform', initialTransform);
     }
 
-    // Backup: If the developer made a UI 'Home' or 'Back' button, click it automatically
-    const resetBtn = document.querySelector('.reset-btn, .home-btn, .zoom-out, .back, #reset');
-    if (resetBtn) resetBtn.click();
+    // 4. CLICK THE BACKGROUND (Forces the framework to clear its memory)
+    if (mapSvg) {
+        mapSvg.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: 1, clientY: 1 }));
+    }
 
-    // 4. THE SILENT CSS HIGHLIGHT
-    // Wait 800ms for the map to finish its smooth zoom-out animation
+    // 5. RE-SELECT THE EXACT HOME DISTRICT
     setTimeout(() => {
-        // Strip the highlight from everything just to be safe
-        document.querySelectorAll('path.on').forEach(p => p.classList.remove('on'));
-        
-        // Silently add the highlight to the home district WITHOUT triggering a click event
-        if (homeDistrictName !== "") {
-            const targetShape = document.querySelector(`path[data-n="${homeDistrictName}"]`);
-            if (targetShape) {
-                targetShape.classList.add('on');
-            }
+        if (homeElement) {
+            const opt = { bubbles: true, cancelable: true, view: window };
+            ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(ev => {
+                homeElement.dispatchEvent(new MouseEvent(ev, opt));
+            });
         }
-        
-        // Remove blindfold, ready for next student
-        isResetting = false; 
-        console.log("Tracker: Reset Complete.");
-    }, 800); 
+
+        // Clean up the transition locks so the next student can zoom normally
+        setTimeout(() => {
+            if (mapSvg) mapSvg.style.transition = "";
+            if (mapGroup) mapGroup.style.transition = "";
+            isResetting = false; 
+            console.log("Tracker: Reset complete.");
+        }, 500);
+
+    }, 400); // Wait 400ms for the zoom-out to happen before clicking home
 }
 
 function startSession() {
@@ -93,7 +109,7 @@ document.addEventListener('mousedown', function(e) {
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-// KEEP ALIVE
+// KEEP ALIVE ON DRAG/ZOOM
 ['wheel', 'touchmove', 'touchstart'].forEach(ev => {
     document.addEventListener(ev, () => { if(!isResetting) startSession(); }, { passive: true });
 });
