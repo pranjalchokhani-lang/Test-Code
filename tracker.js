@@ -34,22 +34,19 @@ let lastInteractionTime = null;
 let idleTimer           = null;
 let isResetting         = false;
 
-// ─── INTERCEPT THE IIFE TO STEAL RESET ACCESS ────────────────────────────────
-// The map IIFE exposes window.mapApply but not scale/tx/ty.
-// We patch the mover's style.transform setter to stay in sync,
-// so we always know the real home state after boot.
+// ─── LOCK BOOT TRANSFORM ──────────────────────────────────────────────────────
+// Polls until the map IIFE has done its first apply(), then locks that
+// transform string as the home position — no need to touch internal variables.
 let bootTransform = null;
 const mover = document.getElementById('map-mover');
 
-// Wait for the IIFE to finish its first apply() call, then lock the home transform
 const bootWatch = setInterval(() => {
-    if (mover && mover.style.transform && mover.style.transform !== '') {
-        // Give it one extra tick to settle after select('Jaipur') runs
+    if (mover && mover.style.transform) {
         setTimeout(() => {
             bootTransform = mover.style.transform;
             console.log('Tracker: boot transform locked ->', bootTransform);
             clearInterval(bootWatch);
-        }, 800);
+        }, 800); // wait for select('Jaipur') animation to finish
     }
 }, 50);
 
@@ -75,7 +72,7 @@ function finalizeSession() {
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
 
-    // 2. Wipe all session data
+    // 2. Wipe all session data + engage blindfold
     isResetting         = true;
     totalClicks         = 0;
     rawData             = {};
@@ -86,51 +83,30 @@ function finalizeSession() {
 
     console.log('Tracker: idle timeout — resetting...');
 
-    // 3. Snap map back to boot position using the locked transform
-    //    This sets the DOM directly — no events fired, no reload risk.
-    //    The IIFE's internal scale/tx/ty will re-sync on next user interaction.
+    // 3. Kill any in-flight stream() animations by bumping currentToken
+    //    select() checks this token and aborts if it has changed
+    currentToken++;
+
+    // 4. Snap map zoom/pan back to boot position — pure DOM, no events
     if (mover && bootTransform) {
         mover.style.transition = 'transform 0.6s ease-in-out';
         mover.style.transform  = bootTransform;
     }
 
-    // 4. Reset right panel
-    const ctag = document.getElementById('ctag');
-    const medList = document.getElementById('med-list');
-    const engList = document.getElementById('eng-list');
-    const medLoading = document.getElementById('med-loading');
-    const engLoading = document.getElementById('eng-loading');
-
-    if (ctag) ctag.innerText = 'SELECT A DISTRICT';
-    if (medList) medList.innerHTML = '';
-    if (engList) engList.innerHTML = '';
-    if (medLoading) { medLoading.style.display = 'none'; medLoading.classList.remove('active'); }
-    if (engLoading) { engLoading.style.display = 'none'; engLoading.classList.remove('active'); }
-
-    // 5. Remove pulse rings
-    document.querySelectorAll('.pulse-ring').forEach(e => e.remove());
-
-    // 6. Silently swap highlight back to home district — zero events fired
+    // 5. Use the map's own select() to properly reset data + sound + labels
+    //    Wrapped in setTimeout so the token bump above has already killed
+    //    any prior stream() before select() starts a fresh one
     setTimeout(() => {
-        document.querySelectorAll('.dist.on').forEach(p => p.classList.remove('on'));
-        document.querySelectorAll('.lbl.on, .lbl.hover-visible').forEach(l => {
-            l.classList.remove('on');
-            l.classList.remove('hover-visible');
-        });
+        select(HOME_DISTRICT);
 
-        const home = document.querySelector(`[data-n="${HOME_DISTRICT}"]`);
-        if (home) home.classList.add('on');
-        const homeLbl = document.getElementById('l-' + HOME_DISTRICT.replace(/\s/g, '_'));
-        if (homeLbl) homeLbl.classList.add('on');
-
-        // Remove transition lock so next zoom is responsive
+        // 6. Remove transition lock after animation so next zoom is responsive
         setTimeout(() => {
             if (mover) mover.style.transition = '';
             isResetting = false;
             console.log('Tracker: reset complete — ready.');
         }, 600);
 
-    }, 600);
+    }, 50);
 }
 
 // ─── CLICK TRACKING ───────────────────────────────────────────────────────────
