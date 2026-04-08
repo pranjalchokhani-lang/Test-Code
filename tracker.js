@@ -1,106 +1,126 @@
-// CAPTURE THE EXACT URL ON BOOT UP (Before anyone clicks anything)
 // =========================================================================
-// KIOSK TELEMETRY: MASTER TRACKER (V3)
+// KIOSK TELEMETRY: MASTER TRACKER (V4)
 // =========================================================================
-(function() {
-    // --- CONFIGURATION ---
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
-    const IDLE_TIMEOUT = 10000; // 10s inactivity = Reset
-    const HOME_DISTRICT_ID = "1"; // Change to your Home/Rajkot ID
 
-    // --- SESSION STATE ---
-    let sessionData = {
-        location: window.location.pathname, // Sends the path for the script to parse
-        clicks: 0,
-        duration: 0,
-        breakdown: {}
-    };
+// 1. CAPTURE THE FULL URL (Includes Folders/Directories)
+const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";  
+const FULL_URL_PATH = window.location.href; // Captures http://.../gujarat/map.html
 
-    let startTime = null;
-    let lastInteractionTime = null;
-    let idleTimer = null;
-    let sessionActive = false;
+let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
+let isResetting = true; 
 
-    // --- SESSION CONTROL ---
+document.body.style.pointerEvents = 'none'; 
 
-    function startNewSession() {
-        sessionActive = true;
-        startTime = Date.now();
-        lastInteractionTime = startTime;
-        sessionData.clicks = 0;
-        sessionData.breakdown = {};
-        console.log("🚀 Session Started via Physical Touch");
-    }
+// --- STATE MEMORY VAULT ---
+let homeDistrictName = "";  
+let mapSvg = null;          
+let mapGroup = null;        
+let initialViewBox = null;  
+let initialTransform = null;
+let homeElement = null; // Stores the physical element to re-click on reset
 
-    function resetIdleTimer() {
-        if (!sessionActive) return;
-        
-        lastInteractionTime = Date.now();
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(finalizeSession, IDLE_TIMEOUT);
-    }
-
-    function finalizeSession() {
-        if (!sessionActive) return;
-
-        // Actual Interaction Time (Last Touch - First Touch)
-        sessionData.duration = Math.round((lastInteractionTime - startTime) / 1000);
-
-        // Send Data to Master Vault (9-Column Script)
-        fetch(APPS_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            cache: "no-cache",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(sessionData)
-        });
-
-        console.log("✅ Data Transmitted. Cleaning UI...");
-
-        // Perform Functional Reset (Clears ghost data)
-        performUIReset();
-
-        sessionActive = false;
-        startTime = null;
-    }
-
-    function performUIReset() {
-        // Target the SVG Home element
-        const homeElement = document.querySelector(`[data-id="${HOME_DISTRICT_ID}"]`) || 
-                            document.getElementById(`district-${HOME_DISTRICT_ID}`);
-
-        if (homeElement) {
-            // Simulated Click to force text panels and ripples to sync
-            homeElement.dispatchEvent(new Event('click', { bubbles: true }));
-        }
-    }
-
-    // --- EVENT LISTENERS (TOUCH & CLICK) ---
-
-    // 1. Map Interaction
-    document.addEventListener('click', function(e) {
-        const target = e.target.closest('path, polygon');
-        if (!target) return;
-
-        if (!sessionActive) startNewSession();
-
-        const districtId = target.getAttribute('data-id') || target.id;
-        if (districtId) {
-            sessionData.clicks++;
-            sessionData.breakdown[districtId] = (sessionData.breakdown[districtId] || 0) + 1;
-        }
-        resetIdleTimer();
-    });
-
-    // 2. Physical Activity (Scroll/Zoom/Touch)
-    // Prevents reset as long as touch is underway
-    const activeEvents = ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel', 'scroll'];
+const bootScan = setInterval(() => {
+    const activePath = document.querySelector('path.on'); 
     
-    activeEvents.forEach(event => {
-        window.addEventListener(event, function() {
-            if (!sessionActive) startNewSession();
-            resetIdleTimer();
-        }, { passive: true });
-    });
+    if (activePath) {
+        homeDistrictName = activePath.getAttribute('data-n');
+        homeElement = activePath; // Lock the home element
+        mapSvg = activePath.closest('svg') || document.querySelector('svg');
+        mapGroup = activePath.closest('g') || document.querySelector('svg > g');
+        
+        if (mapSvg) initialViewBox = mapSvg.getAttribute('viewBox');
+        if (mapGroup) initialTransform = mapGroup.getAttribute('transform');
 
-})();
+        console.log("Tracker: 0th state locked safely ->", homeDistrictName);
+        
+        clearInterval(bootScan); 
+        document.body.style.pointerEvents = 'auto'; 
+        isResetting = false; 
+    }
+}, 100); 
+
+function finalizeSession() {
+    if (totalClicks > 0 && !isResetting) {
+        const payload = { 
+            location: FULL_URL_PATH, // Sends full URL for Folder/File extraction in Sheet
+            clicks: totalClicks, 
+            duration: startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0, 
+            breakdown: JSON.stringify(rawData) 
+        };
+        navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
+    }
+    
+    isResetting = true;
+    totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
+    
+    console.log("Tracker: 10s Idle. Executing Zero-Reload Align & Reset...");
+
+    // CHANGE 2: RESET DATA & RIPPLES
+    // Instead of just painting CSS, we "click" the home element.
+    // This forces ripples and result panels to update back to Home (e.g. Rajkot)
+    if (homeElement) {
+        const opt = { bubbles: true, cancelable: true, view: window };
+        homeElement.dispatchEvent(new MouseEvent('click', opt));
+    }
+
+    // FORCE VISUAL ALIGNMENT
+    if (mapSvg && initialViewBox) {
+        mapSvg.style.transition = "all 0.5s ease-in-out";
+        mapSvg.setAttribute('viewBox', initialViewBox);
+    }
+    if (mapGroup && initialTransform) {
+        mapGroup.style.transition = "transform 0.5s ease-in-out";
+        mapGroup.setAttribute('transform', initialTransform);
+    }
+
+    setTimeout(() => {
+        // Final CSS Cleanup
+        document.querySelectorAll('path.on').forEach(p => p.classList.remove('on'));
+        if (homeElement) homeElement.classList.add('on');
+
+        setTimeout(() => {
+            if (mapSvg) mapSvg.style.transition = "";
+            if (mapGroup) mapGroup.style.transition = "";
+            isResetting = false; 
+            console.log("Tracker: Reset complete.");
+        }, 500);
+    }, 600); 
+}
+
+// CHANGE 3: START SESSION ON ANY TOUCH
+function startSession() {
+    if (isResetting) return; 
+    
+    // Lock start time on the very first touch/interaction
+    if (!startTime) {
+        startTime = Date.now();
+        console.log("Tracker: Session started via Touch/Interaction");
+    }
+    
+    lastInteractionTime = Date.now();
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(finalizeSession, 10000); 
+}
+
+// CAPTURE CLICKS (AND TOUCH START)
+document.addEventListener('mousedown', function(e) {
+    if (isResetting) return;
+    
+    // If it's the first interaction, start session immediately
+    startSession(); 
+
+    const target = e.target.closest('path, polygon, circle, rect');
+    if (!target) return;
+
+    totalClicks++;
+    const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
+    const rawIndex = allShapes.indexOf(target);
+    rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
+});
+
+// CHANGE 3: LISTEN TO ALL TOUCH/SCROLL TO START & KEEP ALIVE
+['wheel', 'touchmove', 'touchstart', 'scroll'].forEach(ev => {
+    document.addEventListener(ev, () => { 
+        if(!isResetting) startSession(); 
+    }, { passive: true });
+});
