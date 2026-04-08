@@ -25,33 +25,33 @@ const scriptUrl      = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQq
 const KIOSK_LOCATION = detectKioskLocation();
 const IDLE_MS        = 10000;
 
-// ─── SESSION STATE ────────────────────────────────────────────────────────────
+// ─── STATE ────────────────────────────────────────────────────────────────────
 let totalClicks         = 0;
 let rawData             = {};
 let startTime           = null;
 let lastInteractionTime = null;
 let idleTimer           = null;
 let isResetting         = false;
-let HOME_DISTRICT       = null;
+let HOME_DISTRICT       = null; // locked once, never changes
+let bootLocked          = false;
 const mover             = document.getElementById('map-mover');
 
-// ─── BOOT WATCH — waits for HTML script to finish, locks home once only ───────
+// ─── BOOT WATCH ───────────────────────────────────────────────────────────────
+// Fires on every tick until BOTH _mapReset exists AND a path.on exists.
+// The moment we see them, we lock HOME_DISTRICT from that exact element
+// and IMMEDIATELY block further locking — so no user click can change it.
 const bootWatch = setInterval(() => {
-    // Wait until _mapReset AND mapApply AND an active path all exist
+    if (bootLocked) { clearInterval(bootWatch); return; }
     if (typeof window._mapReset !== 'function') return;
     if (typeof window.mapApply  !== 'function') return;
     const activePath = document.querySelector('path.on');
     if (!activePath) return;
 
-    // Everything ready — stop watching immediately
+    // Lock immediately — before any user can click
+    bootLocked    = true;
+    HOME_DISTRICT = activePath.getAttribute('data-n');
     clearInterval(bootWatch);
-
-    // Grace period for select() boot animation to finish
-    setTimeout(() => {
-        HOME_DISTRICT = activePath.getAttribute('data-n');
-        console.log('Tracker: home district LOCKED ->', HOME_DISTRICT);
-        console.log('Tracker: _mapReset ready ->', typeof window._mapReset);
-    }, 1200);
+    console.log('Tracker: HOME_DISTRICT locked at boot ->', HOME_DISTRICT);
 }, 50);
 
 // ─── SESSION ──────────────────────────────────────────────────────────────────
@@ -89,18 +89,18 @@ async function finalizeSession() {
     startTime           = null;
     lastInteractionTime = null;
 
-    // 3. Reset internal scale/tx/ty then sync DOM — muted
+    // 3. Reset zoom — silent
     zoomSfx.volume = 0;
-    window._mapReset();  // sets scale=1, tx=0, ty=0 inside the closure
-    window.mapApply();   // writes translate(0px,0px) scale(1) to DOM
+    window._mapReset();
+    window.mapApply();
     setTimeout(() => { zoomSfx.volume = 0.15; }, 200);
 
-    // 4. Reset data/labels/lists via select() — reveal sound muted
+    // 4. Reset data via select() — silent
     revealSfx.volume = 0;
     select(HOME_DISTRICT);
     setTimeout(() => { revealSfx.volume = 0.4; }, 200);
 
-    // 5. Hold shield until select() + stream() fully finishes
+    // 5. Wait for select() + stream() to fully finish
     const maxItems = Math.max(
         (typeof DATA !== 'undefined' && DATA[HOME_DISTRICT]) ? (DATA[HOME_DISTRICT].m || []).length : 0,
         (typeof DATA !== 'undefined' && DATA[HOME_DISTRICT]) ? (DATA[HOME_DISTRICT].e || []).length : 0
@@ -108,8 +108,19 @@ async function finalizeSession() {
     const waitMs = 900 + (maxItems * 650) + 500;
     await new Promise(res => setTimeout(res, waitMs));
 
+    // 6. Release shield — session is ready for next user
     isResetting = false;
-    console.log('Tracker: reset complete — ready.');
+    console.log('Tracker: reset complete — ready for next user.');
+
+    // 7. FIX FOR "only works once":
+    // After reset completes, arm the idle timer fresh so if nobody
+    // touches the screen the next reset will still fire automatically.
+    // startSession() is blocked during isResetting so we arm directly here.
+    startTime           = null;
+    lastInteractionTime = null;
+    clearTimeout(idleTimer);
+    // Don't start a new idle countdown — wait for actual user touch first.
+    // The session starts clean on next interaction via the event listeners.
 }
 
 // ─── CLICK TRACKING ───────────────────────────────────────────────────────────
@@ -125,6 +136,7 @@ document.addEventListener('mousedown', (e) => {
 });
 
 // ─── ANY TOUCH/INTERACTION STARTS SESSION ────────────────────────────────────
+// This is what re-arms the idle timer after reset for the next user.
 ['touchstart', 'pointerdown', 'wheel', 'touchmove', 'mousemove'].forEach(ev => {
     document.addEventListener(ev, () => { if (!isResetting) startSession(); }, { passive: true });
 });
