@@ -4,13 +4,17 @@ const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].t
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let homeDistrict = ""; 
 
-// 1. DYNAMIC HOME CAPTURE
-window.addEventListener('DOMContentLoaded', () => {
+// 1. HARDENED HOME CAPTURE (Tries every 500ms until found)
+function findHome() {
     const label = document.querySelector('.title, #selected-name, .district-label'); 
-    if (label) {
+    if (label && label.innerText.trim() !== "") {
         homeDistrict = label.innerText.trim();
+        console.log("Home District Locked: " + homeDistrict);
+    } else {
+        setTimeout(findHome, 500);
     }
-});
+}
+findHome();
 
 function finalizeSession() {
     if (totalClicks > 0) {
@@ -26,9 +30,12 @@ function finalizeSession() {
     // RESET
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    // 2. SILENT RESET TO HOME
-    if (typeof select === "function" && homeDistrict !== "") {
-        select(homeDistrict); 
+    // 2. FORCED RESET (Using the specific snap-back logic)
+    if (typeof window.select === "function" && homeDistrict !== "") {
+        console.log("Idle Timeout: Returning to " + homeDistrict);
+        window.select(homeDistrict); 
+    } else {
+        console.error("Reset Failed: homeDistrict missing or select() not found.");
     }
 }
 
@@ -36,8 +43,8 @@ function startSession() {
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
-    // 20-SECOND IDLE WINDOW
-    idleTimer = setTimeout(finalizeSession, 20000); 
+    // 10-SECOND RESET WINDOW (As requested)
+    idleTimer = setTimeout(finalizeSession, 10000); 
 }
 
 document.addEventListener('mousedown', function(e) {
