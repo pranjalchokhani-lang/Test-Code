@@ -1,3 +1,31 @@
+// ─── RELOAD DETECTOR — paste this at the very top, before everything else ───
+
+// Intercept any attempt to navigate / reload
+window.addEventListener('beforeunload', (e) => {
+    console.error('TRACKER: beforeunload fired — something is trying to reload!');
+    console.trace(); // shows the exact call stack
+});
+
+// Intercept location changes
+const _origAssign   = window.location.assign.bind(window.location);
+const _origReplace  = window.location.replace.bind(window.location);
+window.location.assign  = (...a) => { console.error('location.assign called',  a); console.trace(); _origAssign(...a); };
+window.location.replace = (...a) => { console.error('location.replace called', a); console.trace(); _origReplace(...a); };
+
+// Intercept history pushes (SPA routers use this)
+const _origPush    = history.pushState.bind(history);
+const _origReplace2= history.replaceState.bind(history);
+history.pushState    = (...a) => { console.log('history.pushState',    a); console.trace(); _origPush(...a); };
+history.replaceState = (...a) => { console.log('history.replaceState', a); console.trace(); _origReplace2(...a); };
+
+// Catch any <a> clicks that might be causing navigation
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (link) {
+        console.warn('TRACKER: <a> clicked — href:', link.href, '| target:', link.target);
+        console.trace();
+    }
+}, true); // capture phase — fires before anything else
 // ─── LOCATION PROFILING ───────────────────────────────────────────────────────
 function detectKioskLocation() {
     const generic = new Set(['index','home','main','default','page','app','www','']);
