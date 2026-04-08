@@ -1,18 +1,57 @@
 // =========================================================================
-// KIOSK TELEMETRY: MASTER TRACKER (100% BULLETPROOF RESET)
+// KIOSK TELEMETRY: MASTER TRACKER (THE OMNI-CLICK BRUTE FORCE)
 // =========================================================================
 
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec";  
-const KIOSK_LOCATION = window.location.href; // Captures Full Path for Apps Script
+const KIOSK_LOCATION = window.location.href; 
 
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
-let isResetting = false; 
+let isResetting = true; 
+document.body.style.pointerEvents = 'none'; 
+
+// --- STATE MEMORY VAULT ---
+let homeDistrictName = "";  
+let homeElement = null; 
+
+// 1. BOOT SCANNER (Finds Jhunjhunu)
+const bootScan = setInterval(() => {
+    const activePath = document.querySelector('path.on'); 
+    if (activePath) {
+        homeDistrictName = activePath.getAttribute('data-n');
+        homeElement = activePath; 
+        console.log("Tracker: Home locked ->", homeDistrictName);
+        
+        clearInterval(bootScan); 
+        document.body.style.pointerEvents = 'auto'; 
+        isResetting = false; 
+    }
+}, 100); 
+
+// --- THE OMNI-CLICK WEAPON ---
+// Fires every type of interaction event to guarantee the map hears it
+function forceInteraction(element) {
+    if (!element) return;
+    const opt = { bubbles: true, cancelable: true, view: window, buttons: 1 };
+    
+    // 1. Touch Events (For Mobile Frameworks)
+    try { element.dispatchEvent(new Event('touchstart', opt)); } catch(e){}
+    try { element.dispatchEvent(new Event('touchend', opt)); } catch(e){}
+    
+    // 2. Pointer Events (For Modern WebGL/SVG Maps)
+    try { element.dispatchEvent(new PointerEvent('pointerdown', opt)); } catch(e){}
+    try { element.dispatchEvent(new PointerEvent('pointerup', opt)); } catch(e){}
+    
+    // 3. Mouse Events (For Legacy Fallbacks)
+    element.dispatchEvent(new MouseEvent('mousedown', opt));
+    element.dispatchEvent(new MouseEvent('mouseup', opt));
+    element.dispatchEvent(new MouseEvent('click', opt));
+}
 
 function finalizeSession() {
     if (isResetting) return;
-    isResetting = true; // Lock the system so it doesn't double-fire
+    isResetting = true;
 
-    // 1. DATA TRANSMISSION (Guaranteed delivery via sendBeacon)
+    // 2. TRANSMIT DATA
     if (totalClicks > 0) {
         const payload = { 
             location: KIOSK_LOCATION, 
@@ -21,32 +60,47 @@ function finalizeSession() {
             breakdown: JSON.stringify(rawData) 
         };
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
-        console.log("Tracker: Data payload transmitted securely.");
     }
     
-    console.log("Tracker: 10s Idle. Executing 100% Guaranteed Hard Reset...");
+    console.log("Tracker: 10s Idle. Executing Omni-Click Reset...");
 
-    // 2. THE 100% FIX: HARD BROWSER RELOAD
-    // This absolutely obliterates "ghost data", resets the ripples, 
-    // and forces the map to reload in its exact default state (Jhunjhunu).
-    window.location.reload(); 
+    // 3. THE BRUTE FORCE RESET SEQUENCE
+    
+    // Target A: "Un-click" the currently open district (Forces most maps to close sidebars)
+    const activePath = document.querySelector('path.on');
+    if (activePath && activePath !== homeElement) {
+        forceInteraction(activePath);
+    }
+
+    // Target B: Click the background (Forces most maps to clear selection)
+    setTimeout(() => {
+        const mapBackground = document.querySelector('svg');
+        if (mapBackground) forceInteraction(mapBackground);
+        
+        // Target C: Force-click Jhunjhunu (Re-establishes the default state)
+        setTimeout(() => {
+            if (homeElement) {
+                forceInteraction(homeElement);
+                console.log("Tracker: Omni-Click Sequence Complete.");
+            }
+            
+            // Clean slate for the next student
+            totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
+            isResetting = false; 
+        }, 150);
+    }, 150);
 }
 
-// SESSION STARTS ON ANY TOUCH (Anywhere on body)
+// 4. SESSION STARTS ON ANY TOUCH
 function startSession() {
     if (isResetting) return; 
-    
-    if (!startTime) {
-        startTime = Date.now();
-        console.log("Tracker: Session started via Touch/Interaction");
-    }
-    
+    if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
     idleTimer = setTimeout(finalizeSession, 10000); 
 }
 
-// CAPTURE CLICKS ON DISTRICTS
+// 5. TOUCH/SCROLL LISTENERS
 document.addEventListener('mousedown', function(e) {
     if (isResetting) return;
     startSession(); 
@@ -60,7 +114,6 @@ document.addEventListener('mousedown', function(e) {
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-// START & KEEP ALIVE ON ALL TOUCH/SCROLL/WHEEL
 ['wheel', 'touchmove', 'touchstart', 'scroll'].forEach(ev => {
     document.addEventListener(ev, () => { 
         if(!isResetting) startSession(); 
