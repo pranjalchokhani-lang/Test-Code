@@ -31,16 +31,31 @@ let rawData             = {};
 let startTime           = null;
 let lastInteractionTime = null;
 let idleTimer           = null;
-let isResetting         = true;  // STARTS LOCKED — released only after boot lock
+let isResetting         = true;   // locked until boot completes
 let HOME_DISTRICT       = null;
 const mover             = document.getElementById('map-mover');
 
+// ─── IDLE TIMER LOGIC ─────────────────────────────────────────────────────────
+// Separated so we can arm it directly after reset
+// without needing a user interaction event
+function armIdleTimer() {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(finalizeSession, IDLE_MS);
+}
+
+// ─── SESSION ──────────────────────────────────────────────────────────────────
+function startSession() {
+    if (isResetting) return;
+    if (!startTime) startTime = Date.now();
+    lastInteractionTime = Date.now();
+    armIdleTimer();
+}
+
 // ─── BOOT WATCH ───────────────────────────────────────────────────────────────
-// Keeps screen fully blocked (isResetting=true) until:
-// - _mapReset exists (HTML IIFE has run)
-// - path.on exists (map has rendered + select() has fired)
-// Locks HOME_DISTRICT from that very first path.on — atomically.
-// No user can click before this because isResetting=true blocks all events.
+// isResetting=true from the very top — screen is locked until boot done.
+// We wait for _mapReset (IIFE ran) AND path.on (select() fired).
+// HOME_DISTRICT locked from that first path.on atomically.
+// No user interaction possible until isResetting=false releases.
 const bootWatch = setInterval(() => {
     if (typeof window._mapReset !== 'function') return;
     if (typeof window.mapApply  !== 'function') return;
@@ -49,22 +64,16 @@ const bootWatch = setInterval(() => {
 
     HOME_DISTRICT = activePath.getAttribute('data-n');
     clearInterval(bootWatch);
+    console.log('Tracker: HOME locked ->', HOME_DISTRICT);
 
-    // Small delay to let select()'s boot animation finish visually
+    // Wait for boot select() animation to finish visually
     setTimeout(() => {
         isResetting = false;
-        console.log('Tracker: boot complete. HOME locked ->', HOME_DISTRICT);
+        // Arm idle timer immediately — if nobody touches, still resets
+        armIdleTimer();
+        console.log('Tracker: boot complete, idle timer armed.');
     }, 1500);
 }, 50);
-
-// ─── SESSION ──────────────────────────────────────────────────────────────────
-function startSession() {
-    if (isResetting) return;
-    if (!startTime) startTime = Date.now();
-    lastInteractionTime = Date.now();
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(finalizeSession, IDLE_MS);
-}
 
 // ─── RESET ────────────────────────────────────────────────────────────────────
 async function finalizeSession() {
@@ -92,29 +101,31 @@ async function finalizeSession() {
     startTime           = null;
     lastInteractionTime = null;
 
-    // 3. Kill any in-flight stream() instantly by bumping currentToken
-    //    stream() checks this on every row and aborts immediately
+    // 3. Kill any in-flight stream() instantly
     currentToken++;
 
-    // 4. Reset zoom — silent
+    // 4. Reset zoom silently
     zoomSfx.volume = 0;
     window._mapReset();
     window.mapApply();
     setTimeout(() => { zoomSfx.volume = 0.15; }, 300);
 
-    // 5. Reset district/data via select() — reveal sound muted
-    //    select() will do its own currentToken++ internally which is fine —
-    //    it just means the new stream gets a fresh token and runs cleanly
+    // 5. Reset district/data — reveal sound muted
     revealSfx.volume = 0;
     select(HOME_DISTRICT);
     setTimeout(() => { revealSfx.volume = 0.4; }, 300);
 
-    // 6. Fixed 2000ms wait — enough for select()'s 900ms loading bar
-    //    + first few rows to appear. No dependency on item count.
-    await new Promise(res => setTimeout(res, 2000));
+    // 6. Wait only for loading bar (900ms) + small buffer — 
+    //    stream is already killed by currentToken++ above so no
+    //    need to wait for all rows to finish typing
+    await new Promise(res => setTimeout(res, 1400));
 
+    // 7. Release shield
     isResetting = false;
     console.log('Tracker: reset complete — ready.');
+
+    // 8. Re-arm idle timer so reset fires again even with zero interaction
+    armIdleTimer();
 }
 
 // ─── CLICK TRACKING ───────────────────────────────────────────────────────────
@@ -129,7 +140,17 @@ document.addEventListener('mousedown', (e) => {
     rawData[idx] = (rawData[idx] || 0) + 1;
 });
 
-// ─── ANY TOUCH/INTERACTION STARTS SESSION ────────────────────────────────────
-['touchstart', 'pointerdown', 'wheel', 'touchmove', 'mousemove'].forEach(ev => {
+// ─── INACTIVITY DETECTION — covers zoom, pan, drag, touch, scroll ─────────────
+// Attached to BOTH document AND #map-viewport because the IIFE uses
+// passive:false + preventDefault on viewport which can swallow document events
+const viewport = document.getElementById('map-viewport');
+const interactionEvents = ['touchstart','touchmove','pointerdown','wheel','mousemove'];
+
+interactionEvents.forEach(ev => {
+    // document level
     document.addEventListener(ev, () => { if (!isResetting) startSession(); }, { passive: true });
+    // viewport level — catches events the IIFE may have stopped from bubbling
+    if (viewport) {
+        viewport.addEventListener(ev, () => { if (!isResetting) startSession(); }, { passive: true });
+    }
 });
