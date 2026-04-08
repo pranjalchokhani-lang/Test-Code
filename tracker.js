@@ -1,93 +1,78 @@
 const scriptUrl = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
-const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
 
-const offsets = { "SIKAR": 3, "GUJARAT": 3, "JAIPUR": 3, "CHANDIGARH": 3 };
-const homeDistricts = { "JAIPUR": "Jaipur", "SIKAR": "Jhunjhunu", "GUJARAT": "Rajkot", "CHANDIGARH": "Panchkula", "TRI-CITY": "Panchkula" };
+// DYNAMIC CONFIGURATION
+const CURRENT_PAGE = window.location.pathname.split("/").pop().split(".")[0].toUpperCase() || "UNKNOWN";
+const OFFSET = 3; 
+const HOME_INDEX = 15; // Target the 16th shape to reset the view
 
-const regionNames = { /* ... keep your full lists here ... */ };
+let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer, isAutoReset = false;
 
-let totalClicks = 0, districtData = {}, startTime = null, lastInteractionTime = null, idleTimer;
-let isAutoReset = false; // THE FLAG: Prevents auto-reset from being counted
+// GRABS NAME DIRECTLY FROM SVG ATTRIBUTES (id, title, or data-name)
+function getDistrictName(element) {
+    return element.getAttribute('title') || 
+           element.getAttribute('data-name') || 
+           element.getAttribute('id') || 
+           "Unknown Region";
+}
 
+// THE 10-SECOND RESET PIECE
 function reinitialiseSession() {
-    // 1. Send data if there was a real user
+    // 1. Send data ONLY if there was a real interaction
     if (totalClicks > 0) {
-        sendData();
+        const payload = {
+            location: CURRENT_PAGE,
+            clicks: totalClicks,
+            duration: startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0,
+            breakdown: JSON.stringify(districtData) 
+        };
+        fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+        console.log("Data Pushed to Excel.");
     }
-    
-    // 2. Wipe memory
-    totalClicks = 0;
-    districtData = {};
-    startTime = null;
-    lastInteractionTime = null;
-    
-    // 3. Trigger the Visual Reset
+
+    // 2. Wipe internal memory
+    totalClicks = 0; districtData = {}; startTime = null; lastInteractionTime = null;
+
+    // 3. Snap map back to Home District
     autoResetMap();
 }
 
 function autoResetMap() {
-    const homeName = homeDistricts[KIOSK_LOCATION];
-    if (!homeName) return;
-
     const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
-    const listKey = (KIOSK_LOCATION === "CHANDIGARH" || KIOSK_LOCATION === "TRI-CITY") ? "CHANDIGARH" : KIOSK_LOCATION;
-    const homeIndex = regionNames[listKey].indexOf(homeName);
+    const targetShape = allShapes[HOME_INDEX + OFFSET];
 
-    if (homeIndex !== -1) {
-        const rawHomeIndex = homeIndex + (offsets[listKey] || 0);
-        const targetShape = allShapes[rawHomeIndex];
-
-        if (targetShape) {
-            isAutoReset = true; // RAISE THE FLAG
-            targetShape.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-            isAutoReset = false; // LOWER THE FLAG
-            console.log("Map Reset to " + homeName + ". Not counted in sessions.");
-        }
+    if (targetShape) {
+        isAutoReset = true; // Signal to ignore this click
+        const eventProps = { bubbles: true, cancelable: true, view: window, buttons: 1 };
+        targetShape.dispatchEvent(new MouseEvent('mousedown', eventProps));
+        targetShape.dispatchEvent(new MouseEvent('click', eventProps));
+        setTimeout(() => { isAutoReset = false; }, 200);
+        console.log("Map reset to Home State.");
     }
 }
-
-function sendData() {
-    let dur = startTime ? Math.floor((lastInteractionTime - startTime) / 1000) : 0;
-    const payload = {
-        location: KIOSK_LOCATION,
-        clicks: totalClicks,
-        duration: dur,
-        breakdown: JSON.stringify(districtData) 
-    };
-    fetch(scriptUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-}
-
-function resetIdleTimer() {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(reinitialiseSession, 10000); // 10-second window
-}
-
-document.addEventListener('mousedown', function(e) {
-    // IF THE FLAG IS UP, DO NOTHING
-    if (isAutoReset) return;
-
-    const target = e.target.closest('path, polygon, circle, rect');
-    startSession(); 
-    if (!target) return;
-
-    totalClicks++;
-    const allShapes = Array.from(document.querySelectorAll('path, polygon, circle, rect'));
-    const rawIndex = allShapes.indexOf(target);
-    let listKey = (KIOSK_LOCATION === "CHANDIGARH" || KIOSK_LOCATION === "TRI-CITY") ? "CHANDIGARH" : KIOSK_LOCATION;
-    const currentMapNames = regionNames[listKey] || [];
-    const correctedIndex = rawIndex - (offsets[listKey] || 0);
-    let name = currentMapNames[correctedIndex] || "Unknown (" + rawIndex + ")";
-
-    districtData[name] = (districtData[name] || 0) + 1;
-    console.log(`User Click: ${name}`);
-});
 
 function startSession() {
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
-    resetIdleTimer();
+    clearTimeout(idleTimer);
+    // SET IDLE WINDOW TO 10 SECONDS
+    idleTimer = setTimeout(reinitialiseSession, 10000); 
 }
 
+// MAIN CLICK LISTENER
+document.addEventListener('mousedown', function(e) {
+    if (isAutoReset) return; // Ignore if the reset logic triggered this
+    const target = e.target.closest('path, polygon, circle, rect');
+    if (!target) return;
+
+    startSession(); 
+    totalClicks++;
+    
+    let name = getDistrictName(target);
+    districtData[name] = (districtData[name] || 0) + 1;
+    console.log(`Tracked: ${name}`);
+});
+
+// Track zoom/scroll as engagement
 ['wheel', 'touchmove', 'touchstart', 'mousemove'].forEach(ev => {
     document.addEventListener(ev, startSession, { passive: true });
 });
