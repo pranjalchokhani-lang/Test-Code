@@ -4,17 +4,19 @@ const KIOSK_LOCATION = window.location.pathname.split("/").pop().split(".")[0].t
 let totalClicks = 0, rawData = {}, startTime = null, lastInteractionTime = null, idleTimer;
 let homeDistrict = ""; 
 
-// 1. HARDENED HOME CAPTURE (Tries every 500ms until found)
-function findHome() {
-    const label = document.querySelector('.title, #selected-name, .district-label'); 
+// 1. IMPROVED HOME CAPTURE
+function findHomeName() {
+    // Looks for the specific label class used in your map (title or selected-name)
+    const label = document.querySelector('.title, #selected-name, .district-label, #district-name'); 
     if (label && label.innerText.trim() !== "") {
         homeDistrict = label.innerText.trim();
-        console.log("Home District Locked: " + homeDistrict);
+        console.log("Tracker: Home District set to [" + homeDistrict + "]");
     } else {
-        setTimeout(findHome, 500);
+        // Retry every second until the map loads the initial name
+        setTimeout(findHomeName, 1000);
     }
 }
-findHome();
+findHomeName();
 
 function finalizeSession() {
     if (totalClicks > 0) {
@@ -27,15 +29,16 @@ function finalizeSession() {
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
     
-    // RESET
+    // RESET INTERNALS
     totalClicks = 0; rawData = {}; startTime = null; lastInteractionTime = null;
     
-    // 2. FORCED RESET (Using the specific snap-back logic)
+    // 2. THE RESET TRIGGER
+    // We use window.select to ensure we are calling the global map function
     if (typeof window.select === "function" && homeDistrict !== "") {
-        console.log("Idle Timeout: Returning to " + homeDistrict);
+        console.log("Tracker: 10s Idle. Executing select('" + homeDistrict + "')");
         window.select(homeDistrict); 
     } else {
-        console.error("Reset Failed: homeDistrict missing or select() not found.");
+        console.warn("Tracker: Reset failed. homeDistrict is empty or select() is missing.");
     }
 }
 
@@ -43,7 +46,7 @@ function startSession() {
     if (!startTime) startTime = Date.now();
     lastInteractionTime = Date.now();
     clearTimeout(idleTimer);
-    // 10-SECOND RESET WINDOW (As requested)
+    // 10-SECOND IDLE WINDOW
     idleTimer = setTimeout(finalizeSession, 10000); 
 }
 
@@ -58,6 +61,7 @@ document.addEventListener('mousedown', function(e) {
     rawData[rawIndex] = (rawData[rawIndex] || 0) + 1;
 });
 
-['wheel', 'touchmove', 'touchstart'].forEach(ev => {
+// Capture all forms of interaction to prevent early reset
+['wheel', 'touchmove', 'touchstart', 'click'].forEach(ev => {
     document.addEventListener(ev, startSession, { passive: true });
 });
