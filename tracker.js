@@ -35,10 +35,8 @@ let idleTimer           = null;
 let isResetting         = false;
 
 // ─── LOCK BOOT TRANSFORM ──────────────────────────────────────────────────────
-// Polls until the map IIFE has done its first apply(), then locks that
-// transform string as the home position — no need to touch internal variables.
-let bootTransform = null;
 const mover = document.getElementById('map-mover');
+let bootTransform = 'translate(0px, 0px) scale(1)';
 
 const bootWatch = setInterval(() => {
     if (mover && mover.style.transform) {
@@ -46,7 +44,7 @@ const bootWatch = setInterval(() => {
             bootTransform = mover.style.transform;
             console.log('Tracker: boot transform locked ->', bootTransform);
             clearInterval(bootWatch);
-        }, 800); // wait for select('Jaipur') animation to finish
+        }, 1200);
     }
 }, 50);
 
@@ -60,7 +58,14 @@ function startSession() {
 }
 
 // ─── RESET ────────────────────────────────────────────────────────────────────
-function finalizeSession() {
+async function finalizeSession() {
+    if (isResetting) return;
+    isResetting = true;
+    clearTimeout(idleTimer);
+    idleTimer = null;
+
+    console.log('Tracker: idle timeout — resetting...');
+
     // 1. Send data before wiping
     if (totalClicks > 0) {
         const payload = {
@@ -72,41 +77,40 @@ function finalizeSession() {
         navigator.sendBeacon(scriptUrl, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
     }
 
-    // 2. Wipe all session data + engage blindfold
-    isResetting         = true;
+    // 2. Wipe session counters
     totalClicks         = 0;
     rawData             = {};
     startTime           = null;
     lastInteractionTime = null;
-    clearTimeout(idleTimer);
-    idleTimer           = null;
 
-    console.log('Tracker: idle timeout — resetting...');
-
-    // 3. Kill any in-flight stream() animations by bumping currentToken
-    //    select() checks this token and aborts if it has changed
-    currentToken++;
-
-    // 4. Snap map zoom/pan back to boot position — pure DOM, no events
-    if (mover && bootTransform) {
-        mover.style.transition = 'transform 0.6s ease-in-out';
+    // 3. Snap map zoom/pan back silently — no zoom sound
+    zoomSfx.volume = 0;
+    if (mover) {
+        mover.style.transition = 'transform 0.5s ease-in-out';
         mover.style.transform  = bootTransform;
+        setTimeout(() => {
+            mover.style.transition = '';
+            zoomSfx.volume = 0.15;
+        }, 550);
     }
 
-    // 5. Use the map's own select() to properly reset data + sound + labels
-    //    Wrapped in setTimeout so the token bump above has already killed
-    //    any prior stream() before select() starts a fresh one
-    setTimeout(() => {
-        select(HOME_DISTRICT);
+    // 4. Reset data/labels/lists via select() but with sound muted
+    //    — reveal sound silent, bg music untouched
+    revealSfx.volume = 0;
+    select(HOME_DISTRICT);
+    setTimeout(() => { revealSfx.volume = 0.4; }, 100);
 
-        // 6. Remove transition lock after animation so next zoom is responsive
-        setTimeout(() => {
-            if (mover) mover.style.transition = '';
-            isResetting = false;
-            console.log('Tracker: reset complete — ready.');
-        }, 600);
+    // 5. Hold the shield until select() + stream() fully finish
+    //    900ms loading + (items × 650ms per row) + 500ms buffer
+    const maxItems = Math.max(
+        (typeof DATA !== 'undefined' && DATA[HOME_DISTRICT]) ? (DATA[HOME_DISTRICT].m || []).length : 0,
+        (typeof DATA !== 'undefined' && DATA[HOME_DISTRICT]) ? (DATA[HOME_DISTRICT].e || []).length : 0
+    );
+    const waitMs = 900 + (maxItems * 650) + 500;
+    await new Promise(res => setTimeout(res, waitMs));
 
-    }, 50);
+    isResetting = false;
+    console.log('Tracker: reset complete — ready.');
 }
 
 // ─── CLICK TRACKING ───────────────────────────────────────────────────────────
