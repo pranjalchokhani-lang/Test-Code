@@ -98,7 +98,8 @@ function finalizeSession() {
         location : KIOSK_LOCATION,
         clicks   : totalClicks,
         duration : sessionDuration,
-        breakdown: JSON.stringify(rawData)
+        breakdown: JSON.stringify(rawData),
+        type     : totalClicks > 0 ? "CLICKED" : sessionDuration > 5 ? "BROWSED" : "TAPPED"
     })], { type: 'text/plain' }));
 
     // 3. Wipe
