@@ -141,8 +141,9 @@ function finalizeSession() {
 
     console.log('Tracker: duration ->', sessionDuration, 'sec | clicks ->', totalClicks);
 
-  // 2. ALWAYS send every session — including zero-click ones
+    // 2. ALWAYS send every session — including zero-click ones
     //    Zero-click = student zoomed/panned/touched but never tapped a district
+    //    These are valid engagement data and must be recorded
     const payload = {
         location : KIOSK_LOCATION,
         clicks   : totalClicks,
@@ -219,3 +220,11 @@ if (viewport) {
 
 // Start activity watcher after map fully renders
 setTimeout(startActivityWatcher, 2000);
+
+
+
+
+
+
+
+
