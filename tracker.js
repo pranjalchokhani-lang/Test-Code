@@ -1,123 +1,73 @@
-// CAPTURE THE EXACT URL ON BOOT UP (Before anyone clicks anything)
 // =========================================================================
-// KIOSK TELEMETRY: MASTER TRACKER (V3 - With Zero-Click Logic)
+// 1. THE DATA CATCHER (Master Data Vault Version)
 // =========================================================================
-(function() {
-    // --- CONFIGURATION ---
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMnasHW4SJZ2dQqLaJZ-GcvKW9lJpiJPEm-eBcN5M-seL8qB9-86FmhTn2rbHwikTg/exec"; 
-    const IDLE_TIMEOUT = 10000; // 10s inactivity = Reset
-    const HOME_DISTRICT_ID = "1"; // Change to your Home/Rajkot ID
-
-    // Clean up location path (e.g., "/jaipur.html" becomes "JAIPUR")
-    let rawLocation = window.location.pathname.split('/').pop().replace('.html', '').toUpperCase();
-
-    // --- SESSION STATE ---
-    let sessionData = {
-        location: rawLocation || "UNKNOWN", 
-        clicks: 0,
-        duration: 0,
-        breakdown: {}
-    };
-
-    let startTime = null;
-    let lastInteractionTime = null;
-    let idleTimer = null;
-    let sessionActive = false;
-
-    // --- SESSION CONTROL ---
-
-    function startNewSession() {
-        sessionActive = true;
-        startTime = Date.now();
-        lastInteractionTime = startTime;
-        sessionData.clicks = 0;
-        sessionData.breakdown = {};
-        console.log("🚀 Session Started (Interaction Detected)");
-    }
-
-    function resetIdleTimer() {
-        if (!sessionActive) return;
-        
-        lastInteractionTime = Date.now();
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(finalizeSession, IDLE_TIMEOUT);
-    }
-
-    function finalizeSession() {
-        if (!sessionActive) return;
-
-        // Actual Interaction Time (Last Touch - First Touch). 
-        // Forced to at least 1 second so a quick single tap doesn't record as 0 seconds.
-        sessionData.duration = Math.max(1, Math.round((lastInteractionTime - startTime) / 1000));
-
-        // CREATE FINAL PAYLOAD
-        // CRITICAL FIX: 'breakdown' must be converted to a string before sending, 
-        // otherwise Google Sheets writes "[object Object]" and breaks your formulas.
-        const finalPayload = {
-            location: sessionData.location,
-            clicks: sessionData.clicks,
-            duration: sessionData.duration,
-            breakdown: JSON.stringify(sessionData.breakdown) 
-        };
-
-        console.log("📦 Sending Data:", finalPayload);
-
-        // Send Data to Master Vault (9-Column Script)
-        fetch(APPS_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            cache: "no-cache",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(finalPayload)
-        });
-
-        console.log("✅ Data Transmitted. Cleaning UI...");
-
-        // Perform Functional Reset (Clears ghost data)
-        performUIReset();
-
-        sessionActive = false;
-        startTime = null;
-    }
-
-    function performUIReset() {
-        // Target the SVG Home element
-        const homeElement = document.querySelector(`[data-id="${HOME_DISTRICT_ID}"]`) || 
-                            document.getElementById(`district-${HOME_DISTRICT_ID}`);
-
-        if (homeElement) {
-            // Simulated Click to force text panels and ripples to sync
-            homeElement.dispatchEvent(new Event('click', { bubbles: true }));
-        }
-    }
-
-    // --- EVENT LISTENERS (TOUCH & CLICK) ---
-
-    // 1. Map Interaction (Specific District Clicks)
-    document.addEventListener('click', function(e) {
-        const target = e.target.closest('path, polygon');
-        if (!target) return; // Ignores empty space clicks (Event Listener #2 catches those)
-
-        if (!sessionActive) startNewSession();
-
-        const districtId = target.getAttribute('data-id') || target.id;
-        if (districtId) {
-            sessionData.clicks++;
-            sessionData.breakdown[districtId] = (sessionData.breakdown[districtId] || 0) + 1;
-        }
-        resetIdleTimer();
-    });
-
-    // 2. Physical Activity (Scroll/Zoom/Touch/Empty space clicks)
-    // THE ZERO-TOUCH PIECE: This guarantees a session starts and stays active
-    // even if a student pans around the map for 3 minutes but never taps a shape.
-    const activeEvents = ['touchstart', 'touchmove', 'touchend', 'mousedown', 'wheel', 'scroll'];
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var dataSheet = ss.getSheetByName("All Data");
     
-    activeEvents.forEach(event => {
-        window.addEventListener(event, function() {
-            if (!sessionActive) startNewSession();
-            resetIdleTimer();
-        }, { passive: true });
-    });
+    var payload = JSON.parse(e.postData.contents);
+    var formattedDate = Utilities.formatDate(new Date(), "GMT+5:30", "dd-MMM-yy HH:mm:ss");
+    var rowNum = dataSheet.getLastRow() + 1;
+    
+    // Column G: Mapped Districts
+    // Uses the parsed Location (Column B) + Raw IDs (Column F) to query the Marriage tab
+    var mapFormula = '=IF(F' + rowNum + '="","", IFERROR(JOIN(", ", MAP(SPLIT(REGEXREPLACE(F' + rowNum + ', "[{}"&CHAR(34)&" ]", ""), ","), LAMBDA(pair, IFERROR(VLOOKUP(B' + rowNum + '&INDEX(SPLIT(pair, ":"), 1), {ARRAYFORMULA(Marriage!$A:$A&Marriage!$B:$B), Marriage!$C:$C}, 2, FALSE), "Unknown ("&INDEX(SPLIT(pair, ":"), 1)&")") & " (" & INDEX(SPLIT(pair, ":"), 2) & ")"))), ""))';
 
-})();
+    dataSheet.appendRow([
+      formattedDate,            // A: Date
+      payload.location,         // B: Location (From detectKioskLocation)
+      "",                       // C: Reserved for File Name splits if needed
+      Number(payload.clicks),   // D: Total Clicks
+      Number(payload.duration), // E: Session Duration
+      payload.breakdown,        // F: Raw JSON IDs
+      mapFormula,               // G: Mapped District Names
+      "",                       // H: Notes
+      payload.location          // I: Full Raw Path Backup
+    ]);
+    
+    return ContentService.createTextOutput("Success");
+  } catch (err) { 
+    return ContentService.createTextOutput("Error: " + err.toString()); 
+  }
+}
+
+// =========================================================================
+// 2. THE EMAIL REPORTER
+// =========================================================================
+function sendUnifiedReport() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var reportSheet = ss.getSheetByName("Report");
+  var todayStr = Utilities.formatDate(new Date(), "GMT+5:30", "dd-MMM-yy");
+  var data = reportSheet.getDataRange().getDisplayValues(); 
+  
+  var html = "<div style='font-family: Arial, sans-serif; max-width: 950px;'>";
+  html += "<h2 style='color: #1155cc; margin-bottom: 5px;'>Kiosk Performance Report</h2>";
+  html += "<p style='color: #555; margin-top: 0px; margin-bottom: 20px;'>Automated snapshot for <strong>" + todayStr + "</strong></p>";
+  html += "<table border='1' cellpadding='8' style='border-collapse: collapse; width: 100%; text-align: center; font-size: 13px;'>";
+
+  for (var i = 0; i < data.length; i++) {
+    var row = data[i];
+    if (row.join("").trim() === "") {
+      html += "<tr><td colspan='" + row.length + "' style='border: none; height: 15px;'></td></tr>";
+      continue;
+    }
+    var trStyle = (i === 1) ? "background-color: #f0f0f0; font-weight: bold; color: #202124;" : "";
+    html += "<tr style='" + trStyle + "'>";
+    for (var j = 0; j < 7; j++) { 
+      var cellStyle = (j === 0) ? "text-align: left; font-weight: bold; color: #202124; " : "";
+      if (j === 1) cellStyle += "background-color: #e0e0e0; font-weight: bold; ";
+      var cellText = row[j] !== "" ? row[j] : "-";
+      if ((i === 2 || i === 9) && j === 0) {
+        html += "<td colspan='7' style='text-align: left; padding-left: 10px; font-size: 14px; background-color: #f8f9fa; font-weight: bold; color: #1155cc; border-bottom: 2px solid #ccc;'>" + cellText + "</td>";
+        break; 
+      } else {
+        html += "<td style='" + cellStyle + "'>" + cellText + "</td>";
+      }
+    }
+    html += "</tr>";
+  }
+  html += "</table><p style='font-size: 11px; color: #888; margin-top: 20px;'>*Data captured via automated telemetry.</p></div>";
+
+  MailApp.sendEmail({to: "pranjal.chokhani@allen.in", subject: "Kiosk Daily Summary - " + todayStr, htmlBody: html});
+}
