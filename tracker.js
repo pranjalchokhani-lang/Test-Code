@@ -29,13 +29,15 @@ const IDLE_MS        = 10000;
 let totalClicks         = 0;
 let rawData             = {};
 let startTime           = null;
-let lastInteractionTime = null;
+let lastInteractionTime = null; // null = no active session
 let isResetting         = true;
 let HOME_DISTRICT       = null;
 const mover             = document.getElementById('map-mover');
 const viewport          = document.getElementById('map-viewport');
 
 // ─── RAF IDLE DETECTION — never throttled by browser ─────────────────────────
+// Polls Date.now() on every frame — fires finalizeSession exactly at 10s
+// lastInteractionTime === null means no active session, RAF just loops silently
 let rafId = null;
 
 function startRAF() {
@@ -44,7 +46,7 @@ function startRAF() {
         if (!isResetting && lastInteractionTime !== null) {
             const elapsed = Date.now() - lastInteractionTime;
             if (elapsed >= IDLE_MS) {
-                lastInteractionTime = null;
+                lastInteractionTime = null; // prevent double-fire
                 finalizeSession();
                 return;
             }
@@ -58,12 +60,9 @@ function stopRAF() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
 }
 
-function armRAF() {
-    stopRAF();
-    startRAF();
-}
-
 // ─── SESSION ──────────────────────────────────────────────────────────────────
+// Called on ANY interaction — touch, move, zoom, pan, click
+// Sets startTime on first interaction, updates lastInteractionTime on every one
 function startSession() {
     if (isResetting) return;
     if (!startTime) startTime = Date.now();
@@ -71,8 +70,8 @@ function startSession() {
 }
 
 // ─── BOOT WATCH ───────────────────────────────────────────────────────────────
-// Keeps screen locked (isResetting=true) until map is fully ready.
-// Locks HOME_DISTRICT from the very first path.on — before any user can click.
+// isResetting=true from top — screen fully locked until map is ready
+// HOME_DISTRICT locked from very first path.on before any user can interact
 const bootWatch = setInterval(() => {
     if (typeof window._mapReset !== 'function') return;
     if (typeof window.mapApply  !== 'function') return;
@@ -92,15 +91,15 @@ const bootWatch = setInterval(() => {
 
     setTimeout(() => {
         isResetting = false;
-        lastInteractionTime = Date.now();
+        // DO NOT set lastInteractionTime here — wait for real user interaction
         startRAF();
-        console.log('Tracker: boot complete. Idle detection running.');
+        console.log('Tracker: boot complete. Waiting for first interaction.');
     }, 1500);
 }, 50);
 
 // ─── ACTIVITY WATCHER ─────────────────────────────────────────────────────────
 // MutationObserver watches DOM directly — catches zoom/pan/clicks
-// on both touchscreen and laptop without relying on event bubbling
+// Works on both touchscreen and laptop without relying on event bubbling
 function startActivityWatcher() {
     // Watch map-mover transform — catches all zoom and pan
     if (mover) {
@@ -131,19 +130,20 @@ function finalizeSession() {
     isResetting = true;
     stopRAF();
 
-    console.log('Tracker: resetting...');
+    console.log('Tracker: resetting... duration:', 
+        startTime && lastInteractionTime 
+            ? Math.floor((lastInteractionTime - startTime) / 1000) 
+            : 0, 
+        'sec | clicks:', totalClicks);
 
-    // 1. Capture duration BEFORE wiping anything
+    // 1. Capture duration BEFORE wiping — always non-negative
     var sessionDuration = (startTime && lastInteractionTime)
         ? Math.floor((lastInteractionTime - startTime) / 1000)
         : 0;
     if (sessionDuration < 0) sessionDuration = 0;
 
-    console.log('Tracker: duration ->', sessionDuration, 'sec | clicks ->', totalClicks);
-
-    // 2. ALWAYS send every session — including zero-click ones
-    //    Zero-click = student zoomed/panned/touched but never tapped a district
-    //    These are valid engagement data and must be recorded
+    // 2. ALWAYS send — zero-click sessions are valid data
+    //    clicks=0 means student zoomed/panned/touched but never tapped a district
     const payload = {
         location : KIOSK_LOCATION,
         clicks   : totalClicks,
@@ -173,12 +173,13 @@ function finalizeSession() {
     select(HOME_DISTRICT);
     revealSfx.volume = 0.4;
 
-    // 7. Release immediately
+    // 7. Release shield immediately
     isResetting = false;
-    console.log('Tracker: reset complete — ready.');
+    console.log('Tracker: reset complete — ready for next student.');
 
-    // 8. Restart RAF for next session
-    lastInteractionTime = Date.now();
+    // 8. Restart RAF but DO NOT set lastInteractionTime
+    //    Session only begins when next student actually interacts
+    //    RAF loops silently until then
     startRAF();
 }
 
@@ -194,7 +195,7 @@ document.addEventListener('mousedown', (e) => {
     rawData[idx] = (rawData[idx] || 0) + 1;
 });
 
-// Touchscreen taps — count district taps + start session on any touch
+// Touchscreen — any finger contact starts session + counts district taps
 document.addEventListener('touchstart', (e) => {
     if (isResetting) return;
     const target = e.target.closest('path, polygon, circle, rect');
@@ -204,10 +205,10 @@ document.addEventListener('touchstart', (e) => {
         const idx = allShapes.indexOf(target);
         rawData[idx] = (rawData[idx] || 0) + 1;
     }
-    startSession(); // any touch starts/extends session
+    startSession(); // ANY touch — tap, drag, pinch — starts/extends session
 }, { passive: true });
 
-// Laptop — mouse movement or scroll extends session
+// Laptop — any mouse movement or scroll starts/extends session
 document.addEventListener('mousemove', () => { if (!isResetting) startSession(); }, { passive: true });
 document.addEventListener('wheel',     () => { if (!isResetting) startSession(); }, { passive: true });
 
@@ -220,11 +221,3 @@ if (viewport) {
 
 // Start activity watcher after map fully renders
 setTimeout(startActivityWatcher, 2000);
-
-
-
-
-
-
-
-
