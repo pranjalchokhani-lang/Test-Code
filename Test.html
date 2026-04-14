@@ -183,40 +183,88 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 }
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;}
 
-/* large tablet / small laptop */
+/* TABLET ADJUSTMENTS */
 @media(max-width:900px){
   .body{padding:0 4cqw;gap:1.5cqw;}
 }
-/* tablet portrait */
 @media(max-width:768px){
   .body{padding:0 2cqw;gap:1cqw;}
   .trap-head{height:auto;padding:10px 3cqw 6px;}
   .trap-foot-wrap{height:auto;padding:6px 3cqw 10px;}
-  .rp-header{padding:4px 6px 6px 10px;}
-  .blk-header{padding:8px 14px;}
 }
-/* phone */
+
+/* PHONE FIX: STACKED & SCROLLABLE */
 @media(max-width:520px){
-  html,body{overflow:auto;height:auto;}
-  body{align-items:flex-start;}
-  .card{height:auto;min-height:100dvh;overflow:hidden;}
-  .card-inner{height:auto;min-height:100dvh;justify-content:flex-start;overflow:hidden;}
-  .body{grid-template-columns:1fr;grid-template-rows:auto auto;padding:8px;gap:8px;flex:none;}
-  .map-panel{height:56vw;min-height:180px;max-height:240px;padding:10px;flex:none;}
-  .right-panel{height:auto;overflow:hidden;display:flex;flex-direction:column;gap:8px;}
-  .blk{min-height:0;height:auto;max-height:38vw;width:100%;flex:none;overflow:hidden;}
-  #med-list,#eng-list{max-height:120px;overflow-y:auto;overflow-x:hidden;}
-  .trap-head{height:auto;min-height:50px;max-height:80px;padding:10px 4vw 6px;flex-shrink:0;overflow:hidden;}
-  .trap-foot-wrap{height:auto;min-height:50px;max-height:80px;padding:6px 4vw 12px;flex-shrink:0;overflow:hidden;}
-  .row{white-space:normal;font-size:12px;line-height:1.4;}
-  .hdr-title{font-size:18px;}
-  .blk-title{font-size:13px;}
-  .ctag{font-size:18px;}
-  .wtag{font-size:12px;}
-  .fsub{font-size:11px;}
-  .fmain{font-size:15px;}
-}
-</style>
+  html, body { 
+    overflow-y: auto !important; 
+    height: auto !important; 
+    position: relative;
+  }
+  
+  .card { 
+    height: auto; 
+    min-height: 100vh; 
+    display: block; /* Disables the flex-center that causes overlap */
+    overflow-y: visible;
+  }
+
+  .card-inner { 
+    height: auto; 
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    position: relative;
+  }
+
+  .body { 
+    display: flex;
+    flex-direction: column; 
+    padding: 10px 15px;
+    gap: 20px; /* Space between Map and the Lists */
+    flex: none;
+    height: auto;
+  }
+
+  .map-panel { 
+    height: 320px; /* Solid height for the map */
+    width: 100%;
+    position: relative;
+    flex: none;
+  }
+
+  .right-panel { 
+    height: auto; 
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px; /* Pushes the footer down further */
+  }
+
+  .blk { 
+    height: auto; 
+    min-height: 180px; 
+    flex: none;
+  }
+
+  .trap-head { 
+    height: auto; 
+    padding: 30px 15px 15px; /* More top padding for the header */
+  }
+
+  .trap-foot-wrap { 
+    height: auto; 
+    padding: 40px 15px 60px; /* Heavy padding to ensure "You belong to this list" is clear */
+    position: relative;
+    margin-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.05); /* Visual separator */
+  }
+
+  /* Text Fixes */
+  .hdr-title { font-size: 1.1rem; }
+  .fmain { font-size: 1.2rem; }
+  .fsub { font-size: 0.85rem; margin-bottom: 5px; }
+  .row { white-space: normal; font-size: 13px; }
+}</style>
 </head>
 <body>
 <canvas id="page-aurora"></canvas>
