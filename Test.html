@@ -51,17 +51,17 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 
 .card-inner{position:relative;z-index:10;display:flex;flex-direction:column;flex:1;min-height:0;justify-content:space-between;will-change:transform;}
 @keyframes spaceFloat{0%{transform:translate3d(0,8px,0);}100%{transform:translate3d(0,-8px,0);}}
-@keyframes headFloat{
-  0%  {transform:scale(0.96);opacity:0.82;}
-  100%{transform:scale(1.03);opacity:1;}
+@keyframes hdrBreathe{
+  0%  {transform:scale(0.97);}
+  100%{transform:scale(1.03);}
 }
-@keyframes footFloat{
-  0%  {transform:scale(1.03);opacity:1;}
-  100%{transform:scale(0.96);opacity:0.82;}
+@keyframes ftBreathe{
+  0%  {transform:scale(1.03);}
+  100%{transform:scale(0.97);}
 }
 
-.trap-head{flex-shrink:0;height:15cqh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8cqh;padding:0 7cqw;line-height:1.2;animation:headFloat 22s ease-in-out infinite alternate;will-change:transform;}
-.hdr-title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-xl);letter-spacing:clamp(2px,0.5cqw,8px);text-transform:uppercase;color:var(--text);display:inline-block;text-shadow:0 0 14px rgba(255,255,255,0.5),0 0 30px rgba(255,255,255,0.15);}
+.trap-head{flex-shrink:0;height:15cqh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8cqh;padding:0 10cqw;line-height:1.2;}
+.hdr-title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-xl);letter-spacing:clamp(4px,0.8cqw,12px);text-transform:uppercase;color:var(--text);display:inline-block;text-shadow:0 0 20px rgba(255,255,255,0.5);}
 @keyframes titleInOut {
   0% {
     transform: translate3d(0, 2px, 0);
@@ -80,7 +80,7 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 .ticker-half{display:inline-flex;gap:48px;padding-right:48px;}
 .ticker-half span{font-family:var(--font-display)!important;font-size:var(--fs-s);font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:clamp(2px,0.35cqw,4px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,255,255,0.6);line-height:1.4;flex-shrink:0;white-space:nowrap;}
 
-.body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 7cqw 0 6cqw;gap:2cqw;}
+.body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw 0 8cqw;gap:2cqw;}
 
 .map-panel,.blk{border-radius:16px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.03);backdrop-filter:blur(22px) saturate(1.2);-webkit-backdrop-filter:blur(22px) saturate(1.2);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 36px rgba(0,0,0,0.35);transform-style:preserve-3d;}
 .box-fill{position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:0;}
@@ -101,12 +101,12 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-rgb),0.8);animation:dotP 1s ease-in-out infinite;}
 @keyframes dotP{0%,100%{opacity:1;box-shadow:0 0 10px rgba(var(--accent-rgb),1.0),0 0 20px rgba(var(--accent-rgb),0.5);}50%{opacity:0.05;box-shadow:none;}}
 
-.map-panel{animation:floatMap 9s ease-in-out infinite alternate,borderMap 10s linear infinite;animation-delay:0s,-1s;padding:18px 12px 12px;touch-action:none;height:100%;will-change:transform;}
-.blk{animation:floatMed 9s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-2s,-5.5s;flex:1;min-height:0;will-change:transform;}
-.blk.eng{animation:floatEng 9s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-4s,-5.5s;will-change:transform;}
+.map-panel{animation:floatMap 7s ease-in-out infinite alternate,borderMap 10s linear infinite;animation-delay:0s,-1s;padding:18px 12px 12px;touch-action:none;height:100%;will-change:transform;}
+.blk{animation:floatMed 7s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-6s,-5.5s;flex:1;min-height:0;will-change:transform;}
+.blk.eng{animation:floatEng 7s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-12s,-5.5s;will-change:transform;}
 @keyframes floatMap{0%{transform:translate3d(0,-7px,0) rotateX(0.4deg);}100%{transform:translate3d(0,7px,0) rotateX(-0.4deg);}}
-@keyframes floatMed{0%{transform:translate3d(0,-6px,0) rotateX(0.3deg);}100%{transform:translate3d(0,6px,0) rotateX(-0.3deg);}}
-@keyframes floatEng{0%{transform:translate3d(0,-5px,0) rotateX(0.25deg);}100%{transform:translate3d(0,5px,0) rotateX(-0.25deg);}}
+@keyframes floatMed{0%{transform:translate3d(0,-3px,0) rotateX(0.2deg);}100%{transform:translate3d(0,3px,0) rotateX(-0.2deg);}}
+@keyframes floatEng{0%{transform:translate3d(0,-3px,0) rotateX(0.15deg);}100%{transform:translate3d(0,3px,0) rotateX(-0.15deg);}}
 @keyframes borderMap{0%{border-color:rgba(var(--accent-rgb),0.06);box-shadow:none;}35%{border-color:rgba(var(--accent-rgb),0.28);box-shadow:0 0 16px rgba(var(--accent-rgb),0.10),inset 0 0 12px rgba(var(--accent-rgb),0.03);}50%{border-color:rgba(var(--accent-rgb),0.06);box-shadow:none;}100%{border-color:rgba(var(--accent-rgb),0.06);box-shadow:none;}}
 @keyframes borderSide{0%{border-color:rgba(255,255,255,0.04);box-shadow:none;}50%{border-color:rgba(255,255,255,0.04);box-shadow:none;}75%{border-color:rgba(var(--accent-rgb),0.18);box-shadow:0 0 8px rgba(var(--accent-rgb),0.06);}100%{border-color:rgba(255,255,255,0.04);box-shadow:none;}}
 
@@ -129,7 +129,7 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 @keyframes pulse-out{0%{r:0;opacity:0.9;stroke-width:2}100%{r:28;opacity:0;stroke-width:0}}
 .state-boundary{display:none;}
 
-.right-panel{display:flex;flex-direction:column;gap:1cqh;min-height:0;overflow:hidden;height:100%;}
+.right-panel{display:flex;flex-direction:column;gap:2cqh;min-height:0;overflow:hidden;height:100%;}
 
 /* Chakra Petch for district readout */
 .wtag{font-family:var(--font-display);font-size:var(--fs-m);letter-spacing:clamp(0.5px,0.2cqw,2px);color:var(--accent);text-transform:uppercase;font-weight:400;white-space:nowrap;line-height:1.4;}
@@ -167,9 +167,9 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 .loading-line.active{display:block;animation:typeload 0.9s steps(22) forwards;}
 @keyframes typeload{from{width:0}to{width:100%}}
 
-.trap-foot-wrap{flex-shrink:0;height:15cqh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.6cqh;padding:0 7cqw;animation:footFloat 26s ease-in-out infinite alternate;animation-delay:-13s;will-change:transform;}
-.fsub{display:block;font-family:var(--font-display);font-size:var(--fs-m);font-weight:400;letter-spacing:clamp(2px,0.35cqw,4px);color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;line-height:1.4;text-shadow:0 0 10px rgba(255,255,255,0.6);}
-.fmain{display:block;font-family:var(--font-display);font-weight:700;font-size:var(--fs-l);letter-spacing:clamp(2px,0.5cqw,6px);text-transform:uppercase;color:#fff;text-align:center;text-shadow:0 0 14px rgba(255,255,255,0.5),0 0 30px rgba(255,255,255,0.15);}
+.trap-foot-wrap{flex-shrink:0;height:15cqh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.6cqh;padding:0 10cqw;}
+.fsub{display:block;transform-origin:center center;font-family:var(--font-display);font-size:var(--fs-m);font-weight:400;letter-spacing:clamp(3px,0.5cqw,7px);color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;line-height:1.4;text-shadow:0 0 10px rgba(255,255,255,0.6);}
+.fmain{display:block;transform-origin:center center;font-family:var(--font-display);font-weight:700;font-size:var(--fs-l);letter-spacing:clamp(4px,0.7cqw,10px);text-transform:uppercase;color:#fff;text-align:center;text-shadow:0 0 20px rgba(255,255,255,0.5);}
 @keyframes footerInOut {
   0% {
     transform: translate3d(0, 2px, 0);
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!track||!half)return;
     const hw=half.getBoundingClientRect().width||half.offsetWidth||600;
     track.style.width=(hw*2)+'px';
-    track.animate([{transform:'translateX(0)'},{transform:`translateX(-${hw}px)`}],{duration:55000,iterations:Infinity,easing:'linear'});
+    track.animate([{transform:'translateX(0)'},{transform:`translateX(-${hw}px)`}],{duration:35000,iterations:Infinity,easing:'linear'});
   }
   // wait for all fonts (incl. Roboto Condensed) before measuring ticker width
   (document.fonts?document.fonts.ready:Promise.resolve()).then(initTicker);
@@ -570,14 +570,14 @@ function initCanvas(){
   const stars=Array.from({length:160},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.2+0.2,o:Math.random()*0.35+0.12,do:(Math.random()*0.004+0.001)*(Math.random()<0.5?1:-1),vx:(Math.random()-0.5)*0.10,vy:(Math.random()-0.5)*0.075}));
 
   const P=[
-    // Large left — moved higher, slow drift
-    {bx:W*-0.22,by:H*-0.05,r:W*0.42,ax:0.00012,ay:0.000082,rx:W*0.28,ry:H*0.22,rimA:0.18,rimW:1.4,rings:[]},
-    // Bottom — tiny sector, centre just below bottom edge
-    {bx:W*0.72,by:H*1.04,r:W*0.14,ax:0.00014,ay:0.000095,rx:W*0.12,ry:H*0.03,rimA:0.12,rimW:0.8,rings:[]},
+    // Large left — wide elliptical orbit, traverses all directions
+    {bx:W*-0.22,by:H*0.10,r:W*0.42,ax:0.00020,ay:0.000150,rx:W*0.16,ry:H*0.18,ph:0,rimA:0.18,rimW:1.4,rings:[]},
+    // Bottom — flatter ellipse, more horizontal than vertical
+    {bx:W*0.72,by:H*1.04,r:W*0.14,ax:0.00026,ay:0.000195,rx:W*0.13,ry:H*0.04,ph:2.1,rimA:0.12,rimW:0.8,rings:[]},
   ];
 
   function drawPlanet(p,t){
-    const ppx=p.bx+Math.sin(t*p.ax)*p.rx,ppy=p.by+Math.cos(t*p.ay)*p.ry,r=p.r;
+    const ppx=p.bx+Math.sin(t*p.ax+(p.ph||0))*p.rx,ppy=p.by+Math.cos(t*p.ay+(p.ph||0)*0.7)*p.ry,r=p.r;
 
     cx.save();cx.beginPath();cx.rect(0,0,W,H);cx.clip();
 
@@ -648,5 +648,27 @@ function initCanvas(){
 }
 </script>
 <script src="tracker.js"></script>
+<script>
+// Subtle glow breathe — alive but not pulsing
+(function(){
+  const hdr  = document.querySelector('.trap-head');
+  const foot = document.querySelector('.trap-foot-wrap');
+  const startTime = performance.now();
+  const PERIOD = 15000; // 2 min cycle — very slow
+  function tick(now){
+    const t   = (now - startTime) / PERIOD;
+    const gIn  = 0.5 + 0.5 * Math.sin(t * Math.PI * 2);
+    const gOut = 0.5 + 0.5 * Math.sin(t * Math.PI * 2 + Math.PI);
+    const blurIn  = (6 + gIn  * 10).toFixed(1);
+    const blurOut = (6 + gOut * 10).toFixed(1);
+    const aIn  = (0.20 + gIn  * 0.18).toFixed(3);
+    const aOut = (0.20 + gOut * 0.18).toFixed(3);
+    if(hdr)  hdr.style.filter  = `drop-shadow(0 0 ${blurIn}px rgba(255,255,255,${aIn}))`;
+    if(foot) foot.style.filter = `drop-shadow(0 0 ${blurOut}px rgba(255,255,255,${aOut}))`;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
 </body>
 </html>
