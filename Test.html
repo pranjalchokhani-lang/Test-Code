@@ -54,7 +54,6 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;display:none;}
 
 /* ── GLOW OVERLAY ────────────────────────────────────────────────────────── */
-/* Border sweep canvas injected here — fires once per select, not looping    */
 #glowOverlay{position:absolute;inset:0;z-index:200;pointer-events:none;}
 .border-svg{display:none;}
 
@@ -267,7 +266,7 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 <div class="card" id="stage">
   <!-- Background starfield canvas -->
   <canvas id="c"></canvas>
-  <!-- Border sweep overlay (fires once per select, not looping) -->
+  <!-- Border sweep overlay -->
   <div id="glowOverlay"></div>
   <svg class="border-svg"></svg>
 
@@ -628,49 +627,6 @@ async function select(name){
 <script>
 document.addEventListener('DOMContentLoaded',function(){
 
-  // ─── BORDER SWEEP (glowOverlay canvas) ───────────────────────────────────
-  // A white bead of light travels around the card border on each district select.
-  // Fires ONCE per trigger — stops at prog=1.0 and does not loop.
-  // This is the third canvas (#c = stars, #page-aurora = aurora waves, this = border)
-  const stage=document.getElementById('stage'),overlay=document.getElementById('glowOverlay');
-  const gc=document.createElement('canvas');
-  gc.style.cssText='position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
-  overlay.appendChild(gc);
-  const W=stage.offsetWidth||700,H=stage.offsetHeight||560;
-  gc.width=W;gc.height=H;
-  const gx=gc.getContext('2d');
-  const perim=2*(W+H),BEAD=600,SPEED=0.018,LW=4;
-  let prog=0,sweepRaf=null;
-  const edges=[
-    {s:0,    e:W,      x0:0,y0:0,x1:W,y1:0},
-    {s:W,    e:W+H,    x0:W,y0:0,x1:W,y1:H},
-    {s:W+H,  e:2*W+H,  x0:W,y0:H,x1:0,y1:H},
-    {s:2*W+H,e:perim,  x0:0,y0:H,x1:0,y1:0}
-  ];
-
-  function drawSweep(){
-    gx.clearRect(0,0,W,H);
-    const cD=prog*perim,loD=cD-BEAD/2,hiD=cD+BEAD/2;
-    function beadAlpha(d){const dist=Math.abs(d-cD);if(dist>=BEAD/2)return 0;const t=dist/(BEAD/2);return 0.80*Math.pow(1-t*t,1.6);}
-    for(const e of edges){
-      const lo=Math.max(loD,e.s),hi=Math.min(hiD,e.e);
-      if(lo>=hi)continue;
-      const eLen=e.e-e.s;
-      const sx=e.x0+(e.x1-e.x0)*((lo-e.s)/eLen),sy=e.y0+(e.y1-e.y0)*((lo-e.s)/eLen);
-      const ex=e.x0+(e.x1-e.x0)*((hi-e.s)/eLen),ey=e.y0+(e.y1-e.y0)*((hi-e.s)/eLen);
-      const grad=gx.createLinearGradient(sx,sy,ex,ey);
-      for(let i=0;i<=12;i++){const t=i/12;grad.addColorStop(t,`rgba(255,255,255,${beadAlpha(lo+(hi-lo)*t).toFixed(3)})`);}
-      gx.save();gx.lineCap='round';gx.lineWidth=LW;gx.shadowBlur=28;gx.shadowColor='rgba(255,255,255,0.30)';gx.strokeStyle=grad;gx.beginPath();gx.moveTo(sx,sy);gx.lineTo(ex,ey);gx.stroke();gx.restore();
-    }
-  }
-
-  function tickSweep(){
-    prog=Math.min(1,prog+SPEED);
-    drawSweep();
-    if(prog>=1){gx.clearRect(0,0,W,H);sweepRaf=null;return;} // done — no loop
-    sweepRaf=requestAnimationFrame(tickSweep);
-  }
-
   // ─── TICKER ───────────────────────────────────────────────────────────────
   function initTicker(){
     const track=document.querySelector('.ticker-track'),half=document.querySelector('.ticker-half');
@@ -756,16 +712,11 @@ document.addEventListener('DOMContentLoaded',function(){
     aRaf=requestAnimationFrame(drawAurora);
   }
 
-  // triggerAurora: fires aurora + border sweep together on every district select
+  // triggerAurora: fires aurora on every district select
   window.triggerAurora=()=>{
-    // Show and start aurora
     aEnergy=1.0;
     aCanvas.style.display='block';
     if(!aRaf)drawAurora();
-    // Restart border sweep from beginning
-    prog=0;
-    if(sweepRaf)cancelAnimationFrame(sweepRaf);
-    sweepRaf=requestAnimationFrame(tickSweep);
   };
 });
 
