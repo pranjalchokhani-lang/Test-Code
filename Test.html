@@ -27,16 +27,18 @@
   --fs-xl : clamp(14px, 2.40cqw, 28px);
   --accent     : #4de8b8;
   --accent-rgb : 77,232,184;
-  --bg  : #0d1014;
+  --bg  : #08090c;
   --text: #fff;
   --planet-period: 524s;
 }
 *{margin:0;padding:0;box-sizing:border-box;cursor:crosshair;}
+/* html background: backstop for iOS Safari dvh resize — ensures no unrendered strip ever shows */
+html{background:#08090c;}
 body{background:var(--bg);margin:0;display:flex;justify-content:center;align-items:center;width:100vw;height:100dvh;overflow:hidden;font-family:var(--font-display);color:var(--text);}
 .shell,.shelf{display:contents;}
 .card{width:100vw;height:100dvh;background:var(--bg);position:relative;overflow:hidden;font-family:var(--font-display);color:var(--text);display:flex;flex-direction:column;perspective:800px;container-type:size;}
 #glowOverlay{position:absolute;inset:0;z-index:200;pointer-events:none;}
-canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block;}
+canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display:block;}
 .border-svg{display:none;}
 .card-inner{position:relative;z-index:10;display:flex;flex-direction:column;flex:1;min-height:0;justify-content:space-between;}
 
@@ -71,7 +73,7 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 
 /* ── HEADER — 90s glow cycle, -22.5s delay so movement visible soon after load ── */
 /* EDIT: city name — change .wg span in HTML below */
-.trap-head{flex-shrink:0;height:15cqh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8cqh;padding:0 10cqw;line-height:1.2;}
+.trap-head{flex-shrink:0;height:18cqh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8cqh;padding:0 10cqw;line-height:1.2;}
 .hdr-title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-xl);text-transform:uppercase;color:var(--text);display:inline-block;animation:glowHdr 90s ease-in-out infinite;animation-delay:-22.5s;}
 .wg{color:var(--accent)!important;text-shadow:0 0 12px rgba(var(--accent-rgb),0.4);}
 .ticker-wrap{width:100%;overflow:hidden;height:22px;margin-top:6px;display:flex;align-items:center;}
@@ -80,8 +82,8 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 /* EDIT: ticker text lives in the two .ticker-half divs in HTML */
 .ticker-half span{font-family:var(--font-display)!important;font-size:var(--fs-s);font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:clamp(2px,0.35cqw,4px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,255,255,0.6);line-height:1.4;flex-shrink:0;white-space:nowrap;}
 
-/* ── BODY ── */
-.body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw 0 8cqw;gap:2cqw;}
+/* ── BODY — symmetric 10% padding each side ── */
+.body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw;gap:2cqw;}
 
 /*
  * Static border — borderMap / borderSide animations REMOVED.
@@ -171,78 +173,80 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;}
 
 /* ══════════════════════════════════════════════════════
-   MOBILE + TABLET STACKED LAYOUT
-   ─────────────────────────────────────────────────────
-   Breakpoint: ≤900px wide  (covers all phones + iPad portrait + iPad mini)
-   OR short landscape (≤500px tall, covers iPhone landscape)
+   LAYOUT BREAKPOINTS — ASPECT RATIO BASED
+   ──────────────────────────────────────────────────────
+   STACKED (vertical scroll): when screen is portrait-ish
+   Trigger: aspect-ratio < 2/3 (width < 0.667× height)
+   Covers: all phones in portrait (390×844 = 0.46, etc.)
 
-   WHY 900px not 600px:
-   • iPad mini  = 768px wide  → was getting cramped desktop 60/40 grid
-   • iPad Air   = 820px wide  → same problem
-   • All phones = ≤430px wide → covered
-   Single-column stacked layout works perfectly on all these.
+   HORIZONTAL GRID (60/40, fits in 100dvh): everything else
+   Covers:
+     • iPad portrait  (768×1024 = 0.75) ← horizontal ✅
+     • iPad landscape (1024×768 = 1.33) ← horizontal ✅
+     • Phone landscape (844×390 = 2.16) ← horizontal ✅
+     • Desktop (any) ← horizontal ✅
 
-   iPad landscape (1024px wide, 768px tall) falls outside this
-   breakpoint so it gets the full desktop 60/40 grid — correct.
+   Landscape NEVER stacks — always horizontal grid, no scroll.
    ══════════════════════════════════════════════════════ */
-@media (max-width:900px),(max-height:500px) and (orientation:landscape){
 
-  html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;}
-  .card{height:auto;min-height:100dvh;overflow-y:visible;display:block;}
+/* ── STACKED: portrait phones only ── */
+@media (max-aspect-ratio:2/3){
+
+  html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;background:#08090c;}
+  .card{height:auto;min-height:100dvh;overflow:visible;display:block;background:transparent;}
   .card-inner{height:auto;display:flex;flex-direction:column;position:relative;}
 
-  /* Header */
-  .trap-head{height:auto;padding:clamp(12px,3.5vw,22px) 5vw 8px;display:flex;flex-direction:column;align-items:center;text-align:center;}
-  .hdr-title{font-size:clamp(13px,4.5vw,22px);text-align:center;width:100%;}
+  /* Canvas fixed to viewport in stacked mode — does not scroll with content */
+  canvas#c{position:fixed;top:0;left:0;width:100vw;height:100dvh;}
 
-  /* Body: single column */
-  .body{display:flex;flex-direction:column;padding:6px 4vw;gap:10px;flex:none;height:auto;}
+  /* Header — dvh-based so it scales with phone height, not cqh (which=0 in auto-height card) */
+  .trap-head{height:10dvh;min-height:52px;padding:0 5vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .hdr-title{font-size:clamp(13px,5vw,22px);text-align:center;width:100%;}
 
-  /* Map panel: taller on tablet, shorter on phone */
-  .map-panel{width:100%;flex:none;height:clamp(200px,45vw,320px);touch-action:none;}
-  @media (orientation:landscape){.map-panel{height:clamp(160px,36vw,220px);}}
+  /* Body: single column, 5% side padding on phone */
+  .body{display:flex;flex-direction:column;padding:8px 5vw;gap:10px;flex:none;height:auto;}
+
+  /* Map panel */
+  .map-panel{width:100%;flex:none;height:min(48vw,220px);touch-action:none;}
 
   /* Right panel */
-  .right-panel{height:auto;display:flex;flex-direction:column;gap:10px;overflow:visible;}
-  .rp-header{padding:6px 10px 4px 10px;flex-shrink:0;}
-  .wtag{font-size:clamp(9px,2.2vw,14px);white-space:normal;}
-  .ctag{font-size:clamp(14px,3.5vw,22px);}
+  .right-panel{height:auto;display:flex;flex-direction:column;gap:8px;overflow:visible;}
+  .rp-header{padding:4px 10px 3px 10px;flex-shrink:0;}
+  .wtag{font-size:clamp(9px,3vw,14px);white-space:normal;}
+  .ctag{font-size:clamp(14px,4.5vw,22px);}
 
-  /*
-   * Block height budget (single-column):
-   * 100dvh − (header~60 + map~260 + rp-hdr~40 + footer~60 + gaps~50) ≈ 430px → ÷2
-   * Clamped 130–280px so tablets get taller blocks than phones.
-   */
-  .blk,.blk.eng{flex:none;height:clamp(130px,calc((100dvh - 430px) / 2),280px);min-height:0;}
-  @media (orientation:landscape){.blk,.blk.eng{height:clamp(110px,28vw,200px);}}
+  /* Block heights — expressed in dvh so they scale with screen height.
+     Total: 100dvh = 10dvh(hdr) + 8dvh(ftr) + map(vw) + ~86px(gaps/padding/rp-hdr) + 2×blk
+     → each blk = (82dvh - min(48vw,220px) - 86px) / 2                                    */
+  .blk,.blk.eng{flex:none;height:clamp(100px,calc((82dvh - min(48vw,220px) - 86px) / 2),260px);min-height:0;}
 
   /* Block internals */
   .blk-header{padding:10px 14px;}
-  .blk-title{font-size:clamp(10px,2.2vw,14px);}
-  .row{white-space:nowrap;font-size:clamp(11px,2.2vw,14px);}
-  .loading-line{font-size:clamp(9px,2vw,12px);letter-spacing:1px;}
+  .blk-title{font-size:clamp(10px,3vw,14px);}
+  .row{white-space:nowrap;font-size:clamp(11px,3vw,14px);}
+  .loading-line{font-size:clamp(9px,2.5vw,12px);letter-spacing:1px;}
+  .lbl,.lbl.on{font-size:22px!important;}
 
-  /* SVG district labels bigger on tablet/phone */
-  .lbl,.lbl.on{font-size:24px!important;}
-
-  /* Footer */
-  .trap-foot-wrap{height:auto;padding:14px 5vw 28px;border-top:1px solid rgba(255,255,255,0.05);}
-  .fmain{font-size:clamp(14px,4vw,22px);}
-  .fsub{font-size:clamp(10px,2.5vw,15px);}
-
-  /* Ticker */
-  .ticker-half span{font-size:clamp(7px,1.8vw,11px);letter-spacing:1px;}
-  .ticker-wrap{margin-top:4px;}
+  /* Footer — dvh-based, proportional to screen height */
+  .trap-foot-wrap{height:8dvh;min-height:44px;padding:0 5vw;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .fmain{font-size:clamp(13px,4.5vw,20px);}
+  .fsub{font-size:clamp(9px,2.5vw,13px);}
+  .ticker-half span{font-size:clamp(7px,2.2vw,11px);letter-spacing:1px;}
+  .ticker-wrap{margin-top:3px;}
 }
 
-/* ── iPad landscape only (1024px wide, 768px tall) ── */
-/* Gets desktop 60/40 grid but with breathing room adjustments */
-@media (min-width:901px) and (max-width:1180px){
-  .body{padding:0 4cqw;gap:1.5cqw;}
-  /* Font sizes: cqw on 1000px container = 10px for fs-m — need to push up slightly */
-  .hdr-title{font-size:clamp(16px,2.4cqw,26px);}
-  .ctag{font-size:clamp(13px,1.8cqw,20px);}
-  .blk-header{padding:10px 14px;}
+/* ── HORIZONTAL GRID: iPad portrait, iPad landscape, phone landscape, desktop ──
+   Applies when aspect-ratio ≥ 2/3 (covers everything except portrait phones).
+   Card stays 100dvh, overflow hidden, no scroll — always fits in one screen.
+   Padding: 10% each side (symmetric).
+   Font sizes boosted for mid-size screens (iPad etc) where cqw can be small. ── */
+@media (min-aspect-ratio:2/3) and (max-width:1180px){
+  .body{padding:0 10cqw;gap:2cqw;}
+  /* Boost font sizes where container is narrower than full desktop */
+  .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
+  .ctag{font-size:clamp(13px,2.0cqw,22px);}
+  .blk-header{padding:clamp(8px,1.2cqh,20px) 14px;}
+  .row{font-size:clamp(11px,1.1cqw,13px);}
 }
 </style>
 </head>
@@ -607,7 +611,7 @@ function addPulse(cx,cy){
         const factor=dist/lastDist;
         const ns=Math.min(12,Math.max(0.3,scale*factor));
         tx=mx-(mx-tx)*(ns/scale);ty=my-(my-ty)*(ns/scale);scale=ns;
-        playZoom();apply();
+        apply(); /* playZoom removed from here — audio during touchmove causes jank on iOS */
       }
       lastDist=dist;
     }
@@ -695,14 +699,9 @@ function addPulse(cx,cy){
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION 13 — GLOW OVERLAY  (stage border sweep canvas)
-   One-shot bead of light travels around the outer stage edge on load.
-   ═══════════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════════
    SECTION 13 — TICKER + AURORA INIT
-   Glow overlay sweep canvas REMOVED — caused light moving across
-   page borders on load and on every resize. glowOverlay div is kept
-   in HTML (harmless empty) but nothing is drawn into it.
+   Glow overlay sweep canvas REMOVED (was causing border light sweep).
+   glowOverlay div kept in HTML but nothing drawn into it.
    ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',function(){
 
@@ -719,8 +718,9 @@ document.addEventListener('DOMContentLoaded',function(){
 
   /* ═══════════════════════════════════════════════════════════════
      SECTION 14 — AURORA CANVAS
-     decay 0.978 — very slow fade (~140 frames / ~2.3s at 60fps)
-     wave speeds = original ×0.49 (two rounds of 30% slowdown)
+     decay 0.967 — fades over ~90 frames (~1.5s at 60fps)
+     wave speeds: original ×0.5
+     touch devices: shadowBlur capped, white stroke skipped (GPU perf)
      ═══════════════════════════════════════════════════════════════ */
   const aCanvas=document.getElementById('page-aurora'),ax=aCanvas.getContext('2d');
   let aW,aH;
@@ -735,15 +735,21 @@ document.addEventListener('DOMContentLoaded',function(){
     {speed:0.0065,amp:55,color:'185,43,227', alpha:0.45,width:95,fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
     {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
+  /* Touch detection covers phones AND iPad — navigator.maxTouchPoints > 0 */
+  const isTouch=(navigator.maxTouchPoints||0)>0;
   const isMobile=window.innerWidth<=768;
   function drawAurora(){
     ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
     if(aEnergy<0.01){aEnergy=0;aRaf=null;return;}
-    const e=aEnergy,rScale=Math.min(1,aW/900),blurMult=isMobile?0.5:1.0;
+    const e=aEnergy,rScale=Math.min(1,aW/900);
+    /* Touch devices: cap shadowBlur at 15px and skip the white highlight stroke
+       — these are the two most expensive operations per wave frame on mobile GPU */
+    const blurMult=isMobile?0.5:1.0;
+    const maxBlur=isTouch?15:9999;
     ax.globalCompositeOperation='lighter';
     waves.forEach((w,wi)=>{
       const ph=waveSeeds[wi]||waveSeeds[wi%waveSeeds.length],fr=w.fr;
-      const ampR=w.amp*rScale,widR=w.width*rScale,step=isMobile?20:10;
+      const ampR=w.amp*rScale,widR=w.width*rScale,step=isTouch?20:10;
       ax.beginPath();
       for(let x=0;x<=aW;x+=step){
         const nx=x/aW;
@@ -751,9 +757,11 @@ document.addEventListener('DOMContentLoaded',function(){
         x===0?ax.moveTo(x,aH+wobble):ax.lineTo(x,aH+wobble);
       }
       ax.strokeStyle=`rgba(${w.color},${w.alpha*e})`;ax.lineWidth=widR*e;ax.lineCap='round';ax.lineJoin='round';
-      ax.shadowBlur=widR*4.5*e*blurMult;ax.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ax.stroke();
-      ax.strokeStyle=`rgba(255,255,255,${w.alpha*e*0.9})`;ax.lineWidth=widR*0.20*e;
-      ax.shadowBlur=widR*1.0*e*blurMult;ax.shadowColor='rgba(255,255,255,1)';ax.stroke();
+      ax.shadowBlur=Math.min(widR*4.5*e*blurMult,maxBlur);ax.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ax.stroke();
+      if(!isTouch){
+        ax.strokeStyle=`rgba(255,255,255,${w.alpha*e*0.9})`;ax.lineWidth=widR*0.20*e;
+        ax.shadowBlur=Math.min(widR*1.0*e*blurMult,maxBlur);ax.shadowColor='rgba(255,255,255,1)';ax.stroke();
+      }
     });
     aEnergy*=0.967;aT++;aRaf=requestAnimationFrame(drawAurora);
   }
@@ -763,32 +771,29 @@ document.addEventListener('DOMContentLoaded',function(){
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 15 — BACKGROUND CANVAS  (starfield + planets)
 
-   --planet-period: computed from P[0].ax and written to CSS so
-   header/footer animation-duration exactly matches planet orbit.
+   Stars: 120. document.hidden throttle ~10fps saves battery.
 
-   RIM FIX: original drawPlanet used two hard arc() strokes that
-   were clipped by the canvas rect() clip at screen edges, leaving
-   a sharp bright cut. New approach: rim drawn as ~120 short segments,
-   each with alpha = brightFactor × edgeFactor × rimA.
-   edgeFactor fades the segment to 0 before it reaches any canvas
-   edge, so the clip is completely invisible.
+   --planet-period: written to CSS by JS (value computed from P[0].ax)
+   but header/footer animations currently use hardcoded 90s.
 
-   rimStart uses two independent slow oscillations for a gentle
-   light-shift effect (lit side migrates very slowly over time).
-
-   Stars: 240 (was 160). document.hidden throttle saves battery.
+   RIM: drawn as ~120 short segments with edge-fade alpha so the canvas
+   clip boundary is invisible. rimStart oscillates slowly for organic
+   light-shift (lit side migrates very slowly over time).
    ═══════════════════════════════════════════════════════════════════ */
 let _canvasLoopId=null;
 function initCanvas(){
   if(_canvasLoopId){cancelAnimationFrame(_canvasLoopId);_canvasLoopId=null;}
   const cv=document.getElementById('c'),stage=document.getElementById('stage');
-  const W=stage.getBoundingClientRect().width||stage.offsetWidth||700;
-  const H=stage.getBoundingClientRect().height||stage.offsetHeight||560;
+  /* In stacked mode canvas is position:fixed — use viewport dimensions.
+     In desktop/horizontal mode canvas is position:absolute inside card — use card dimensions. */
+  const isFixed=getComputedStyle(cv).position==='fixed';
+  const W=isFixed?window.innerWidth:(stage.getBoundingClientRect().width||stage.offsetWidth||700);
+  const H=isFixed?window.innerHeight:(stage.getBoundingClientRect().height||stage.offsetHeight||560);
   if(W<50){requestAnimationFrame(initCanvas);return;}
   cv.width=W;cv.height=H;cv.style.width=W+'px';cv.style.height=H+'px';
   const cx=cv.getContext('2d');
 
-  const stars=Array.from({length:240},()=>({
+  const stars=Array.from({length:120},()=>({
     x:Math.random()*W,y:Math.random()*H,
     r:Math.random()*1.5+0.2,
     o:Math.random()*0.40+0.10,
@@ -802,7 +807,7 @@ function initCanvas(){
    * rimA boosted so rim is actually visible with the edge-fade logic.
    */
   const P=[
-    {bx:W*-0.20,by:H*0.08,r:W*0.42,ax:0.00028,ay:0.000168,rx:W*0.04,ry:H*0.06,ph:0,  rimA:0.55,rimW:1.6},
+    {bx:W*-0.20,by:H*0.08,r:W*0.42,ax:0.00028,ay:0.000168,rx:W*0.04,ry:H*0.06,ph:0,  rimA:0.30,rimW:0.9},
     {bx:W*0.74, by:H*1.02,r:W*0.14,ax:0.00036,ay:0.000273,rx:W*0.05,ry:H*0.025,ph:2.1,rimA:0.30,rimW:0.9}
   ];
 
@@ -820,12 +825,12 @@ function initCanvas(){
     cx.fillStyle='rgba(2,12,10,0.96)';
     cx.beginPath();cx.arc(ppx,ppy,r,0,Math.PI*2);cx.fill();
 
-    /* Atmospheric glow */
-    const innerG=cx.createRadialGradient(ppx,ppy,r*0.70,ppx,ppy,r*1.02);
+    /* Atmospheric glow — pulled inward so diffusion sits on surface, not outside */
+    const innerG=cx.createRadialGradient(ppx,ppy,r*0.82,ppx,ppy,r*0.99);
     innerG.addColorStop(0,'transparent');
-    innerG.addColorStop(0.72,'rgba(77,232,184,0.04)');
-    innerG.addColorStop(0.92,`rgba(77,232,184,${p.rimA*0.20})`);
-    innerG.addColorStop(1.0,`rgba(77,232,184,${p.rimA*0.06})`);
+    innerG.addColorStop(0.72,'rgba(77,232,184,0.03)');
+    innerG.addColorStop(0.92,`rgba(77,232,184,${p.rimA*0.18})`);
+    innerG.addColorStop(1.0,`rgba(77,232,184,${p.rimA*0.05})`);
     cx.fillStyle=innerG;cx.beginPath();cx.arc(ppx,ppy,r*1.02,0,Math.PI*2);cx.fill();
 
     /*
@@ -868,7 +873,7 @@ function initCanvas(){
   function loop(ts){
     if(document.hidden&&ts-lastFrameTime<IDLE_INTERVAL){_canvasLoopId=requestAnimationFrame(loop);return;}
     lastFrameTime=ts;
-    cx.clearRect(0,0,W,H);cx.fillStyle='#0d1014';cx.fillRect(0,0,W,H);
+    cx.clearRect(0,0,W,H);cx.fillStyle='#08090c';cx.fillRect(0,0,W,H);
     const n1x=W*0.08+Math.sin(t*0.00042)*W*0.07,n1y=H*0.50+Math.cos(t*0.00036)*H*0.09;
     const nb1=cx.createRadialGradient(n1x,n1y,0,n1x,n1y,W*0.44);
     nb1.addColorStop(0,'rgba(18,52,34,0.07)');nb1.addColorStop(0.5,'rgba(10,30,20,0.04)');nb1.addColorStop(1,'transparent');
