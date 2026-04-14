@@ -237,8 +237,6 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
     font-size:clamp(8px,2.2vw,11px);
     letter-spacing:1px;
   }
-  .lbl{font-size:13px;}
-  .lbl.on{font-size:14px;}
 
   /* ── FOOTER ── */
   .trap-foot-wrap{
@@ -425,7 +423,7 @@ async function select(name){
     const cx=px(sumX/count),cy=py(sumY/count);centroids[name]={cx,cy};
     const t=document.createElementNS('http://www.w3.org/2000/svg','text');
     t.setAttribute('class','lbl');t.setAttribute('id','l-'+name.replace(/\s/g,'_'));t.setAttribute('data-name',name);
-    t.setAttribute('x',cx.toFixed(1));t.setAttribute('y',cy.toFixed(1));t.setAttribute('text-anchor','middle');t.textContent=name.toUpperCase();
+    t.setAttribute('x',cx.toFixed(1));t.setAttribute('y',cy.toFixed(1));t.setAttribute('text-anchor','middle');t.setAttribute('font-size','28');t.textContent=name.toUpperCase();
     svg.appendChild(t);
   });
   let stateGj={"type":"FeatureCollection","features":[
