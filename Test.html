@@ -122,13 +122,9 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
   overflow:hidden;
   display:none;
 }
-/* Make every emoji inside a row render at full system color */
+/* Emoji inside rows – override dimmed row color */
 .row .emoji{
-  font-style:normal;
-  color:transparent; /* clears inherited tint */
-  -webkit-text-fill-color:initial;
-  text-shadow:none;
-  filter:none;
+  color:#fff;
   opacity:1;
 }
 .row:last-child{border:none;}
@@ -326,7 +322,7 @@ function wrapEmojis(html){
 
 const DATA={
   "Barmer":{
-    m:["<b>Deraj Ram</b>: AIR 285 → AIIMS Jodhpur ('25) <span class='emoji'>🔥</span>","<b>17 Allenites</b> scored ≥600 in NEET ('22-'25)","<b>9 Allenites</b> cracked GMC Barmer ('24) <span class='emoji'>🏆</span>","<b>18 Allenites</b> in GMCs pan-India ('22-'25)","<b>Tiloka Ram</b>: AIR 1,186 (685/720) ('23)","<b>Bharat Kumar</b>: AIR 4,466 → RUHS CMS Jaipur ('25)","<b>Kamal Kishor</b>: GMC Washim ('25)","<b>Khinya Ram</b>: GMC Sirohi ('25)","<b>Ramesh Choudhary</b>: IGGMC Nagpur ('25)","<b>Sohan Godara</b>: AIIMS Madurai ('25)","<b>Dinesh Kumar</b>: GMC Mahabubabad ('24)","<b>Hemakshi Pooniya</b>: GMC Sirohi ('24)","<b>Khet Singh</b>: GMC Churachandpur ('24)","<b>Santosh</b>: JLN MC Ajmer ('24)","<b>Priya Sharma</b>: AIIMS Jodhpur ('24)","<b>Ravi Kumar</b>: GMC Bikaner ('24)","<b>Sunita Devi</b>: SMS Medical College ('24)","<b>Arjun Singh</b>: GMC Kota ('23)","<b>Meena Kumari</b>: RNT Medical College ('23)","<b>Lokesh Patel</b>: AIR 3,210 → AIIMS Bhopal ('23)","<b>Kavita Bishnoi</b>: GMC Pali ('23)","<b>Deepak Nayak</b>: GMC Barmer ('23)","<b>Anita Choudhary</b>: JLN MC Ajmer ('22)","<b>Suresh Godara</b>: GMC Sirohi ('22)"],
+    m:["<b>Deraj Ram</b>: AIR 285 → AIIMS Jodhpur ('25) 🔥","<b>17 Allenites</b> scored ≥600 in NEET ('22-'25)","<b>9 Allenites</b> cracked GMC Barmer ('24) 🏆","<b>18 Allenites</b> in GMCs pan-India ('22-'25)","<b>Tiloka Ram</b>: AIR 1,186 (685/720) ('23)","<b>Bharat Kumar</b>: AIR 4,466 → RUHS CMS Jaipur ('25)","<b>Kamal Kishor</b>: GMC Washim ('25)","<b>Khinya Ram</b>: GMC Sirohi ('25)","<b>Ramesh Choudhary</b>: IGGMC Nagpur ('25)","<b>Sohan Godara</b>: AIIMS Madurai ('25)","<b>Dinesh Kumar</b>: GMC Mahabubabad ('24)","<b>Hemakshi Pooniya</b>: GMC Sirohi ('24)","<b>Khet Singh</b>: GMC Churachandpur ('24)","<b>Santosh</b>: JLN MC Ajmer ('24)","<b>Priya Sharma</b>: AIIMS Jodhpur ('24)","<b>Ravi Kumar</b>: GMC Bikaner ('24)","<b>Sunita Devi</b>: SMS Medical College ('24)","<b>Arjun Singh</b>: GMC Kota ('23)","<b>Meena Kumari</b>: RNT Medical College ('23)","<b>Lokesh Patel</b>: AIR 3,210 → AIIMS Bhopal ('23)","<b>Kavita Bishnoi</b>: GMC Pali ('23)","<b>Deepak Nayak</b>: GMC Barmer ('23)","<b>Anita Choudhary</b>: JLN MC Ajmer ('22)","<b>Suresh Godara</b>: GMC Sirohi ('22)"],
     e:["<b>Vineet Jatol</b>: IIT Ropar CS ('25)","<b>Poonam</b>: IIT Kanpur Civil (Balotra) ('25)","<b>Rohit Sharma</b>: IIT Delhi Mechanical ('25)","<b>Ankita Verma</b>: IIT Bombay EE ('24)","<b>Sunil Kumar</b>: IIT Madras CS ('24)","<b>Neha Singh</b>: IIT Kharagpur ('24)","<b>Manish Yadav</b>: NIT Jaipur CS ('23)","<b>Pooja Bishnoi</b>: IIT Roorkee ('23)","<b>Rakesh Patel</b>: IIT Hyderabad ('23)","<b>Geeta Choudhary</b>: IIT BHU ('22)","<b>Vijay Nayak</b>: NIT Surat ('22)","<b>Sunita Kumari</b>: IIT Guwahati ('22)"]
   },
   "Jalore":{
