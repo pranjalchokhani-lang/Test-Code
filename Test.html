@@ -497,36 +497,29 @@ document.addEventListener('DOMContentLoaded',function(){
 
   // Aurora waves — asymmetric: each wave has unique freq ratios so no mirroring
   const waves = [
-  // --- WHITE CORES ---
-  {speed: 0.019, amp: 38, hue: 0, alpha: 0.82, width: 42, sat: 0, fr:[1.00,1.73,0.61,2.41,0.37,1.19]},
-  {speed: 0.041, amp: 22, hue: 0, alpha: 0.65, width: 28, sat: 0, fr:[1.00,2.13,0.79,1.57,0.43,2.87]},
-
-  // --- TEAL HIGHLIGHTS ---
-  {speed: 0.013, amp: 46, hue: 172, alpha: 0.38, width: 44, fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
-  {speed: 0.053, amp: 13, hue: 172, alpha: 0.28, width: 18, fr:[1.00,0.83,1.97,2.51,0.71,1.33]},
-
-  // --- WIDE DIFFUSE WHITE ---
-  {speed: 0.011, amp: 40, hue: 0, alpha: 0.38, width: 110, sat: 0, fr:[1.00,1.67,0.53,2.09,1.43,0.89]},
-  {speed: 0.027, amp: 20, hue: 0, alpha: 0.28, width: 80, sat: 0, fr:[1.00,2.31,1.17,0.59,1.73,2.07]},
-
-  // --- SOFT CYAN WISPS ---
-  {speed: 0.037, amp: 28, hue: 172, alpha: 0.22, width: 14, fr:[1.00,1.53,2.71,0.41,1.27,0.79]},
-  {speed: 0.023, amp: 17, hue: 172, alpha: 0.18, width: 10, fr:[1.00,0.73,1.89,2.43,0.61,1.57]}
-];
+    {speed: 0.022, amp: 40, color: '77,232,184', alpha: 0.45, width: 85, fr:[1.00,1.67,0.53,2.09,1.43,0.89]},
+    {speed: 0.019, amp: 45, color: '66,133,244', alpha: 0.45, width: 85, fr:[1.00,1.73,0.61,2.41,0.37,1.19]},
+    {speed: 0.013, amp: 55, color: '185,43,227', alpha: 0.45, width: 95, fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
+    {speed: 0.041, amp: 25, color: '255,255,255', alpha: 0.30, width: 60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
+  ];
 
   function drawAurora(){
+    ax.globalCompositeOperation = 'source-over';
     ax.clearRect(0,0,aW,aH);
+    
     if(aEnergy<0.01){aEnergy=0;aRaf=null;return;}
     const e=aEnergy;
-    // Responsive scale: full size at 900px+, shrinks proportionally on phones
     const rScale=Math.min(1, aW/900);
+
+    ax.globalCompositeOperation = 'lighter';
 
     waves.forEach((w,wi)=>{
       const ph=waveSeeds[wi]||waveSeeds[wi%waveSeeds.length];
       const fr=w.fr||[1,1.61,0.72,2.11,0.43,1.37];
       const ampR=w.amp*rScale, widR=w.width*rScale;
       ax.beginPath();
-      for(let x=0;x<=aW;x+=2){
+      
+      for(let x=0;x<=aW;x+=10){
         const nx=x/aW;
         const wobble=e*(
           Math.sin(nx*3.7 +aT*w.speed*60*fr[0]+ph[0])*ampR*0.40+
@@ -538,22 +531,25 @@ document.addEventListener('DOMContentLoaded',function(){
         );
         x===0?ax.moveTo(x,aH+wobble):ax.lineTo(x,aH+wobble);
       }
-      if(w.sat===0){
-        ax.strokeStyle=`rgba(255,255,255,${w.alpha*e})`;
-        ax.lineWidth=widR*e;ax.lineCap='round';
-        ax.shadowBlur=widR*3*e;
-        ax.shadowColor=`rgba(255,255,255,${w.alpha*e*0.35})`;
-      } else {
-        // locked to exact accent teal — no hue drift
-        ax.strokeStyle=`rgba(77,232,184,${w.alpha*e})`;
-        ax.lineWidth=widR*e;ax.lineCap='round';
-        ax.shadowBlur=widR*2*e;
-        ax.shadowColor=`rgba(77,232,184,${w.alpha*e*0.6})`;
-      }
+      
+      ax.strokeStyle = `rgba(${w.color}, ${w.alpha * e})`;
+      ax.lineWidth = widR * e;
+      ax.lineCap = 'round';
+      ax.lineJoin = 'round';
+      ax.shadowBlur = widR * 4.5 * e; 
+      ax.shadowColor = `rgba(${w.color}, ${w.alpha * e * 0.95})`; 
+      ax.stroke();
+
+      ax.strokeStyle = `rgba(255, 255, 255, ${w.alpha * e * 0.9})`;
+      ax.lineWidth = widR * 0.20 * e;
+      ax.shadowBlur = widR * 1.0 * e;
+      ax.shadowColor = `rgba(255, 255, 255, 1)`;
       ax.stroke();
     });
 
-    aEnergy*=0.955;aT++;aRaf=requestAnimationFrame(drawAurora);
+    aEnergy*=0.955;
+    aT++;
+    aRaf=requestAnimationFrame(drawAurora);
   }
 
   window.triggerAurora=()=>{aEnergy=1.0;if(!aRaf)drawAurora()};
