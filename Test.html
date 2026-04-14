@@ -148,8 +148,7 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 @keyframes pulse-out{0%{r:0;opacity:0.9;stroke-width:2}100%{r:28;opacity:0;stroke-width:0}}
 
 /* ── STATE BOUNDARY LINE ─────────────────────────────────────────────────── */
-/* SVG feGaussianBlur glow — more reliable than CSS drop-shadow on iOS       */
-.state-boundary{fill:none;stroke:#fff;stroke-width:2.5;pointer-events:none;}
+.state-boundary{fill:none;stroke:#fff;stroke-width:2.5;pointer-events:none;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 6px rgba(255,255,255,0.6));}
 
 /* ── RIGHT PANEL ─────────────────────────────────────────────────────────── */
 .right-panel{display:flex;flex-direction:column;gap:2cqh;min-height:0;overflow:hidden;height:100%;}
@@ -605,19 +604,8 @@ async function select(name){
     const sp=document.createElementNS('http://www.w3.org/2000/svg','path');
     sp.setAttribute('class','state-boundary');
     sp.setAttribute('d',d);
-    sp.setAttribute('filter','url(#state-glow)');
     svg.appendChild(sp);
   });
-
-  // SVG glow filter for state boundaries
-  // Using feGaussianBlur (not CSS drop-shadow) — reliable on iOS Safari
-  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-  defs.innerHTML=`<filter id="state-glow" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1"/>
-    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur2"/>
-    <feMerge><feMergeNode in="blur2"/><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>`;
-  svg.insertBefore(defs,svg.firstChild);
 
   // Auto-select first district on load
   select('Barmer');
