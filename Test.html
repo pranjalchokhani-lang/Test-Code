@@ -29,11 +29,11 @@
 *{margin:0;padding:0;box-sizing:border-box;cursor:crosshair;}
 body{background:var(--bg);margin:0;display:flex;justify-content:center;align-items:center;width:100vw;height:100dvh;overflow:hidden;font-family:var(--font-display);color:var(--text);}
 .shell,.shelf{display:contents;}
-.card{width:100vw;height:100dvh;background:var(--bg);position:relative;overflow:hidden;font-family:var(--font-display);color:var(--text);display:flex;flex-direction:column;perspective:800px;}
+.card{width:100vw;height:100dvh;background:var(--bg);position:relative;overflow:hidden;font-family:var(--font-display);color:var(--text);display:flex;flex-direction:column;perspective:800px;container-type:size;}
 #glowOverlay{position:absolute;inset:0;z-index:200;pointer-events:none;}
 canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block;}
 .border-svg{display:none;}
-.card-inner{position:relative;z-index:10;display:flex;flex-direction:column;flex:1;min-height:0;justify-content:space-between;will-change:transform;}
+.card-inner{position:relative;z-index:10;display:flex;flex-direction:column;flex:1;min-height:0;justify-content:space-between;}
 @keyframes spaceFloat{0%{transform:translate3d(0,8px,0);}100%{transform:translate3d(0,-8px,0);}}
 @keyframes glowHdr{
   0%,100%{letter-spacing:clamp(3px,0.5cqw,8px); text-shadow:none;}
@@ -50,7 +50,7 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 .ticker-track{display:inline-flex;white-space:nowrap;}
 .ticker-half{display:inline-flex;gap:48px;padding-right:48px;}
 .ticker-half span{font-family:var(--font-display)!important;font-size:var(--fs-s);font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:clamp(2px,0.35cqw,4px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,255,255,0.6);line-height:1.4;flex-shrink:0;white-space:nowrap;}
-.body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw 0 8cqw;gap:2cqw;container-type:size;}
+.body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw 0 8cqw;gap:2cqw;}
 .map-panel,.blk{border-radius:16px;border:1px solid rgba(255,255,255,0.10);background:rgba(255,255,255,0.03);backdrop-filter:blur(22px) saturate(1.2);-webkit-backdrop-filter:blur(22px) saturate(1.2);position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 36px rgba(0,0,0,0.35);transform-style:preserve-3d;}
 .box-fill{position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:0;}
 .map-panel .box-fill{animation:bfMap 2.0s ease-in-out infinite alternate;}
@@ -69,9 +69,9 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
 .bdot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),0.7);animation:bdotBlink 0.4s ease-in-out infinite alternate;flex-shrink:0;}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-rgb),0.8);animation:dotP 1s ease-in-out infinite;}
 @keyframes dotP{0%,100%{opacity:1;box-shadow:0 0 10px rgba(var(--accent-rgb),1.0),0 0 20px rgba(var(--accent-rgb),0.5);}50%{opacity:0.05;box-shadow:none;}}
-.map-panel{animation:floatMap 7s ease-in-out infinite alternate,borderMap 10s linear infinite;animation-delay:0s,-1s;padding:18px 12px 12px;touch-action:none;height:100%;will-change:transform;}
-.blk{animation:floatMed 7s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-6s,-5.5s;flex:1;min-height:0;will-change:transform;}
-.blk.eng{animation:floatEng 7s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-12s,-5.5s;will-change:transform;}
+.map-panel{animation:floatMap 7s ease-in-out infinite alternate,borderMap 10s linear infinite;animation-delay:0s,-1s;padding:18px 12px 12px;touch-action:none;height:100%;}
+.blk{animation:floatMed 7s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-6s,-5.5s;flex:1;min-height:0;}
+.blk.eng{animation:floatEng 7s ease-in-out infinite alternate,borderSide 10s linear infinite;animation-delay:-12s,-5.5s;}
 @keyframes floatMap{0%{transform:translate3d(0,-7px,0) rotateX(0.4deg);}100%{transform:translate3d(0,7px,0) rotateX(-0.4deg);}}
 @keyframes floatMed{0%{transform:translate3d(0,-3px,0) rotateX(0.2deg);}100%{transform:translate3d(0,3px,0) rotateX(-0.2deg);}}
 @keyframes floatEng{0%{transform:translate3d(0,-3px,0) rotateX(0.15deg);}100%{transform:translate3d(0,3px,0) rotateX(-0.15deg);}}
@@ -185,11 +185,9 @@ canvas#c{position:absolute;top:0;left:0;right:0;bottom:0;z-index:0;display:block
     gap:12px;
     flex:none;
     height:auto;
-    /* container-type breaks cqw/cqh on mobile stacked layout – remove it */
-    container-type:normal;
+    /* container-type is now on .card so cqw/cqh always resolve correctly */
   }
 
-  /* ── MAP ── */
   .map-panel{
     width:100%;
     flex:none;
