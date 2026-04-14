@@ -436,8 +436,8 @@ async function select(name){
   // SVG native glow filter — works on iOS/iPad Safari unlike CSS drop-shadow
   const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
   defs.innerHTML=`<filter id="state-glow" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1"/>
-    <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur2"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1"/>
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur2"/>
     <feMerge><feMergeNode in="blur2"/><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>`;
   svg.insertBefore(defs, svg.firstChild);
