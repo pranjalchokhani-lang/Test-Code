@@ -339,19 +339,6 @@ async function select(name){
   const d=DATA[name]||{m:[],e:[]};stream('med-list',d.m,myToken);stream('eng-list',d.e,myToken);
 }
 
-// ── 10-SECOND INACTIVITY RESET ──
-let _idleTimer=null;
-function resetIdle(){
-  clearTimeout(_idleTimer);
-  _idleTimer=setTimeout(()=>{
-     lastSelectTime = 0; // Allow the idle reset to bypass the throttle
-     if(typeof window._mapReset==='function'){window._mapReset();window.mapApply();}
-     select('Jaipur');
-  }, 10000);
-}
-// USE POINTER EVENTS TO STOP DOUBLE TRIGGERS ON THE DOCUMENT
-document.addEventListener('pointerdown', resetIdle);
-resetIdle();
 (function(){
   const viewport=document.getElementById('map-viewport'),mover=document.getElementById('map-mover');
   let scale=1,tx=0,ty=0,lastDist=null,drag=false,sx=0,sy=0,stx=0,sty=0;
