@@ -17,7 +17,7 @@
   --fs-s :clamp(7px,0.70cqw,10px);
   --fs-m :clamp(8px,0.85cqw,11px);
   --fs-l :clamp(10px,1.30cqw,16px);
-  --fs-xl:clamp(12px,1.90cqw,22px);
+  --fs-xl:clamp(18px,1.90cqw,22px);
   --accent:#4de8b8;
   --accent-rgb:77,232,184;
   --bg:#08090c;
@@ -439,9 +439,11 @@ document.addEventListener('DOMContentLoaded',function(){
     {speed:0.0065,amp:55,color:'185,43,227', alpha:0.45,width:95,fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
     {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
-  const isMobile=window.innerWidth<=600;
-  const blurMult=isMobile?0.25:1.0;
-  const decayRate=isMobile?0.948:0.967;
+  const isPhone=window.innerWidth<=600 || window.innerHeight<=440;
+  const isTablet=!isPhone && window.innerWidth<=1024;
+  const blurMult=isPhone?0.25:isTablet?0.5:1.0;
+  const decayRate=isPhone?0.948:isTablet?0.955:0.967;
+  const drawStep=isPhone?20:isTablet?14:10;
 
   function drawAurora(){
     ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
@@ -450,7 +452,7 @@ document.addEventListener('DOMContentLoaded',function(){
     ax.globalCompositeOperation='lighter';
     waves.forEach((w,wi)=>{
       const ph=waveSeeds[wi]||waveSeeds[wi%waveSeeds.length],fr=w.fr;
-      const ampR=w.amp*rScale,widR=w.width*rScale,step=isMobile?20:10;
+      const ampR=w.amp*rScale,widR=w.width*rScale,step=drawStep;
       ax.beginPath();
       for(let x=0;x<=aW;x+=step){
         const nx=x/aW;
