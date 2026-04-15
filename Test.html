@@ -13,27 +13,22 @@
 
 /* ═══════════════════════════════════════════════════════
    DESIGN TOKENS
-   --accent / --accent-rgb : teal glow colour
-   --planet-period         : set by JS once canvas boots;
-                             syncs header/footer animation
-                             duration to planet orbit speed
    ═══════════════════════════════════════════════════════ */
 :root{
   --font-display : 'Chakra Petch', sans-serif;
   --font-content : 'Inter', sans-serif;
-  --fs-s  : clamp(8px,  0.80cqw, 11px);
-  --fs-m  : clamp(9px,  1.00cqw, 12px);
-  --fs-l  : clamp(11px, 1.60cqw, 20px);
-  --fs-xl : clamp(14px, 2.40cqw, 28px);
+  --fs-s  : clamp(7px,   0.70cqw, 10px);
+  --fs-m  : clamp(8px,   0.85cqw, 11px);
+  --fs-l  : clamp(10px,  1.30cqw, 16px);
+  --fs-xl : clamp(12px,  1.90cqw, 22px);
   --accent     : #4de8b8;
   --accent-rgb : 77,232,184;
   --bg  : #08090c;
   --text: #fff;
-  --planet-period: 524s;
 }
 *{margin:0;padding:0;box-sizing:border-box;cursor:crosshair;}
-/* html background: backstop for iOS Safari dvh resize — ensures no unrendered strip ever shows */
-html{background:#08090c;}
+/* html background: backstop for iOS Safari dvh resize — must match --bg */
+html{background:var(--bg);}
 body{background:var(--bg);margin:0;display:flex;justify-content:center;align-items:center;width:100vw;height:100dvh;overflow:hidden;font-family:var(--font-display);color:var(--text);}
 .shell,.shelf{display:contents;}
 .card{width:100vw;height:100dvh;background:var(--bg);position:relative;overflow:hidden;font-family:var(--font-display);color:var(--text);display:flex;flex-direction:column;perspective:800px;container-type:size;}
@@ -73,8 +68,8 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 /* ── HEADER — 90s glow cycle, -22.5s delay so movement visible soon after load ── */
 /* EDIT: city name — change .wg span in HTML below */
-.trap-head{flex-shrink:0;height:18cqh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8cqh;padding:0 10cqw;line-height:1.2;}
-.hdr-title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-xl);text-transform:uppercase;color:var(--text);display:inline-block;animation:glowHdr 90s ease-in-out infinite;animation-delay:-22.5s;}
+.trap-head{flex-shrink:0;height:14dvh;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6cqh;padding:0 10cqw;line-height:1.2;}
+.hdr-title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-xl);text-transform:uppercase;color:var(--text);display:inline-block;white-space:nowrap;animation:glowHdr 90s ease-in-out infinite;animation-delay:-22.5s;}
 .wg{color:var(--accent)!important;text-shadow:0 0 12px rgba(var(--accent-rgb),0.4);}
 .ticker-wrap{width:100%;overflow:hidden;height:22px;margin-top:6px;display:flex;align-items:center;}
 .ticker-track{display:inline-flex;white-space:nowrap;}
@@ -82,7 +77,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 /* EDIT: ticker text lives in the two .ticker-half divs in HTML */
 .ticker-half span{font-family:var(--font-display)!important;font-size:var(--fs-s);font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:clamp(2px,0.35cqw,4px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,255,255,0.6);line-height:1.4;flex-shrink:0;white-space:nowrap;}
 
-/* ── BODY — symmetric 10% padding each side ── */
 .body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw;gap:2cqw;}
 
 /*
@@ -101,6 +95,11 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   display:flex;flex-direction:column;
   box-shadow:0 8px 36px rgba(0,0,0,0.35);
   transform-style:preserve-3d;
+}
+/* On touch devices remove backdrop-filter — MUST come after base rule above.
+   Fixes GPU compositing artefacts and panel clipping on iPad and iPhone. */
+@media (hover:none){
+  .map-panel,.blk{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,14,18,0.85);}
 }
 .box-fill{position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:0;}
 .map-panel .box-fill{animation:bfMap 2.0s ease-in-out infinite alternate;}
@@ -166,9 +165,9 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 /* ── FOOTER — 90s glow cycle, -45s offset (half-phase from header) ── */
 /* EDIT: city name — change .wg span in HTML below */
-.trap-foot-wrap{flex-shrink:0;height:15cqh;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.6cqh;padding:0 10cqw;}
-.fsub{display:block;transform-origin:center center;font-family:var(--font-display);font-size:var(--fs-m);font-weight:400;color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;line-height:1.4;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
-.fmain{display:block;transform-origin:center center;font-family:var(--font-display);font-weight:700;font-size:var(--fs-l);text-transform:uppercase;color:#fff;text-align:center;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
+.trap-foot-wrap{flex-shrink:0;height:12dvh;min-height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.5cqh;padding:0 10cqw;}
+.fsub{display:block;transform-origin:center center;font-family:var(--font-display);font-size:var(--fs-m);font-weight:400;color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;line-height:1.4;white-space:nowrap;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
+.fmain{display:block;transform-origin:center center;font-family:var(--font-display);font-weight:700;font-size:var(--fs-l);text-transform:uppercase;color:#fff;text-align:center;white-space:nowrap;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
 
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;}
 
@@ -192,47 +191,45 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 /* ── STACKED: portrait phones only ── */
 @media (max-aspect-ratio:2/3){
 
-  html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;background:#08090c;}
+  html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;background:var(--bg);align-items:flex-start!important;}
   .card{height:auto;min-height:100dvh;overflow:visible;display:block;background:transparent;}
   .card-inner{height:auto;display:flex;flex-direction:column;position:relative;}
 
   /* Canvas fixed to viewport in stacked mode — does not scroll with content */
   canvas#c{position:fixed;top:0;left:0;width:100vw;height:100dvh;}
 
-  /* Header — dvh-based so it scales with phone height, not cqh (which=0 in auto-height card) */
-  .trap-head{height:10dvh;min-height:52px;padding:0 5vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
-  .hdr-title{font-size:clamp(13px,5vw,22px);text-align:center;width:100%;}
+  /* Header — 8dvh, min 44px */
+  .trap-head{height:8dvh;min-height:44px;padding:0 5vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .hdr-title{font-size:clamp(10px,3.5vw,16px);text-align:center;width:100%;}
 
-  /* Body: single column, 5% side padding on phone */
-  .body{display:flex;flex-direction:column;padding:8px 5vw;gap:10px;flex:none;height:auto;}
+  /* Body: single column — larger gap between map block and legends block */
+  .body{display:flex;flex-direction:column;padding:8px 5vw;gap:20px;flex:none;height:auto;}
 
-  /* Map panel */
-  .map-panel{width:100%;flex:none;height:min(48vw,220px);touch-action:none;}
+  /* Map panel — 45% of available (available = 86dvh - 82px fixed overhead) */
+  .map-panel{width:100%;flex:none;height:calc(38.7dvh - 37px);min-height:100px;touch-action:none;}
 
   /* Right panel */
   .right-panel{height:auto;display:flex;flex-direction:column;gap:8px;overflow:visible;}
   .rp-header{padding:4px 10px 3px 10px;flex-shrink:0;}
-  .wtag{font-size:clamp(9px,3vw,14px);white-space:normal;}
-  .ctag{font-size:clamp(14px,4.5vw,22px);}
+  .wtag{font-size:clamp(7px,2.2vw,10px);white-space:normal;}
+  .ctag{font-size:clamp(11px,3.5vw,17px);}
 
-  /* Block heights — expressed in dvh so they scale with screen height.
-     Total: 100dvh = 10dvh(hdr) + 8dvh(ftr) + map(vw) + ~86px(gaps/padding/rp-hdr) + 2×blk
-     → each blk = (82dvh - min(48vw,220px) - 86px) / 2                                    */
-  .blk,.blk.eng{flex:none;height:clamp(100px,calc((82dvh - min(48vw,220px) - 86px) / 2),260px);min-height:0;}
+  /* Block heights — 55% of available split ÷2; each blk = calc(23.65dvh - 23px) */
+  .blk,.blk.eng{flex:none;height:clamp(75px,calc(23.65dvh - 23px),200px);min-height:0;}
 
   /* Block internals */
-  .blk-header{padding:10px 14px;}
-  .blk-title{font-size:clamp(10px,3vw,14px);}
-  .row{white-space:nowrap;font-size:clamp(11px,3vw,14px);}
-  .loading-line{font-size:clamp(9px,2.5vw,12px);letter-spacing:1px;}
+  .blk-header{padding:8px 12px;}
+  .blk-title{font-size:clamp(9px,2.5vw,12px);}
+  .row{white-space:nowrap;font-size:clamp(10px,2.8vw,13px);}
+  .loading-line{font-size:clamp(8px,2.2vw,11px);letter-spacing:1px;}
   .lbl,.lbl.on{font-size:22px!important;}
 
-  /* Footer — dvh-based, proportional to screen height */
-  .trap-foot-wrap{height:8dvh;min-height:44px;padding:0 5vw;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;justify-content:center;align-items:center;}
-  .fmain{font-size:clamp(13px,4.5vw,20px);}
-  .fsub{font-size:clamp(9px,2.5vw,13px);}
-  .ticker-half span{font-size:clamp(7px,2.2vw,11px);letter-spacing:1px;}
-  .ticker-wrap{margin-top:3px;}
+  /* Footer — 6dvh, proportional */
+  .trap-foot-wrap{height:6dvh;min-height:44px;padding:0 5vw 12px;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .fmain{font-size:clamp(11px,3.5vw,16px);}
+  .fsub{font-size:clamp(8px,2vw,11px);}
+  .ticker-half span{font-size:clamp(6px,1.8vw,9px);letter-spacing:1px;}
+  .ticker-wrap{margin-top:2px;}
 }
 
 /* ── HORIZONTAL GRID: iPad portrait, iPad landscape, phone landscape, desktop ──
@@ -286,7 +283,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
       <div class="right-panel">
         <div class="rp-header">
           <!-- EDIT: sub-label city name -->
-          <div class="wtag">ALLEN SIKAR LEGENDS FROM</div>
+          <div class="wtag">ALLEN SIKAR LEGENDS FROM:</div>
           <div class="ctag"><span id="ctag">SELECT A DISTRICT</span></div>
         </div>
         <div class="blk">
@@ -500,7 +497,9 @@ async function select(name,opts){
     SESSION.touch('select');
     unlockAudio();
     if(bg.paused){bg.volume=0.12;bg.play().catch(()=>{});}
-    revealSfx.currentTime=0;revealSfx.volume=0.4;revealSfx.play().catch(()=>{});
+    /* Defer audio to next tick — synchronous Web Audio API calls on touch events
+       block the iOS compositor for one frame, causing aurora/click stutter on iPad */
+    setTimeout(()=>{revealSfx.currentTime=0;revealSfx.volume=0.4;revealSfx.play().catch(()=>{});},0);
     if(typeof triggerAurora==='function')triggerAurora();
   }
   currentToken++;
@@ -554,7 +553,8 @@ function addPulse(cx,cy){
 
   function playZoom(){
     const now=Date.now();
-    if(now-lastPlayTime>300){zoomSfx.currentTime=0;zoomSfx.volume=0.15;zoomSfx.play().catch(()=>{});lastPlayTime=now;}
+    /* Defer audio to next tick — Web Audio API call on touch event blocks compositor on iOS/iPadOS */
+    if(now-lastPlayTime>300){lastPlayTime=now;setTimeout(()=>{zoomSfx.currentTime=0;zoomSfx.volume=0.15;zoomSfx.play().catch(()=>{});},0);}
   }
 
   function apply(){
@@ -580,17 +580,25 @@ function addPulse(cx,cy){
     playZoom();SESSION.touch('wheel');apply();
   },{passive:false});
 
+  let mouseDragCounted=false;
   viewport.addEventListener('mousedown',e=>{
     drag=true;sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;
-    viewport.style.cursor='grabbing';playZoom();SESSION.touch('drag');
+    mouseDragCounted=false;
+    viewport.style.cursor='grabbing';playZoom();
   });
-  window.addEventListener('mousemove',e=>{if(!drag)return;tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);apply();});
-  window.addEventListener('mouseup',()=>{drag=false;viewport.style.cursor='grab';});
+  window.addEventListener('mousemove',e=>{
+    if(!drag)return;
+    if(!mouseDragCounted){mouseDragCounted=true;SESSION.touch('drag');}
+    tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);apply();
+  });
+  window.addEventListener('mouseup',()=>{drag=false;mouseDragCounted=false;viewport.style.cursor='grab';});
 
+  let dragCounted=false;
   viewport.addEventListener('touchstart',e=>{
     if(e.touches.length===1){
       drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=tx;sty=ty;
-      playZoom();SESSION.touch('drag');
+      dragCounted=false; /* reset — drag only counted on first actual move, not on tap */
+      playZoom();
     } else if(e.touches.length===2){
       drag=false;
       lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
@@ -600,6 +608,7 @@ function addPulse(cx,cy){
 
   viewport.addEventListener('touchmove',e=>{
     if(e.touches.length===1&&drag){
+      if(!dragCounted){dragCounted=true;SESSION.touch('drag');} /* count drag once on first actual move */
       tx=stx+(e.touches[0].clientX-sx);ty=sty+(e.touches[0].clientY-sy);apply();
     } else if(e.touches.length===2){
       e.preventDefault();
@@ -617,7 +626,7 @@ function addPulse(cx,cy){
     }
   },{passive:false});
 
-  viewport.addEventListener('touchend',()=>{drag=false;lastDist=null;});
+  viewport.addEventListener('touchend',()=>{drag=false;lastDist=null;dragCounted=false;});
   window.mapApply=apply;
   window._mapReset=()=>{scale=1;tx=0;ty=0;lastApplyScale=-1;};
 })();
@@ -735,21 +744,22 @@ document.addEventListener('DOMContentLoaded',function(){
     {speed:0.0065,amp:55,color:'185,43,227', alpha:0.45,width:95,fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
     {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
-  /* Touch detection covers phones AND iPad — navigator.maxTouchPoints > 0 */
+  /* Touch detection covers phones AND iPad — navigator.maxTouchPoints > 0.
+     Use isTouch for ALL performance decisions — isMobile (width-based) misses iPad landscape */
   const isTouch=(navigator.maxTouchPoints||0)>0;
-  const isMobile=window.innerWidth<=768;
   function drawAurora(){
     ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
     if(aEnergy<0.01){aEnergy=0;aRaf=null;return;}
     const e=aEnergy,rScale=Math.min(1,aW/900);
-    /* Touch devices: cap shadowBlur at 15px and skip the white highlight stroke
-       — these are the two most expensive operations per wave frame on mobile GPU */
-    const blurMult=isMobile?0.5:1.0;
-    const maxBlur=isTouch?15:9999;
+    /* On touch devices: cap blur, coarser step, skip white stroke — smooth on all touch hardware */
+    const blurMult=isTouch?0.4:1.0;
+    const maxBlur=isTouch?12:9999;
+    const step=isTouch?20:10;
     ax.globalCompositeOperation='lighter';
     waves.forEach((w,wi)=>{
       const ph=waveSeeds[wi]||waveSeeds[wi%waveSeeds.length],fr=w.fr;
-      const ampR=w.amp*rScale,widR=w.width*rScale,step=isTouch?20:10;
+      /* amp scaled by rScale — waves are proportionally smaller on small screens */
+      const ampR=w.amp*rScale*rScale,widR=w.width*rScale;
       ax.beginPath();
       for(let x=0;x<=aW;x+=step){
         const nx=x/aW;
@@ -760,7 +770,7 @@ document.addEventListener('DOMContentLoaded',function(){
       ax.shadowBlur=Math.min(widR*4.5*e*blurMult,maxBlur);ax.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ax.stroke();
       if(!isTouch){
         ax.strokeStyle=`rgba(255,255,255,${w.alpha*e*0.9})`;ax.lineWidth=widR*0.20*e;
-        ax.shadowBlur=Math.min(widR*1.0*e*blurMult,maxBlur);ax.shadowColor='rgba(255,255,255,1)';ax.stroke();
+        ax.shadowBlur=Math.min(widR*1.0*e,maxBlur);ax.shadowColor='rgba(255,255,255,1)';ax.stroke();
       }
     });
     aEnergy*=0.967;aT++;aRaf=requestAnimationFrame(drawAurora);
@@ -772,9 +782,6 @@ document.addEventListener('DOMContentLoaded',function(){
    SECTION 15 — BACKGROUND CANVAS  (starfield + planets)
 
    Stars: 120. document.hidden throttle ~10fps saves battery.
-
-   --planet-period: written to CSS by JS (value computed from P[0].ax)
-   but header/footer animations currently use hardcoded 90s.
 
    RIM: drawn as ~120 short segments with edge-fade alpha so the canvas
    clip boundary is invisible. rimStart oscillates slowly for organic
@@ -811,9 +818,7 @@ function initCanvas(){
     {bx:W*0.74, by:H*1.02,r:W*0.14,ax:0.00036,ay:0.000273,rx:W*0.05,ry:H*0.025,ph:2.1,rimA:0.30,rimW:0.9}
   ];
 
-  /* Write planet period to CSS → syncs header/footer glowHdr/glowFtr */
-  const p1Period=(2*Math.PI/(P[0].ax*60));
-  document.documentElement.style.setProperty('--planet-period',p1Period.toFixed(1)+'s');
+  /* Planet orbital periods — ax/ay in rad/frame at 60fps */
 
   function drawPlanet(p,t){
     const ppx=p.bx+Math.sin(t*p.ax+(p.ph||0))*p.rx;
