@@ -162,8 +162,8 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   /* 70% height, 85% width, centred — equal columns */
   .body{width:85%;margin:0 auto;gap:2vw;grid-template-columns:1fr 1fr;display:grid;align-items:stretch;flex:0 0 60dvh;min-height:0;padding:0;}
   /* map fills grid cell fully */
-  .map-panel{min-height:0;height:100%;align-self:stretch;}
-  .blk,.blk.eng{flex:1;min-height:0;max-height:none;}
+  .map-panel{width:65%;min-height:0;height:100%;align-self:stretch;}
+  .blk,.blk.eng{width:35%;flex:1;min-height:0;max-height:none;}
   .map-label{font-size:clamp(9px,1.2vw,12px);letter-spacing:2px;}
   .right-panel{gap:clamp(12px,1.2dvh,16px);justify-content:flex-start;}
   .rp-header{padding:clamp(4px,0.6dvh,8px) 10px clamp(3px,0.4dvh,6px) 12px;}
