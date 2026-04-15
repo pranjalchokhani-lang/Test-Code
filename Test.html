@@ -3,246 +3,271 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=Inter:wght@200;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --font-display: 'Chakra Petch', sans-serif;
-  --font-content: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Inter', sans-serif; /* Apple Pro Look */
+  --font-content: 'Inter', sans-serif;
   --accent: #4de8b8;
   --accent-rgb: 77, 232, 184;
-  --bg: #08090c;
-  --safe-top: env(safe-area-inset-top, 20px);
+  --bg: #050608;
+  --text: #ffffff;
+  --glass: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.12);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
+* { margin:0; padding:0; box-sizing:border-box; cursor:crosshair; }
 body { 
-    background: var(--bg); 
-    color: #fff; 
-    font-family: var(--font-content); 
-    height: 100dvh; 
-    overflow: hidden; 
-    letter-spacing: -0.015em;
-    -webkit-font-smoothing: antialiased;
+  background: var(--bg); 
+  width: 100vw; height: 100dvh; 
+  overflow: hidden; 
+  color: var(--text);
+  font-family: var(--font-display);
 }
 
-canvas#bg-canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-
-/* APPLE MATERIAL DESIGN */
-.apple-glass {
-  background: rgba(20, 22, 26, 0.45);
-  backdrop-filter: blur(35px) saturate(210%) brightness(110%);
-  -webkit-backdrop-filter: blur(35px) saturate(210%) brightness(110%);
-  border: 0.5px solid rgba(255, 255, 255, 0.15);
-  border-radius: 28px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+/* ══════════════ APPLE GLASSMORHISM ══════════════ */
+.map-panel, .blk {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border-radius: 24px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.2, 0, 0.2, 1);
 }
 
-.card {
-  width: 100vw; height: 100dvh;
-  display: flex; flex-direction: column;
-  perspective: 1200px;
-  position: relative; z-index: 10;
-}
-
+/* ══════════════ TYPOGRAPHY & HEADER ══════════════ */
 .trap-head {
-  height: 14dvh; padding-top: var(--safe-top);
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 12dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
 }
-.hdr-title { font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 2.5vw, 24px); letter-spacing: 0.2em; text-transform: uppercase; }
+.hdr-title {
+  font-size: clamp(20px, 2.5cqw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.wg { color: var(--accent); -webkit-text-fill-color: var(--accent); }
 
-.body-grid {
-  flex: 1; display: grid; grid-template-columns: 1fr 400px;
-  gap: 25px; padding: 0 5vw 40px; min-height: 0;
+/* ══════════════ SMOOTH SCROLLING ══════════════ */
+#med-list, #eng-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px;
+  scroll-behavior: smooth;
+  /* The "Apple Fade" - makes content dissolve at edges */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
 }
 
-.map-panel { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-#rj { width: 95%; height: 95%; }
-
-.dist { fill: rgba(255,255,255,0.03); stroke: rgba(255,255,255,0.12); cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.dist:hover { fill: rgba(var(--accent-rgb), 0.15); stroke: rgba(255,255,255,0.3); }
-.dist.on { fill: rgba(var(--accent-rgb), 0.25)!important; stroke: var(--accent)!important; stroke-width: 2px!important; }
-
-.state-boundary { fill: none; stroke: rgba(255,255,255,0.4); stroke-width: 1px; pointer-events: none; }
-
-.right-panel { display: flex; flex-direction: column; gap: 20px; min-height: 0; }
-.data-blk { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
-.blk-header { padding: 20px 24px 10px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.15em; }
-
-.topper-list {
-  flex: 1; overflow-y: auto; padding: 0 16px 40px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+/* Minimalist Apple Scrollbar */
+#med-list::-webkit-scrollbar, #eng-list::-webkit-scrollbar { width: 3px; }
+#med-list::-webkit-scrollbar-thumb, #eng-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
-.topper-list::-webkit-scrollbar { display: none; }
 
-.row { padding: 16px; border-radius: 18px; margin-bottom: 4px; transition: 0.2s; cursor: pointer; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
-.row:active { background: rgba(255, 255, 255, 0.1); transform: scale(0.98); }
-.row b { color: var(--accent); display: block; font-size: 14px; margin-bottom: 4px; }
-.row span { color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1.4; }
+/* ══════════════ LAYOUT ══════════════ */
+.card { width: 100vw; height: 100dvh; display: flex; flex-direction: column; position: relative; }
+canvas#c { position: absolute; inset:0; z-index: 0; opacity: 0.6; }
 
-@media (max-width: 900px) {
-    .body-grid { grid-template-columns: 1fr; }
-    .right-panel { height: 50dvh; }
+.body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 58% 42%;
+  padding: 0 6vw 4vh;
+  gap: 24px;
+  z-index: 10;
 }
+
+.right-panel { display: flex; flex-direction: column; gap: 20px; }
+.rp-header { padding: 0 10px; }
+.wtag { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+.ctag { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+
+.blk-header {
+  padding: 16px 20px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.blk-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; color: var(--accent); }
+
+.row {
+  font-family: var(--font-content);
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); /* Apple Quint ease-out */
+}
+.row.visible { opacity: 1; transform: translateY(0); }
+.row b { font-weight: 600; color: #fff; }
+
+.map-panel { padding: 20px; display: flex; flex-direction: column; }
+.map-viewport { flex: 1; cursor: grab; position: relative; }
+
+/* Map Path Styling */
+.dist { 
+  fill: rgba(255,255,255,0.03); 
+  stroke: rgba(255,255,255,0.1); 
+  stroke-width: 0.5; 
+  transition: all 0.4s ease;
+}
+.dist.on { 
+  fill: rgba(var(--accent-rgb), 0.2) !important; 
+  stroke: #fff !important; 
+  stroke-width: 1.5 !important;
+  filter: drop-shadow(0 0 15px rgba(var(--accent-rgb), 0.4));
+}
+.lbl { fill: #fff; font-size: 10px; font-weight: 700; opacity: 0; transition: 0.3s; pointer-events: none; }
+.lbl.on { opacity: 1; font-size: 14px; }
+
+/* ══════════════ FOOTER ══════════════ */
+.trap-foot-wrap { height: 10dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.fsub { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; }
+.fmain { font-size: 16px; font-weight: 700; letter-spacing: 1px; margin-top: 4px; }
 </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
-
-<div class="card" id="stage">
+<div class="card">
+  <canvas id="c"></canvas>
   <div class="trap-head">
-    <div class="hdr-title">ALLEN SIKAR <span style="color:var(--accent)">TOPPER ATLAS</span></div>
+    <div class="hdr-title">ALLEN <span class="wg">Sikar</span> ATLAS</div>
   </div>
 
-  <div class="body-grid">
-    <div class="map-panel apple-glass" id="map-viewport">
-      <svg id="rj" viewBox="0 0 500 520"></svg>
+  <div class="body">
+    <div class="map-panel">
+      <div class="map-viewport" id="map-viewport">
+        <div id="map-mover">
+          <svg id="rj" viewBox="0 0 500 520"></svg>
+        </div>
+      </div>
     </div>
 
     <div class="right-panel">
-      <div class="data-blk apple-glass">
-        <div class="blk-header">Medical Legends</div>
-        <div class="topper-list" id="med-list"></div>
+      <div class="rp-header">
+        <div class="wtag">Regional Excellence</div>
+        <div class="ctag" id="ctag">SELECT DISTRICT</div>
       </div>
-      <div class="data-blk apple-glass">
-        <div class="blk-header">Engineering Legends</div>
-        <div class="topper-list" id="eng-list"></div>
+      
+      <div class="blk">
+        <div class="blk-header">
+          <div class="blk-title">Medical</div>
+          <div class="status-dot"></div>
+        </div>
+        <div id="med-list"></div>
+      </div>
+
+      <div class="blk">
+        <div class="blk-header">
+          <div class="blk-title">Engineering</div>
+          <div class="status-dot"></div>
+        </div>
+        <div id="eng-list"></div>
       </div>
     </div>
+  </div>
+
+  <div class="trap-foot-wrap">
+    <div class="fsub">The Next Legend Could Be You</div>
+    <div class="fmain">JOIN <span class="wg">ALLEN SIKAR</span></div>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════
-   STEP 1: PASTE YOUR DATA BLOCKS HERE
-   ═══════════════════════════════════════════════════════ */
-
-// 1. DISTRICT GEOJSON
-const districtGJ = {
-  "type": "FeatureCollection",
-  "features": [
-    // Paste your district features here
-    {"type":"Feature","properties":{"district":"Barmer"},"geometry":{"type":"Polygon","coordinates":[[[70.0,24.5],[72.0,24.5],[72.0,26.5],[70.0,26.5],[70.0,24.5]]]}},
-    {"type":"Feature","properties":{"district":"Jalore"},"geometry":{"type":"Polygon","coordinates":[[[71.1,24.5],[73.0,24.5],[73.0,25.8],[71.1,25.8],[71.1,24.5]]]}}
-  ]
-};
-
-// 2. STATE GEOJSON
-const stateGJ = {
-  "type": "FeatureCollection",
-  "features": [
-    // Paste your state boundaries here
-    {"type":"Feature","properties":{"state":"Rajasthan"},"geometry":{"type":"Polygon","coordinates":[[[69.5,23.3],[78.2,23.3],[78.2,30.1],[69.5,30.1],[69.5,23.3]]]}}
-  ]
-};
-
-// 3. FACT BASE (Topper Data)
 const DATA = {
   "Barmer": {
-    m: ["<b>Deraj Ram</b>: AIR 285 → AIIMS Jodhpur ('25)", "<b>17 Allenites</b> scored 600+ in NEET"],
-    e: ["<b>Vineet Jatol</b>: IIT Ropar CS ('25)"]
+    m: ["<b>Deraj Ram</b>: AIR 285 → AIIMS Jodhpur", "<b>17 Allenites</b> scored ≥600 in NEET", "<b>9 Allenites</b> cracked GMC Barmer", "<b>Tiloka Ram</b>: AIR 1,186 (685/720)"],
+    e: ["<b>Vineet Jatol</b>: IIT Ropar CS", "<b>Poonam</b>: IIT Kanpur Civil", "<b>Rohit Sharma</b>: IIT Delhi"]
   },
   "Jalore": {
-    m: ["<b>Jeevika Choudhary</b>: AIR 2,310 ('23)"],
-    e: ["<b>Ankita Verma</b>: IIT Bombay EE ('24)"]
+    m: ["<b>Jeevika Choudhary</b>: AIR 2,310 (675/720)", "<b>Kamlesh Choudhary</b>: GMC Koraput", "<b>Chetna Charan</b>: GMC Sirohi"],
+    e: ["<b>Vineet Jatol</b>: IIT Ropar CS (Barmer)"]
   }
 };
 
-/* ═══════════════════════════════════════════════════════
-   STEP 2: THE RENDER ENGINE (Original Logic + Apple UI)
-   ═══════════════════════════════════════════════════════ */
+const districtGJ={"type":"FeatureCollection","features":[{"type":"Feature","properties":{"district":"Barmer"},"geometry":{"type":"Polygon","coordinates":[[[70.04,24.62],[71.15,24.62],[71.15,26.54],[70.04,26.54],[70.04,24.62]]]}},{"type":"Feature","properties":{"district":"Jalore"},"geometry":{"type":"Polygon","coordinates":[[[71.16,24.59],[73.10,24.59],[73.10,25.81],[71.16,25.81],[71.16,24.59]]]}}]};
 
-const svg = document.getElementById('rj');
-
-function renderMap() {
-    // Determine Bounding Box
-    let x0=Infinity, x1=-Infinity, y0=Infinity, y1=-Infinity;
-    districtGJ.features.forEach(f => {
-        f.geometry.coordinates.flat(Infinity).forEach((v, i) => {
-            if(i%2===0) { if(v<x0)x0=v; if(v>x1)x1=v; }
-            else { if(v<y0)y0=v; if(v>y1)y1=v; }
-        });
-    });
-
-    const sc = Math.min(460/(x1-x0), 480/(y1-y0));
-    const px = lo => 20 + (lo - x0) * sc;
-    const py = la => 500 - (la - y0) * sc;
-
-    const ringToD = ring => ring.map((pt, i) => (i?'L':'M') + px(pt[0]).toFixed(1) + ',' + py(pt[1]).toFixed(1)).join('') + 'Z';
-
-    // Draw Districts
-    districtGJ.features.forEach(f => {
-        const name = f.properties.district;
-        const d = f.geometry.coordinates.map(ringToD).join(' ');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('class', 'dist');
-        path.setAttribute('d', d);
-        path.onclick = () => select(name, path);
-        svg.appendChild(path);
-    });
-
-    // Draw State Boundaries
-    stateGJ.features.forEach(f => {
-        const d = f.geometry.coordinates.map(ringToD).join(' ');
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('class', 'state-boundary');
-        path.setAttribute('d', d);
-        svg.appendChild(path);
-    });
+function stream(id, facts) {
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  facts.forEach((f, i) => {
+    const r = document.createElement('div');
+    r.className = 'row';
+    r.innerHTML = f;
+    el.appendChild(r);
+    // Staggered reveal
+    setTimeout(() => r.classList.add('visible'), i * 80);
+  });
 }
 
-function select(name, el) {
-    document.querySelectorAll('.dist').forEach(p => p.classList.remove('on'));
-    el.classList.add('on');
+function select(name) {
+  document.getElementById('ctag').innerText = name.toUpperCase();
+  document.querySelectorAll('.dist').forEach(p => p.classList.remove('on'));
+  const path = document.querySelector(`[data-n="${name}"]`);
+  if(path) path.classList.add('on');
+
+  const d = DATA[name] || { m: [], e: [] };
+  stream('med-list', d.m);
+  stream('eng-list', d.e);
+}
+
+// Map Rendering Logic
+(function initMap() {
+  const svg = document.getElementById('rj');
+  const VW=500, VH=520;
+  const px = lo => (lo - 70.0) * 150 + 50;
+  const py = la => (26.6 - la) * 150 + 50;
+
+  districtGJ.features.forEach(f => {
+    const name = f.properties.district;
+    const coords = f.geometry.coordinates[0];
+    const d = coords.map((pt, i) => (i===0?'M':'L') + px(pt[0]) + ',' + py(pt[1])).join(' ') + 'Z';
     
-    const d = DATA[name] || {m:[], e:[]};
-    document.getElementById('med-list').innerHTML = d.m.map(t => `<div class="row"><span>${t}</span></div>`).join('');
-    document.getElementById('eng-list').innerHTML = d.e.map(t => `<div class="row"><span>${t}</span></div>`).join('');
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d);
+    p.setAttribute('class', 'dist');
+    p.setAttribute('data-n', name);
+    p.onclick = () => select(name);
+    svg.appendChild(p);
+  });
+  
+  select("Barmer");
+})();
+
+// Background Stars Logic
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+window.onresize = resize; resize();
+
+const stars = Array.from({length: 100}, () => ({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.2 }));
+function draw() {
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  stars.forEach(s => {
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
+    s.y -= 0.2; if(s.y < 0) s.y = h;
+  });
+  requestAnimationFrame(draw);
 }
-
-/* ═══════════════════════════════════════════════════════
-   STEP 3: APPLE INTERACTION & BACKGROUND
-   ═══════════════════════════════════════════════════════ */
-const stage = document.getElementById('stage');
-document.addEventListener('mousemove', (e) => {
-    const x = (window.innerWidth / 2 - e.pageX) / 85;
-    const y = (window.innerHeight / 2 - e.pageY) / 85;
-    stage.style.transform = `rotateX(${-y}deg) rotateY(${x}deg)`;
-});
-
-// Simple Starfield Background
-function initStars() {
-    const c = document.getElementById('bg-canvas');
-    const ctx = c.getContext('2d');
-    let w, h, stars = [];
-    const resize = () => { w = c.width = window.innerWidth; h = c.height = window.innerHeight; };
-    window.onresize = resize; resize();
-    for(let i=0; i<100; i++) stars.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.2});
-    function anim() {
-        ctx.clearRect(0,0,w,h);
-        ctx.fillStyle = "rgba(255,255,255,0.3)";
-        stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
-        requestAnimationFrame(anim);
-    }
-    anim();
-}
-
-window.onload = () => {
-    renderMap();
-    initStars();
-    // Default Selection
-    const first = document.querySelector('.dist');
-    if(first) first.click();
-};
+draw();
 </script>
 </body>
 </html>
