@@ -67,7 +67,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 .blk .box-fill{animation:bfMed 1.5s ease-in-out infinite alternate;animation-delay:-1s;}
 .blk.eng .box-fill{animation:bfEng 1.5s ease-in-out infinite alternate;animation-delay:-1s;}
 .box-bar{position:absolute;left:0;top:15%;bottom:15%;width:2px;border-radius:1px;background:linear-gradient(180deg,transparent,rgba(var(--accent-rgb),0.5),transparent);box-shadow:0 0 6px rgba(var(--accent-rgb),0.25);animation:barP 1.8s ease-in-out infinite alternate;}
-.box-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),0.35),rgba(var(--accent-rgb),0.55),rgba(var(--accent-rgb),0.35),transparent);box-shadow:0 0 4px rgba(var(--accent-rgb),0.25);pointer-events:none;z-index:2;}
+.box-scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(var(--accent-rgb),0.6),rgba(var(--accent-rgb),0.95),rgba(var(--accent-rgb),0.6),transparent);box-shadow:0 0 8px rgba(var(--accent-rgb),0.7),0 0 2px #fff;pointer-events:none;z-index:2;}
 .map-panel .box-scan{animation:scAll 3s linear infinite;}
 .blk .box-scan{animation:scAll 3s linear infinite;animation-delay:0.15s;}
 .blk.eng .box-scan{animation:scAll 3s linear infinite;animation-delay:0.3s;}
@@ -87,7 +87,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 .dist{fill:rgba(255,255,255,0.02);stroke:rgba(255,255,255,0.07);stroke-width:0.5;cursor:pointer;transition:fill .25s,stroke .25s;}
 .dist:hover{fill:rgba(var(--accent-rgb),0.1);stroke:rgba(var(--accent-rgb),0.35);}
-.dist.on{fill:rgba(var(--accent-rgb),0.35)!important;stroke:rgba(var(--accent-rgb),1);stroke-width:1.2;}
+.dist.on{fill:rgba(var(--accent-rgb),0.12)!important;stroke:rgba(var(--accent-rgb),1);stroke-width:2;filter:url(#district-glow);}
 
 .lbl{fill:rgba(255,255,255,1.0);font-size:8px;text-anchor:middle;pointer-events:none;text-transform:uppercase;letter-spacing:0.8px;dominant-baseline:middle;opacity:0;transition:opacity 0.2s ease,fill 0.2s ease;font-weight:bold;filter:drop-shadow(0 0 3px rgba(0,0,0,0.9)) drop-shadow(0 1px 2px rgba(0,0,0,1));}
 .lbl.on{fill:#000!important;font-weight:700;opacity:1!important;filter:none;}
@@ -198,30 +198,30 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   .card-inner{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
   canvas#c{position:absolute;}
   /* Header sliver */
-  .trap-head{flex-shrink:0;height:22px;min-height:22px;max-height:22px;padding:0 10px;flex-direction:row;align-items:center;justify-content:center;}
+  .trap-head{flex-shrink:0;height:22px;min-height:22px;max-height:22px;padding:0 8px;flex-direction:row;align-items:center;justify-content:center;}
   .hdr-title{font-size:9px;animation:none;letter-spacing:2px;white-space:nowrap;}
   .ticker-wrap{display:none!important;}
-  /* Body */
-  .body{flex:1;min-height:0;display:flex;flex-direction:row;padding:3px 6px;gap:6px;overflow:hidden;}
-  /* Map — height:auto overrides the base height:100% */
-  .map-panel{flex:0 0 42%;height:auto!important;min-height:0;padding:5px;border-radius:8px;}
-  .map-label{font-size:6px;letter-spacing:1px;margin-bottom:3px;padding:2px 4px;}
-  /* Right panel */
-  .right-panel{flex:1;min-width:0;height:auto!important;min-height:0;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
-  .rp-header{flex-shrink:0;padding:1px 5px;}
+  /* Body — consistent 4px gap everywhere */
+  .body{flex:1;min-height:0;display:flex;flex-direction:row;padding:4px 6px;gap:4px;overflow:hidden;}
+  /* Map */
+  .map-panel{flex:0 0 42%;height:auto!important;max-height:100%;min-height:0;padding:4px;border-radius:6px;}
+  .map-label{font-size:6px;letter-spacing:1px;margin-bottom:2px;padding:1px 4px;}
+  /* Right panel — same 4px gap between all elements */
+  .right-panel{flex:1;min-width:0;height:100%!important;min-height:0;display:flex;flex-direction:column;gap:4px;overflow:hidden;}
+  .rp-header{flex-shrink:0;padding:1px 4px 2px 4px;}
   .wtag{font-size:6px;letter-spacing:0.5px;line-height:1.2;}
   .ctag{font-size:8px;letter-spacing:1px;line-height:1.2;}
   /* Two panels stacked equally */
   .blk{flex:1;min-height:0;height:auto!important;border-radius:6px;}
   .blk.eng{flex:1;min-height:0;height:auto!important;border-radius:6px;}
-  .blk-header{padding:2px 7px;}
+  .blk-header{padding:2px 6px;}
   .blk-title{font-size:7px;letter-spacing:1px;}
   .row{font-size:7px;line-height:1.3;padding:1px 0;white-space:nowrap;}
-  #med-list,#eng-list{padding:2px 7px;overflow-y:auto;flex:1;}
-  .loading-line{font-size:6px;letter-spacing:1px;padding:2px 7px 0;}
+  #med-list,#eng-list{padding:2px 6px;overflow-y:auto;flex:1;}
+  .loading-line{font-size:6px;letter-spacing:1px;padding:2px 6px 0;}
   .lbl,.lbl.on{font-size:12px!important;}
   /* Footer sliver */
-  .trap-foot-wrap{flex-shrink:0;height:18px;min-height:18px;max-height:18px;padding:0 10px;justify-content:center;}
+  .trap-foot-wrap{flex-shrink:0;height:18px;min-height:18px;max-height:18px;padding:0 8px;justify-content:center;}
   .fsub{display:none!important;}
   .fmain{font-size:9px;letter-spacing:2px;}
 }
@@ -394,7 +394,8 @@ function addPulse(cx,cy){const svg=document.getElementById('rj');document.queryS
   const px=lo=>ox+(lo-x0)*sc,py=la=>oy+(y1-la)*sc;
   function ringToD(ring){return ring.map(([lo,la],i)=>(i?'L':'M')+px(lo).toFixed(1)+','+py(la).toFixed(1)).join('')+'Z';}
   const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
-  defs.innerHTML=`<filter id="state-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1"/><feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur2"/><feMerge><feMergeNode in="blur2"/><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  defs.innerHTML=`<filter id="state-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1"/><feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur2"/><feMerge><feMergeNode in="blur2"/><feMergeNode in="blur1"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="district-glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur in="SourceGraphic" stdDeviation="4" result="soft"/><feGaussianBlur in="SourceGraphic" stdDeviation="12" result="wide"/><feGaussianBlur in="SourceGraphic" stdDeviation="24" result="wider"/><feMerge><feMergeNode in="wider"/><feMergeNode in="wide"/><feMergeNode in="soft"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
   svg.insertBefore(defs,svg.firstChild);
   districtGJ.features.forEach(f=>{
     const name=f.properties.district,geom=f.geometry;
@@ -439,7 +440,9 @@ document.addEventListener('DOMContentLoaded',function(){
     {speed:0.0065,amp:55,color:'185,43,227', alpha:0.45,width:95,fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
     {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
-  const isPhone=window.innerWidth<=600 || window.innerHeight<=440;
+  const isLandscapePhone=window.innerHeight<=440;
+  const isPortraitPhone=window.innerWidth<=600 && !isLandscapePhone;
+  const isPhone=isPortraitPhone||isLandscapePhone;
   const isTablet=!isPhone && window.innerWidth<=1024;
   const blurMult=isPhone?0.25:isTablet?0.5:1.0;
   const decayRate=isPhone?0.948:isTablet?0.955:0.967;
