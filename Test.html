@@ -121,20 +121,25 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 /* ══════════════════════════════════════════════════════
    BP2 — iPad PORTRAIT (601–850px wide, 900px+ tall)
-   Horizontal layout. Tighter header/footer/panel padding
-   so content isn't cut on ~768px wide screens.
    ══════════════════════════════════════════════════════ */
 @media (min-width:601px) and (min-height:900px) and (max-width:850px){
   .trap-head{height:8dvh;min-height:40px;}
   .trap-foot-wrap{height:7dvh;min-height:36px;}
+
+  /* body is flex:1 from base — constrain it by shrinking the parent */
+  /* card-inner fills remaining 85dvh; body fills it with grid */
   .body{padding:0 5cqw;gap:1.2cqw;}
-  .blk-header{padding:clamp(5px,0.7cqh,10px) 10px;}
-  .blk-title{font-size:clamp(8px,0.9cqw,11px);letter-spacing:1px;}
-  .right-panel{gap:clamp(3px,0.8cqh,10px);}
-  .rp-header{padding:clamp(1px,0.15cqh,3px) 6px clamp(1px,0.2cqh,4px) 8px;}
-  .ctag{font-size:clamp(11px,1.6cqw,18px);}
-  .row{font-size:clamp(10px,1.0cqw,12px);line-height:1.5;}
-  #med-list,#eng-list{padding:4px 12px;}
+
+  /* blk boxes use flex:1 from base — they'll fill right-panel height equally */
+  .blk-header{padding:5px 10px;}
+  .blk-title{font-size:clamp(8px,0.9cqw,10px);letter-spacing:1px;}
+  .right-panel{gap:8px;}
+  .rp-header{padding:2px 6px 4px 8px;}
+  .ctag{font-size:clamp(11px,1.6cqw,16px);}
+  .wtag{font-size:clamp(8px,0.9cqw,10px);}
+  .row{font-size:clamp(8px,0.85cqw,10px);line-height:1.4;white-space:nowrap;overflow:hidden;}
+  #med-list,#eng-list{padding:3px 10px;overflow-x:hidden;}
+  .loading-line{font-size:clamp(7px,0.8cqw,9px);}
 }
 
 /* ══════════════════════════════════════════════════════
@@ -144,9 +149,8 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   .body{padding:0 10cqw;gap:2cqw;}
   .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
   .ctag{font-size:clamp(13px,2.0cqw,22px);}
-  .blk-header{padding:clamp(6px,1.0cqh,14px) 14px;}
+  .blk-header{padding:clamp(8px,1.2cqh,20px) 14px;}
   .row{font-size:clamp(11px,1.1cqw,13px);}
-  .right-panel{gap:clamp(4px,1.2cqh,16px);}
 }
 
 /* ══════════════════════════════════════════════════════
@@ -190,25 +194,25 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 @media (max-height:440px) and (orientation:landscape){
   html,body{overflow:hidden!important;height:100dvh!important;}
   .card{height:100dvh;overflow:hidden;}
-  .card-inner{height:100%;display:flex;flex-direction:column;min-height:0;}
+  .card-inner{height:100%;display:flex;flex-direction:column;min-height:0;overflow:hidden;}
   canvas#c{position:absolute;}
   /* Header sliver */
   .trap-head{flex-shrink:0;height:22px;min-height:22px;max-height:22px;padding:0 10px;flex-direction:row;align-items:center;justify-content:center;}
   .hdr-title{font-size:9px;animation:none;letter-spacing:2px;white-space:nowrap;}
   .ticker-wrap{display:none!important;}
   /* Body */
-  .body{flex:1;min-height:0;display:flex;flex-direction:row;padding:3px 6px;gap:6px;}
-  /* Map */
-  .map-panel{flex:0 0 42%;min-height:0;padding:5px;border-radius:8px;}
+  .body{flex:1;min-height:0;display:flex;flex-direction:row;padding:3px 6px;gap:6px;overflow:hidden;}
+  /* Map — height:auto overrides the base height:100% */
+  .map-panel{flex:0 0 42%;height:auto!important;min-height:0;padding:5px;border-radius:8px;}
   .map-label{font-size:6px;letter-spacing:1px;margin-bottom:3px;padding:2px 4px;}
   /* Right panel */
-  .right-panel{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
+  .right-panel{flex:1;min-width:0;height:auto!important;min-height:0;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
   .rp-header{flex-shrink:0;padding:1px 5px;}
   .wtag{font-size:6px;letter-spacing:0.5px;line-height:1.2;}
   .ctag{font-size:8px;letter-spacing:1px;line-height:1.2;}
   /* Two panels stacked equally */
-  .blk{flex:1;min-height:0;border-radius:6px;}
-  .blk.eng{flex:1;min-height:0;border-radius:6px;}
+  .blk{flex:1;min-height:0;height:auto!important;border-radius:6px;}
+  .blk.eng{flex:1;min-height:0;height:auto!important;border-radius:6px;}
   .blk-header{padding:2px 7px;}
   .blk-title{font-size:7px;letter-spacing:1px;}
   .row{font-size:7px;line-height:1.3;padding:1px 0;white-space:nowrap;}
@@ -434,7 +438,7 @@ document.addEventListener('DOMContentLoaded',function(){
     {speed:0.0065,amp:55,color:'185,43,227', alpha:0.45,width:95,fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
     {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
-  const isMobile=window.innerWidth<=1024;
+  const isMobile=window.innerWidth<=600;
   const blurMult=isMobile?0.25:1.0;
   const decayRate=isMobile?0.948:0.967;
 
