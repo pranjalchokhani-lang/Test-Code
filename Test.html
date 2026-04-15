@@ -151,18 +151,19 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 
-/* ══════════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════════
    LAYOUT BREAKPOINTS — THREE TIERS
-   ──────────────────────────────────────────────────────
-   1. STACKED (portrait phone): aspect-ratio < 2/3
-   2. LANDSCAPE PHONE: aspect ≥ 2/3 AND height ≤ 440px
-      → Option A: map 50% left, stacked lists right
-      → No ticker, no "you belong" line
+   ────────────────────────────────────────────────────────────────
+   1. STACKED (portrait phone): max-width 600px AND portrait
+   2. LANDSCAPE PHONE: max-height 440px AND landscape
    3. HORIZONTAL GRID (iPad + desktop): everything else
-   ══════════════════════════════════════════════════════ */
 
-/* ── 1. STACKED: portrait phones (aspect < 2/3) ── */
-@media (max-aspect-ratio:2/3){
+   Using width+orientation instead of aspect-ratio for cleaner
+   device targeting. iPad portrait (768×1024) hits tier 3.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. STACKED: portrait phones ── */
+@media (max-width:600px) and (orientation:portrait){
 
   html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;background:var(--bg);align-items:flex-start!important;}
   .card{height:auto;min-height:100dvh;overflow:visible;display:block;background:transparent;}
@@ -170,86 +171,97 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
   canvas#c{position:fixed;top:0;left:0;width:100vw;height:100dvh;}
 
-  /* Header — compact, no ticker */
-  .trap-head{height:8dvh;min-height:44px;padding:0 5vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
-  .hdr-title{font-size:clamp(10px,3.5vw,16px);text-align:center;width:100%;}
+  .trap-head{height:7dvh;min-height:40px;padding:0 5vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+  .hdr-title{font-size:clamp(10px,3.5vw,15px);text-align:center;width:100%;}
   .ticker-wrap{display:none!important;}
 
-  .body{display:flex;flex-direction:column;padding:8px 5vw;gap:20px;flex:none;height:auto;}
+  .body{display:flex;flex-direction:column;padding:6px 4vw;gap:10px;flex:none;height:auto;}
 
-  .map-panel{width:100%;flex:none;height:calc(38.7dvh - 37px);min-height:100px;touch-action:none;}
+  .map-panel{width:100%;flex:none;height:calc(38dvh - 30px);min-height:90px;touch-action:none;padding:10px 8px 8px;border-radius:12px;}
+  .map-label{font-size:clamp(7px,2vw,9px);margin-bottom:6px;padding:2px 6px;letter-spacing:1.5px;}
 
-  .right-panel{height:auto;display:flex;flex-direction:column;gap:8px;overflow:visible;}
-  .rp-header{padding:4px 10px 3px 10px;flex-shrink:0;}
-  .wtag{font-size:clamp(7px,2.2vw,10px);white-space:normal;}
-  .ctag{font-size:clamp(11px,3.5vw,17px);}
+  .right-panel{height:auto;display:flex;flex-direction:column;gap:6px;overflow:visible;}
+  .rp-header{padding:2px 8px 1px 8px;flex-shrink:0;}
+  .wtag{font-size:clamp(6px,1.8vw,9px);white-space:normal;}
+  .ctag{font-size:clamp(10px,3.2vw,15px);}
 
-  .blk,.blk.eng{flex:none;height:clamp(75px,calc(23.65dvh - 23px),200px);min-height:0;}
+  .blk,.blk.eng{flex:none;height:clamp(70px,calc(23dvh - 20px),190px);min-height:0;border-radius:12px;}
 
-  .blk-header{padding:8px 12px;}
-  .blk-title{font-size:clamp(9px,2.5vw,12px);}
-  .row{white-space:nowrap;font-size:clamp(10px,2.8vw,13px);}
-  .loading-line{font-size:clamp(8px,2.2vw,11px);letter-spacing:1px;}
+  .blk-header{padding:6px 10px;}
+  .blk-title{font-size:clamp(8px,2.2vw,11px);}
+  /* Slightly smaller content font on phone */
+  .row{white-space:nowrap;font-size:clamp(9px,2.5vw,11px);line-height:1.6;padding:2px 0;}
+  #med-list,#eng-list{padding:4px 10px;}
+  .loading-line{font-size:clamp(7px,2vw,10px);letter-spacing:1px;padding:3px 10px 0;}
   .lbl,.lbl.on{font-size:22px!important;}
 
-  /* Footer — no "you belong" line */
-  .trap-foot-wrap{height:6dvh;min-height:44px;padding:0 5vw 12px;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .trap-foot-wrap{height:5dvh;min-height:36px;padding:0 5vw 8px;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;justify-content:center;align-items:center;}
   .fsub{display:none!important;}
-  .fmain{font-size:clamp(11px,3.5vw,16px);}
-  .ticker-half span{font-size:clamp(6px,1.8vw,9px);letter-spacing:1px;}
+  .fmain{font-size:clamp(10px,3vw,14px);}
 }
 
-/* ── 2. LANDSCAPE PHONE: wide + short (aspect ≥ 2/3, height ≤ 440px) ──
-   Map 50% left. District name + two list blocks stacked right.
-   Single-line header/footer slivers. No ticker, no "you belong". ── */
-@media (min-aspect-ratio:2/3) and (max-height:440px){
+/* ── 2. LANDSCAPE PHONE: short + wide screens ──
+   max-height 440px AND landscape orientation.
+   Layout: map 50% left, district+lists right.
+   No ticker, no "you belong". Fits in viewport. ── */
+@media (max-height:440px) and (orientation:landscape){
 
   html,body{overflow:hidden!important;height:100dvh!important;}
   .card{height:100dvh;overflow:hidden;}
+  .card-inner{flex:1;min-height:0;}
 
   canvas#c{position:absolute;}
 
-  /* Header — single line sliver */
-  .trap-head{height:28px;min-height:28px;padding:0 12px;flex-direction:row;gap:0;}
-  .hdr-title{font-size:clamp(10px,2.2vw,14px);animation:none;letter-spacing:2px;}
+  /* Header — single line */
+  .trap-head{height:26px;min-height:26px;padding:0 10px;flex-direction:row;gap:0;justify-content:center;}
+  .hdr-title{font-size:clamp(9px,2vw,13px);animation:none;letter-spacing:2px;}
   .ticker-wrap{display:none!important;}
 
-  /* Body — 50/50 grid */
-  .body{display:grid;grid-template-columns:50% 50%;padding:0 8px;gap:6px;flex:1;min-height:0;}
+  /* Body — 50/50 grid, takes all remaining space */
+  .body{display:grid;grid-template-columns:1fr 1fr;padding:0 6px;gap:5px;flex:1;min-height:0;}
 
-  /* Map panel — tighter padding for landscape */
-  .map-panel{padding:10px 8px 8px;height:100%;border-radius:10px;}
-  .map-label{font-size:clamp(7px,1.6vw,10px);letter-spacing:1.5px;margin-bottom:6px;padding:2px 6px;}
+  /* Map panel */
+  .map-panel{padding:8px 6px 6px;height:auto;border-radius:10px;}
+  .map-label{font-size:clamp(6px,1.4vw,9px);letter-spacing:1px;margin-bottom:4px;padding:2px 5px;}
 
-  /* Right panel — district + 2 blocks */
-  .right-panel{gap:4px;height:100%;overflow:hidden;}
-  .rp-header{padding:2px 6px 1px 8px;}
-  .wtag{font-size:clamp(7px,1.4vw,9px);letter-spacing:0.5px;}
-  .ctag{font-size:clamp(10px,2.2vw,15px);}
+  /* Right panel — flex column fills grid cell */
+  .right-panel{gap:3px;height:auto;overflow:hidden;}
+  .rp-header{padding:1px 5px 0 6px;}
+  .wtag{font-size:clamp(6px,1.2vw,8px);letter-spacing:0.5px;}
+  .ctag{font-size:clamp(9px,2vw,13px);}
 
-  .blk,.blk.eng{flex:1;min-height:0;border-radius:10px;}
-  .blk-header{padding:5px 10px;}
-  .blk-title{font-size:clamp(7px,1.5vw,10px);letter-spacing:1.5px;}
-  .row{font-size:clamp(9px,1.8vw,12px);line-height:1.5;padding:1px 0;}
-  #med-list,#eng-list{padding:4px 10px;}
-  .loading-line{font-size:clamp(7px,1.4vw,9px);letter-spacing:1px;padding:3px 10px 0;}
-  .lbl,.lbl.on{font-size:16px!important;}
+  .blk,.blk.eng{flex:1;min-height:0;border-radius:8px;}
+  .blk-header{padding:4px 8px;}
+  .blk-title{font-size:clamp(6px,1.3vw,9px);letter-spacing:1px;}
+  /* Smaller content font for landscape phone */
+  .row{font-size:clamp(8px,1.5vw,11px);line-height:1.4;padding:1px 0;}
+  #med-list,#eng-list{padding:3px 8px;}
+  .loading-line{font-size:clamp(6px,1.2vw,8px);letter-spacing:1px;padding:2px 8px 0;}
+  .lbl,.lbl.on{font-size:14px!important;}
 
-  /* Footer — single line, no "you belong" */
-  .trap-foot-wrap{height:24px;min-height:24px;padding:0 12px;gap:0;}
+  /* Footer — single line */
+  .trap-foot-wrap{height:22px;min-height:22px;padding:0 10px;gap:0;}
   .fsub{display:none!important;}
-  .fmain{font-size:clamp(9px,1.8vw,13px);}
+  .fmain{font-size:clamp(8px,1.6vw,12px);}
 }
 
 /* ── 3. HORIZONTAL GRID: iPad + desktop ──
-   aspect ≥ 2/3 AND height > 440px AND width ≤ 1180px
-   (wider than 1180px uses default token sizes) ── */
-@media (min-aspect-ratio:2/3) and (min-height:441px) and (max-width:1180px){
+   Everything not caught by the above two breakpoints.
+   iPad portrait (768×1024), iPad landscape, desktop. ── */
+@media (min-width:601px) and (min-height:441px) and (max-width:1180px){
   .body{padding:0 10cqw;gap:2cqw;}
   .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
   .ctag{font-size:clamp(13px,2.0cqw,22px);}
   .blk-header{padding:clamp(8px,1.2cqh,20px) 14px;}
   .row{font-size:clamp(11px,1.1cqw,13px);}
+}
+
+/* ── iPad portrait specific — ensure blocks don't get cut ── */
+@media (min-width:601px) and (min-height:900px) and (max-width:850px){
+  .trap-head{height:10dvh;min-height:50px;}
+  .trap-foot-wrap{height:8dvh;min-height:44px;}
+  .body{padding:0 6cqw;gap:1.5cqw;}
+  .blk-header{padding:clamp(6px,1cqh,14px) 12px;}
 }
 </style>
 </head>
@@ -667,19 +679,26 @@ document.addEventListener('DOMContentLoaded',function(){
   /* ═══════════════════════════════════════════════════════════════
      SECTION 14 — AURORA CANVAS
      ─────────────────────────────────────────────────────────────
-     AURORA FIX for iPad/mobile:
-     The old touch path used 'source-over' on the offscreen canvas,
-     which killed the additive glow (overlapping wave colours didn't
-     mix — they just painted over each other).
+     COMPLETE REWRITE for touch devices.
 
-     FIX: Now uses 'lighter' compositing on the small offscreen
-     canvas (300×200), then blits to the full-size main canvas with
-     'source-over'. This gives correct additive colour mixing while
-     keeping the performance benefit of small-canvas rendering.
+     Root causes of old bugs:
+     1. "Going very up" — wave amplitude was computed as
+        amp * rScale² where rScale = 300/900 = 0.33, giving
+        amp * 0.11 in offscreen coords. But that was PIXELS in
+        a 200px-tall canvas, so waves sat at y=200±22 — meaning
+        some harmonics pushed up to y=130 (35% from top).
+        When blitted to full screen that's 35% from top = way
+        too high. FIX: clamp total wobble to ±15% of canvas H.
 
-     shadowBlur is still 0 on touch — replaced with 3 layered
-     strokes (wide halo → medium glow → bright core) which the GPU
-     handles as fast fill operations, not Gaussian blur passes.
+     2. "Very slow" — 'lighter' compositing on offscreen canvas
+        still triggered GPU readback on iOS tile-based renderer.
+        FIX: use 'source-over' only. Boost alpha values to
+        compensate for loss of additive mixing.
+
+     3. Multiple stroke() calls per wave (was 3) — each one is
+        a GPU draw call. FIX: 2 strokes max (halo + core).
+
+     Desktop path unchanged — works fine with 'lighter' + shadowBlur.
      ═══════════════════════════════════════════════════════════════ */
   const aCanvas=document.getElementById('page-aurora'),ax=aCanvas.getContext('2d');
   let aW,aH;
@@ -700,14 +719,47 @@ document.addEventListener('DOMContentLoaded',function(){
     {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
 
-  function renderWaves(ctx,cW,cH,e,rScale){
+  function renderWavesTouch(ctx,cW,cH,e){
+    /* Waves render in bottom 20% of canvas only.
+       baseY = 85% down. Max wobble = ±15% of cH.
+       This keeps aurora as a subtle bottom-edge sweep. */
+    const baseY=cH*0.85;
+    const maxWobble=cH*0.15;
+    ctx.lineCap='round';ctx.lineJoin='round';ctx.shadowBlur=0;
+    waves.forEach((w,wi)=>{
+      const ph=waveSeeds[wi],fr=w.fr;
+      const step=20;
+      ctx.beginPath();
+      for(let x=0;x<=cW;x+=step){
+        const nx=x/cW;
+        /* Raw wobble — sum of harmonics, normalised to [-1,1] range then scaled */
+        const raw=
+          Math.sin(nx*3.7 +aT*w.speed*60*fr[0]+ph[0])*0.40+
+          Math.sin(nx*7.3 +aT*w.speed*60*fr[1]+ph[1])*0.30+
+          Math.sin(nx*13.1+aT*w.speed*60*fr[2]+ph[2])*0.22+
+          Math.sin(nx*19.7+aT*w.speed*60*fr[3]+ph[3])*0.16+
+          Math.sin(nx*31.4+aT*w.speed*60*fr[4]+ph[4])*0.12+
+          Math.sin(nx*47.3+aT*w.speed*60*fr[5]+ph[5])*0.08;
+        /* raw range is about -1.28 to +1.28. Scale to maxWobble. */
+        const wobble=raw*maxWobble*e;
+        const y=baseY+wobble;
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      /* 2 strokes only: soft halo + bright core */
+      const a=w.alpha*e;
+      ctx.strokeStyle=`rgba(${w.color},${a*0.35})`;ctx.lineWidth=Math.max(1,w.width*0.04*e);ctx.stroke();
+      ctx.strokeStyle=`rgba(${w.color},${a*0.9})`;ctx.lineWidth=Math.max(0.5,w.width*0.012*e);ctx.stroke();
+    });
+  }
+
+  function renderWavesDesktop(ctx,cW,cH,e){
     ctx.lineCap='round';ctx.lineJoin='round';
+    const rScale=Math.min(1,cW/900);
     waves.forEach((w,wi)=>{
       const ph=waveSeeds[wi],fr=w.fr;
       const ampR=w.amp*rScale*rScale,widR=w.width*rScale;
-      const step=isTouch?18:10;
       ctx.beginPath();
-      for(let x=0;x<=cW;x+=step){
+      for(let x=0;x<=cW;x+=10){
         const nx=x/cW;
         const wobble=e*(
           Math.sin(nx*3.7 +aT*w.speed*60*fr[0]+ph[0])*ampR*0.40+
@@ -719,21 +771,11 @@ document.addEventListener('DOMContentLoaded',function(){
         );
         x===0?ctx.moveTo(x,cH+wobble):ctx.lineTo(x,cH+wobble);
       }
-      if(isTouch){
-        /* 3 layered strokes — no shadowBlur, no GPU Gaussian penalty.
-           The 'lighter' compositing on the offscreen canvas makes
-           overlapping waves additively mix their colours. */
-        ctx.shadowBlur=0;
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.18})`;ctx.lineWidth=widR*e*3.0;ctx.stroke();
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.45})`;ctx.lineWidth=widR*e*1.2;ctx.stroke();
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.85})`;ctx.lineWidth=widR*e*0.4;ctx.stroke();
-      } else {
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e})`;ctx.lineWidth=widR*e;
-        ctx.shadowBlur=widR*4.5*e;ctx.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ctx.stroke();
-        ctx.strokeStyle=`rgba(255,255,255,${w.alpha*e*0.9})`;ctx.lineWidth=widR*0.20*e;
-        ctx.shadowBlur=widR*1.0*e;ctx.shadowColor='rgba(255,255,255,1)';ctx.stroke();
-        ctx.shadowBlur=0;
-      }
+      ctx.strokeStyle=`rgba(${w.color},${w.alpha*e})`;ctx.lineWidth=widR*e;
+      ctx.shadowBlur=widR*4.5*e;ctx.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ctx.stroke();
+      ctx.strokeStyle=`rgba(255,255,255,${w.alpha*e*0.9})`;ctx.lineWidth=widR*0.20*e;
+      ctx.shadowBlur=widR*1.0*e;ctx.shadowColor='rgba(255,255,255,1)';ctx.stroke();
+      ctx.shadowBlur=0;
     });
   }
 
@@ -744,18 +786,18 @@ document.addEventListener('DOMContentLoaded',function(){
     }
     const e=aEnergy;
     if(isTouch){
-      /* FIX: 'lighter' on offscreen → 'source-over' blit to main.
-         Offscreen is only 300×200 so 'lighter' cost is minimal.
-         The blit scales it to full viewport in one GPU drawImage. */
-      offCtx.globalCompositeOperation='source-over';offCtx.clearRect(0,0,OFF_W,OFF_H);
-      offCtx.globalCompositeOperation='lighter';
-      renderWaves(offCtx,OFF_W,OFF_H,e,Math.min(1,OFF_W/900));
-      ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
+      /* source-over ONLY on both canvases — no 'lighter' anywhere on touch.
+         Waves drawn on small offscreen, blitted scaled to main. */
+      offCtx.globalCompositeOperation='source-over';
+      offCtx.clearRect(0,0,OFF_W,OFF_H);
+      renderWavesTouch(offCtx,OFF_W,OFF_H,e);
+      ax.globalCompositeOperation='source-over';
+      ax.clearRect(0,0,aW,aH);
       ax.drawImage(offCanvas,0,0,aW,aH);
     } else {
       ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
       ax.globalCompositeOperation='lighter';
-      renderWaves(ax,aW,aH,e,Math.min(1,aW/900));
+      renderWavesDesktop(ax,aW,aH,e);
     }
     aEnergy*=0.967;aT++;aRaf=requestAnimationFrame(drawAurora);
   }
