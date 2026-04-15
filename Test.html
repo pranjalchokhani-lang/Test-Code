@@ -120,21 +120,53 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 
 /* ══════════════════════════════════════════════════════
-   BP1 — PORTRAIT PHONE (≤600px wide, portrait)
+   BP2 — iPad PORTRAIT (601–850px wide, 900px+ tall)
+   Horizontal layout. Tighter header/footer/panel padding
+   so content isn't cut on ~768px wide screens.
+   ══════════════════════════════════════════════════════ */
+@media (min-width:601px) and (min-height:900px) and (max-width:850px){
+  .trap-head{height:8dvh;min-height:40px;}
+  .trap-foot-wrap{height:7dvh;min-height:36px;}
+  .body{padding:0 5cqw;gap:1.2cqw;}
+  .blk-header{padding:clamp(5px,0.7cqh,10px) 10px;}
+  .blk-title{font-size:clamp(8px,0.9cqw,11px);letter-spacing:1px;}
+  .right-panel{gap:clamp(3px,0.8cqh,10px);}
+  .rp-header{padding:clamp(1px,0.15cqh,3px) 6px clamp(1px,0.2cqh,4px) 8px;}
+  .ctag{font-size:clamp(11px,1.6cqw,18px);}
+  .row{font-size:clamp(10px,1.0cqw,12px);line-height:1.5;}
+  #med-list,#eng-list{padding:4px 12px;}
+}
+
+/* ══════════════════════════════════════════════════════
+   BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
+   ══════════════════════════════════════════════════════ */
+@media (min-width:601px) and (min-height:441px) and (max-width:1180px) and (max-height:899px){
+  .body{padding:0 10cqw;gap:2cqw;}
+  .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
+  .ctag{font-size:clamp(13px,2.0cqw,22px);}
+  .blk-header{padding:clamp(6px,1.0cqh,14px) 14px;}
+  .row{font-size:clamp(11px,1.1cqw,13px);}
+  .right-panel{gap:clamp(4px,1.2cqh,16px);}
+}
+
+/* ══════════════════════════════════════════════════════
+   BP4 — PHONE PORTRAIT (≤600px wide, portrait)
+   Vertical stacking. Lose ticker + "you belong" line.
+   Footer pinned to bottom, extra space between map and legends.
    ══════════════════════════════════════════════════════ */
 @media (max-width:600px) and (orientation:portrait){
   html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;background:var(--bg);align-items:flex-start!important;}
   .card{height:auto;min-height:100dvh;overflow:visible;display:block;background:transparent;}
-  .card-inner{height:auto;display:flex;flex-direction:column;position:relative;}
+  .card-inner{min-height:100dvh;display:flex;flex-direction:column;position:relative;}
   canvas#c{position:fixed;top:0;left:0;width:100vw;height:100dvh;}
   .trap-head{height:7dvh;min-height:38px;padding:0 5vw;}
   .hdr-title{font-size:clamp(10px,3.5vw,15px);text-align:center;width:100%;}
   .ticker-wrap{display:none!important;}
-  .body{display:flex;flex-direction:column;padding:6px 4vw;gap:10px;flex:none;height:auto;}
+  .body{display:flex;flex-direction:column;padding:6px 4vw;gap:20px;flex:1;height:auto;}
   .map-panel{width:100%;flex:none;height:calc(34dvh - 20px);min-height:85px;touch-action:none;padding:10px 8px 8px;border-radius:12px;}
   .map-label{font-size:clamp(7px,2vw,9px);margin-bottom:6px;padding:2px 6px;letter-spacing:1.5px;}
-  .right-panel{height:auto;display:flex;flex-direction:column;gap:6px;overflow:visible;}
-  .rp-header{padding:2px 8px 1px 8px;}
+  .right-panel{height:auto;display:flex;flex-direction:column;gap:10px;overflow:visible;}
+  .rp-header{padding:8px 8px 4px 8px;}
   .wtag{font-size:clamp(6px,1.8vw,9px);white-space:normal;}
   .ctag{font-size:clamp(10px,3.2vw,15px);}
   .blk,.blk.eng{flex:none;height:clamp(65px,calc(20dvh - 15px),175px);min-height:0;border-radius:12px;}
@@ -144,70 +176,49 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   #med-list,#eng-list{padding:4px 10px;}
   .loading-line{font-size:clamp(7px,2vw,10px);letter-spacing:1px;padding:3px 10px 0;}
   .lbl,.lbl.on{font-size:22px!important;}
-  .trap-foot-wrap{height:5dvh;min-height:34px;padding:0 5vw 8px;border-top:1px solid rgba(255,255,255,0.05);}
+  .trap-foot-wrap{margin-top:auto;height:auto;min-height:60px;padding:16px 5vw 24px;border-top:1px solid rgba(255,255,255,0.05);}
   .fsub{display:none!important;}
   .fmain{font-size:clamp(10px,3vw,14px);}
 }
 
 /* ══════════════════════════════════════════════════════
-   BP2 — LANDSCAPE PHONE (≤440px tall, landscape)
-   50/50: map left, district+lists right.
-   Uses flexbox (not grid) for reliable height distribution.
+   BP5 — PHONE LANDSCAPE (≤440px tall, landscape)
+   Horizontal: map left, 2 stacked panels right.
+   Lose ticker + "you belong" line.
+   Nothing overlaps header/footer — fixed-height slivers.
    ══════════════════════════════════════════════════════ */
 @media (max-height:440px) and (orientation:landscape){
   html,body{overflow:hidden!important;height:100dvh!important;}
   .card{height:100dvh;overflow:hidden;}
-  .card-inner{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .card-inner{height:100%;display:flex;flex-direction:column;min-height:0;}
   canvas#c{position:absolute;}
-
   /* Header sliver */
-  .trap-head{height:24px;min-height:24px;max-height:24px;padding:0 10px;flex-direction:row;gap:0;justify-content:center;}
-  .hdr-title{font-size:clamp(9px,2vw,13px);animation:none;letter-spacing:2px;}
+  .trap-head{flex-shrink:0;height:22px;min-height:22px;max-height:22px;padding:0 10px;flex-direction:row;align-items:center;justify-content:center;}
+  .hdr-title{font-size:9px;animation:none;letter-spacing:2px;white-space:nowrap;}
   .ticker-wrap{display:none!important;}
-
-  /* Body — flexbox row, not grid. Takes all remaining space. */
-  .body{display:flex;flex-direction:row;padding:3px 8px;gap:8px;flex:1;min-height:0;}
-
-  /* Map — 48% width, full height of body */
-  .map-panel{flex:0 0 48%;height:auto;padding:6px;border-radius:8px;min-height:0;}
-  .map-label{font-size:clamp(6px,1.3vw,8px);letter-spacing:1px;margin-bottom:4px;padding:2px 4px;}
-
-  /* Right panel — 52% width, flex column */
-  .right-panel{flex:1;min-width:0;gap:5px;height:auto;overflow:hidden;}
-  .rp-header{padding:0 4px 0 6px;min-height:0;}
-  .wtag{font-size:clamp(6px,1.2vw,8px);letter-spacing:0.5px;}
-  .ctag{font-size:clamp(9px,1.8vw,12px);}
-  .blk,.blk.eng{flex:1;min-height:0;border-radius:8px;}
-  .blk-header{padding:3px 8px;}
-  .blk-title{font-size:clamp(6px,1.3vw,9px);letter-spacing:1px;}
-  .row{font-size:clamp(8px,1.5vw,10px);line-height:1.4;padding:1px 0;}
-  #med-list,#eng-list{padding:3px 8px;}
-  .loading-line{font-size:clamp(6px,1.2vw,8px);letter-spacing:1px;padding:2px 8px 0;}
-  .lbl,.lbl.on{font-size:14px!important;}
-
+  /* Body */
+  .body{flex:1;min-height:0;display:flex;flex-direction:row;padding:3px 6px;gap:6px;}
+  /* Map */
+  .map-panel{flex:0 0 42%;min-height:0;padding:5px;border-radius:8px;}
+  .map-label{font-size:6px;letter-spacing:1px;margin-bottom:3px;padding:2px 4px;}
+  /* Right panel */
+  .right-panel{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:3px;overflow:hidden;}
+  .rp-header{flex-shrink:0;padding:1px 5px;}
+  .wtag{font-size:6px;letter-spacing:0.5px;line-height:1.2;}
+  .ctag{font-size:8px;letter-spacing:1px;line-height:1.2;}
+  /* Two panels stacked equally */
+  .blk{flex:1;min-height:0;border-radius:6px;}
+  .blk.eng{flex:1;min-height:0;border-radius:6px;}
+  .blk-header{padding:2px 7px;}
+  .blk-title{font-size:7px;letter-spacing:1px;}
+  .row{font-size:7px;line-height:1.3;padding:1px 0;white-space:nowrap;}
+  #med-list,#eng-list{padding:2px 7px;overflow-y:auto;flex:1;}
+  .loading-line{font-size:6px;letter-spacing:1px;padding:2px 7px 0;}
+  .lbl,.lbl.on{font-size:12px!important;}
   /* Footer sliver */
-  .trap-foot-wrap{height:20px;min-height:20px;max-height:20px;padding:0 10px;gap:0;}
+  .trap-foot-wrap{flex-shrink:0;height:18px;min-height:18px;max-height:18px;padding:0 10px;justify-content:center;}
   .fsub{display:none!important;}
-  .fmain{font-size:clamp(8px,1.5vw,11px);}
-}
-
-/* ══════════════════════════════════════════════════════
-   BP3 — iPad + smaller desktops (601-1180px, 441px+)
-   ══════════════════════════════════════════════════════ */
-@media (min-width:601px) and (min-height:441px) and (max-width:1180px){
-  .body{padding:0 10cqw;gap:2cqw;}
-  .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
-  .ctag{font-size:clamp(13px,2.0cqw,22px);}
-  .blk-header{padding:clamp(8px,1.2cqh,20px) 14px;}
-  .row{font-size:clamp(11px,1.1cqw,13px);}
-}
-
-/* iPad portrait — reduce header/footer to give panels more room */
-@media (min-width:601px) and (min-height:900px) and (max-width:850px){
-  .trap-head{height:10dvh;min-height:48px;}
-  .trap-foot-wrap{height:8dvh;min-height:40px;}
-  .body{padding:0 6cqw;gap:1.5cqw;}
-  .blk-header{padding:clamp(6px,1cqh,14px) 12px;}
+  .fmain{font-size:9px;letter-spacing:2px;}
 }
 </style>
 </head>
@@ -409,128 +420,46 @@ document.addEventListener('DOMContentLoaded',function(){
   (document.fonts?document.fonts.ready:Promise.resolve()).then(initTicker);
 
   /* ═══════════════════════════════════════════════════════
-     S14 — AURORA
-     ─────────────────────────────────────────────────────
-     UNIFIED approach — ONE render path for ALL devices.
-
-     How it works:
-     1. Render to an offscreen canvas at half the real resolution.
-        This is cheap on every GPU.
-     2. For each wave, draw a FILLED SHAPE (not a stroke):
-        - Trace the wave curve across the canvas width
-        - Draw a line down to the canvas bottom
-        - Close the path
-        - Fill with a vertical linearGradient:
-          wave colour (translucent) at the curve → transparent at bottom
-     3. Blit the offscreen canvas to the real canvas (one drawImage).
-
-     Why this works everywhere:
-     - No shadowBlur (causes GPU stalls on iOS, looks wrong on some Windows)
-     - No 'lighter' compositing (causes GPU readback on iOS tile renderer)
-     - Gradient fills are a basic GPU operation — fast everywhere
-     - Overlapping translucent fills naturally blend colours
-     - The gradient creates the "glow" effect — bright at the wave, fading below
+     S14 — AURORA (atlas style: shadowBlur + lighter compositing)
      ═══════════════════════════════════════════════════════ */
   const aCanvas=document.getElementById('page-aurora'),ax=aCanvas.getContext('2d');
-  let aW,aH,offW,offH,offCanvas,offCtx;
-
-  function resizeAurora(){
-    aW=aCanvas.width=window.innerWidth;
-    aH=aCanvas.height=window.innerHeight;
-    /* Offscreen at half resolution — proportional to real screen */
-    offW=Math.round(aW/2);
-    offH=Math.round(aH/2);
-    offCanvas=document.createElement('canvas');
-    offCanvas.width=offW;offCanvas.height=offH;
-    offCtx=offCanvas.getContext('2d');
-  }
-  resizeAurora();
-  window.addEventListener('resize',resizeAurora);
-
+  let aW,aH;
+  function resizeAurora(){aW=aCanvas.width=window.innerWidth;aH=aCanvas.height=window.innerHeight;}
+  resizeAurora();window.addEventListener('resize',resizeAurora);
   let aEnergy=0,aT=0,aRaf=null;
-
+  const waveSeeds=[[2.31,5.17,1.83,4.42,0.91,3.67],[1.14,3.89,6.02,2.55,5.33,0.77],[4.66,1.22,3.14,5.88,2.09,4.31],[0.55,4.73,2.61,1.39,5.94,3.02],[3.21,0.88,4.55,2.17,6.11,1.44],[5.77,2.43,0.66,4.88,1.55,3.99],[1.89,3.44,5.21,0.73,4.17,2.88],[4.02,1.67,3.55,5.43,0.29,2.14],[0.91,4.12,2.88,5.67,1.33,3.77],[3.54,0.22,4.91,2.05,5.78,1.62]];
   const waves=[
-    {speed:0.011, color:'77,232,184', alpha:0.38,fr:[1.00,1.67,0.53,2.09,1.43,0.89],ph:[2.31,5.17,1.83,4.42,0.91,3.67]},
-    {speed:0.0095,color:'66,133,244', alpha:0.32,fr:[1.00,1.73,0.61,2.41,0.37,1.19],ph:[1.14,3.89,6.02,2.55,5.33,0.77]},
-    {speed:0.0065,color:'185,43,227', alpha:0.32,fr:[1.00,1.41,2.23,0.67,1.89,0.53],ph:[4.66,1.22,3.14,5.88,2.09,4.31]},
-    {speed:0.0205,color:'180,240,220',alpha:0.18,fr:[1.00,2.13,0.79,1.57,0.43,2.87],ph:[0.55,4.73,2.61,1.39,5.94,3.02]}
+    {speed:0.011, amp:40,color:'77,232,184', alpha:0.52,width:85,fr:[1.00,1.67,0.53,2.09,1.43,0.89]},
+    {speed:0.0095,amp:45,color:'66,133,244', alpha:0.45,width:85,fr:[1.00,1.73,0.61,2.41,0.37,1.19]},
+    {speed:0.0065,amp:55,color:'185,43,227', alpha:0.45,width:95,fr:[1.00,1.41,2.23,0.67,1.89,0.53]},
+    {speed:0.0205,amp:25,color:'180,240,220',alpha:0.22,width:60, fr:[1.00,2.13,0.79,1.57,0.43,2.87]}
   ];
+  const isMobile=window.innerWidth<=1024;
+  const blurMult=isMobile?0.25:1.0;
+  const decayRate=isMobile?0.948:0.967;
 
   function drawAurora(){
-    if(aEnergy<0.005){
-      ax.clearRect(0,0,aW,aH);
-      aEnergy=0;aRaf=null;return;
-    }
-    const e=aEnergy;
-    const cW=offW,cH=offH;
-    const ctx=offCtx;
-
-    ctx.clearRect(0,0,cW,cH);
-
-    /* Wave baseline: 88% down the canvas. Wobble range: ±10% of canvas height.
-       This keeps aurora firmly in the bottom band on every screen size. */
-    const baseY=cH*0.88;
-    const wobbleRange=cH*0.10;
-    const step=Math.max(4,Math.round(cW/80));
-
-    waves.forEach(w=>{
-      const fr=w.fr,ph=w.ph;
-
-      /* Build the wave path points */
-      const pts=[];
-      for(let x=0;x<=cW;x+=step){
-        const nx=x/cW;
-        const raw=
-          Math.sin(nx*3.7 +aT*w.speed*60*fr[0]+ph[0])*0.40+
-          Math.sin(nx*7.3 +aT*w.speed*60*fr[1]+ph[1])*0.30+
-          Math.sin(nx*13.1+aT*w.speed*60*fr[2]+ph[2])*0.22+
-          Math.sin(nx*19.7+aT*w.speed*60*fr[3]+ph[3])*0.16+
-          Math.sin(nx*31.4+aT*w.speed*60*fr[4]+ph[4])*0.12+
-          Math.sin(nx*47.3+aT*w.speed*60*fr[5]+ph[5])*0.08;
-        /* raw ranges ≈ -1.28 to +1.28. Normalise to ±wobbleRange. */
-        const y=baseY + (raw/1.28)*wobbleRange*e;
-        pts.push({x,y});
+    ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
+    if(aEnergy<0.01){aEnergy=0;aRaf=null;return;}
+    const e=aEnergy,rScale=Math.min(1,aW/900);
+    ax.globalCompositeOperation='lighter';
+    waves.forEach((w,wi)=>{
+      const ph=waveSeeds[wi]||waveSeeds[wi%waveSeeds.length],fr=w.fr;
+      const ampR=w.amp*rScale,widR=w.width*rScale,step=isMobile?20:10;
+      ax.beginPath();
+      for(let x=0;x<=aW;x+=step){
+        const nx=x/aW;
+        const wobble=e*(Math.sin(nx*3.7+aT*w.speed*60*fr[0]+ph[0])*ampR*0.40+Math.sin(nx*7.3+aT*w.speed*60*fr[1]+ph[1])*ampR*0.30+Math.sin(nx*13.1+aT*w.speed*60*fr[2]+ph[2])*ampR*0.22+Math.sin(nx*19.7+aT*w.speed*60*fr[3]+ph[3])*ampR*0.16+Math.sin(nx*31.4+aT*w.speed*60*fr[4]+ph[4])*ampR*0.12+Math.sin(nx*47.3+aT*w.speed*60*fr[5]+ph[5])*ampR*0.08);
+        x===0?ax.moveTo(x,aH+wobble):ax.lineTo(x,aH+wobble);
       }
-
-      /* Find the topmost point of this wave for gradient start */
-      let minY=cH;
-      for(let i=0;i<pts.length;i++){if(pts[i].y<minY)minY=pts[i].y;}
-
-      /* Create vertical gradient: colour at wave top → transparent at canvas bottom */
-      const grad=ctx.createLinearGradient(0,minY,0,cH);
-      grad.addColorStop(0,`rgba(${w.color},${w.alpha*e})`);
-      grad.addColorStop(0.4,`rgba(${w.color},${w.alpha*e*0.5})`);
-      grad.addColorStop(1,`rgba(${w.color},0)`);
-
-      /* Draw filled shape: wave curve → bottom-right → bottom-left → close */
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x,pts[0].y);
-      for(let i=1;i<pts.length;i++){ctx.lineTo(pts[i].x,pts[i].y);}
-      ctx.lineTo(cW,cH);
-      ctx.lineTo(0,cH);
-      ctx.closePath();
-      ctx.fillStyle=grad;
-      ctx.fill();
-
-      /* Bright core line along the wave — thin, higher alpha */
-      ctx.beginPath();
-      ctx.moveTo(pts[0].x,pts[0].y);
-      for(let i=1;i<pts.length;i++){ctx.lineTo(pts[i].x,pts[i].y);}
-      ctx.strokeStyle=`rgba(${w.color},${Math.min(1,w.alpha*e*1.8)})`;
-      ctx.lineWidth=Math.max(1,cW*0.003*e);
-      ctx.lineCap='round';
-      ctx.stroke();
+      ax.strokeStyle=`rgba(${w.color},${w.alpha*e})`;ax.lineWidth=widR*e;ax.lineCap='round';ax.lineJoin='round';
+      ax.shadowBlur=widR*4.5*e*blurMult;ax.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ax.stroke();
+      ax.strokeStyle=`rgba(255,255,255,${w.alpha*e*0.9})`;ax.lineWidth=widR*0.20*e;
+      ax.shadowBlur=widR*1.0*e*blurMult;ax.shadowColor='rgba(255,255,255,1)';ax.stroke();
     });
-
-    /* Blit offscreen → main canvas */
-    ax.clearRect(0,0,aW,aH);
-    ax.drawImage(offCanvas,0,0,aW,aH);
-
-    aEnergy*=0.967;aT++;
-    aRaf=requestAnimationFrame(drawAurora);
+    aEnergy*=decayRate;aT++;aRaf=requestAnimationFrame(drawAurora);
   }
-
-  window.triggerAurora=()=>{aEnergy=1.0;if(!aRaf)aRaf=requestAnimationFrame(drawAurora);};
+  window.triggerAurora=()=>{aEnergy=1.0;if(!aRaf)drawAurora();};
 });
 
 /* ═══════════════════════════════════════════════════════
