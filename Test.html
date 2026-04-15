@@ -488,7 +488,7 @@ window.triggerAurora=function(){};
 let lastSelectTime=0;
 let touchHandled=false;
 
-async function select(name,opts){
+function select(name,opts){
   const silent=!!(opts&&opts.silent);
   const now=Date.now();
   if(!silent){
@@ -498,8 +498,6 @@ async function select(name,opts){
     unlockAudio();
     if(bg.paused){bg.volume=0.12;bg.play().catch(()=>{});}
     setTimeout(()=>{revealSfx.currentTime=0;revealSfx.volume=0.4;revealSfx.play().catch(()=>{});},0);
-    /* Trigger aurora in next rAF — DOM work below (classList, innerHTML) holds the main thread.
-       Firing aurora after DOM mutations means the first frame renders when the compositor is free. */
     requestAnimationFrame(()=>{if(typeof triggerAurora==='function')triggerAurora();});
   }
   currentToken++;
@@ -514,22 +512,17 @@ async function select(name,opts){
   document.getElementById('med-list').innerHTML='';
   document.getElementById('eng-list').innerHTML='';
   const mL=document.getElementById('med-loading'),eL=document.getElementById('eng-loading');
-  /* Remove offsetWidth reflow — it forced a synchronous layout on the touch event thread.
-     Instead: remove class, then re-add in rAF which is enough for CSS animation to restart. */
-  [mL,eL].forEach(lo=>{
-    lo.classList.remove('active');
-    lo.style.display='block';
-  });
-  requestAnimationFrame(()=>{
-    [mL,eL].forEach(lo=>lo.classList.add('active'));
-  });
-  await new Promise(res=>setTimeout(res,900));
-  if(currentToken!==myToken)return;
-  mL.style.display='none';mL.classList.remove('active');
-  eL.style.display='none';eL.classList.remove('active');
-  const d=DATA[name]||{m:[],e:[]};
-  stream('med-list',d.m,myToken);
-  stream('eng-list',d.e,myToken);
+  [mL,eL].forEach(lo=>{lo.classList.remove('active');void lo.offsetWidth;lo.classList.add('active');lo.style.display='block';});
+  /* Plain setTimeout — no async/await. iOS Safari throttles setTimeout inside async
+     functions after the first await when the call is no longer in a user gesture context. */
+  setTimeout(()=>{
+    if(currentToken!==myToken)return;
+    mL.style.display='none';mL.classList.remove('active');
+    eL.style.display='none';eL.classList.remove('active');
+    const d=DATA[name]||{m:[],e:[]};
+    stream('med-list',d.m,myToken);
+    stream('eng-list',d.e,myToken);
+  },900);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
