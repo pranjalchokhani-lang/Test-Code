@@ -33,7 +33,7 @@ body{background:var(--bg);margin:0;display:flex;justify-content:center;align-ite
 .shell,.shelf{display:contents;}
 .card{width:100vw;height:100dvh;background:var(--bg);position:relative;overflow:hidden;font-family:var(--font-display);color:var(--text);display:flex;flex-direction:column;perspective:800px;container-type:size;}
 #glowOverlay{position:absolute;inset:0;z-index:200;pointer-events:none;}
-canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display:block;}
+canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display:block;will-change:transform;}
 .border-svg{display:none;}
 .card-inner{position:relative;z-index:10;display:flex;flex-direction:column;flex:1;min-height:0;justify-content:space-between;}
 
@@ -169,7 +169,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 .fsub{display:block;transform-origin:center center;font-family:var(--font-display);font-size:var(--fs-m);font-weight:400;color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;line-height:1.4;white-space:nowrap;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
 .fmain{display:block;transform-origin:center center;font-family:var(--font-display);font-weight:700;font-size:var(--fs-l);text-transform:uppercase;color:#fff;text-align:center;white-space:nowrap;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
 
-#page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;}
+#page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 
 /* ══════════════════════════════════════════════════════
    LAYOUT BREAKPOINTS — ASPECT RATIO BASED
@@ -778,10 +778,11 @@ document.addEventListener('DOMContentLoaded',function(){
         x===0?ctx.moveTo(x,cH+wobble):ctx.lineTo(x,cH+wobble);
       }
       if(isTouch){
+        /* source-over only — 'lighter' forces GPU readback on iOS tile GPUs (same cost as shadowBlur).
+           2 strokes: soft wide halo + bright core. shadowBlur=0. */
         ctx.shadowBlur=0;
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.10})`;ctx.lineWidth=widR*e*4.0;ctx.stroke();
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.30})`;ctx.lineWidth=widR*e*2.0;ctx.stroke();
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.80})`;ctx.lineWidth=widR*e*0.6;ctx.stroke();
+        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.22})`;ctx.lineWidth=widR*e*2.8;ctx.stroke();
+        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.85})`;ctx.lineWidth=widR*e*0.5;ctx.stroke();
       } else {
         ctx.strokeStyle=`rgba(${w.color},${w.alpha*e})`;ctx.lineWidth=widR*e;
         ctx.shadowBlur=widR*4.5*e;ctx.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ctx.stroke();
@@ -799,11 +800,11 @@ document.addEventListener('DOMContentLoaded',function(){
     }
     const e=aEnergy;
     if(isTouch){
+      /* Draw on small offscreen canvas with source-over — no 'lighter' on touch */
       offCtx.globalCompositeOperation='source-over';offCtx.clearRect(0,0,OFF_W,OFF_H);
-      offCtx.globalCompositeOperation='lighter';
       renderWaves(offCtx,OFF_W,OFF_H,e,Math.min(1,OFF_W/900));
+      /* Blit to main canvas with source-over — single GPU scale operation */
       ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
-      ax.globalCompositeOperation='lighter';
       ax.drawImage(offCanvas,0,0,aW,aH);
     } else {
       ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
@@ -910,10 +911,13 @@ function initCanvas(){
     cx.restore();
   }
 
+  const isTouchBg=(navigator.maxTouchPoints||0)>0;
+  const BG_INTERVAL=isTouchBg?33:0; /* 30fps on touch, 60fps on desktop */
   let t=0,lastFrameTime=0;
   const IDLE_INTERVAL=100;
   function loop(ts){
     if(document.hidden&&ts-lastFrameTime<IDLE_INTERVAL){_canvasLoopId=requestAnimationFrame(loop);return;}
+    if(isTouchBg&&ts-lastFrameTime<BG_INTERVAL){_canvasLoopId=requestAnimationFrame(loop);return;}
     lastFrameTime=ts;
     cx.clearRect(0,0,W,H);cx.fillStyle='#08090c';cx.fillRect(0,0,W,H);
     const n1x=W*0.08+Math.sin(t*0.00042)*W*0.07,n1y=H*0.50+Math.cos(t*0.00036)*H*0.09;
