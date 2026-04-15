@@ -121,25 +121,25 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 /* ══════════════════════════════════════════════════════
    BP2 — iPad PORTRAIT (601–850px wide, 900px+ tall)
+   Horizontal layout. Tighter sizing so panels aren't
+   excessively tall and content isn't cut.
    ══════════════════════════════════════════════════════ */
 @media (min-width:601px) and (min-height:900px) and (max-width:850px){
   .trap-head{height:8dvh;min-height:40px;}
   .trap-foot-wrap{height:7dvh;min-height:36px;}
-
-  /* body is flex:1 from base — constrain it by shrinking the parent */
-  /* card-inner fills remaining 85dvh; body fills it with grid */
   .body{padding:0 5cqw;gap:1.2cqw;}
-
-  /* blk boxes use flex:1 from base — they'll fill right-panel height equally */
-  .blk-header{padding:5px 10px;}
-  .blk-title{font-size:clamp(8px,0.9cqw,10px);letter-spacing:1px;}
-  .right-panel{gap:8px;}
-  .rp-header{padding:2px 6px 4px 8px;}
-  .ctag{font-size:clamp(11px,1.6cqw,16px);}
-  .wtag{font-size:clamp(8px,0.9cqw,10px);}
-  .row{font-size:clamp(8px,0.85cqw,10px);line-height:1.4;white-space:nowrap;overflow:hidden;}
-  #med-list,#eng-list{padding:3px 10px;overflow-x:hidden;}
-  .loading-line{font-size:clamp(7px,0.8cqw,9px);}
+  /* ~30% shorter than before */
+  .blk,.blk.eng{flex:0 0 auto;max-height:clamp(90px,18dvh,140px);min-height:0;}
+  .blk-header{padding:clamp(4px,0.5cqh,7px) 10px;}
+  .blk-title{font-size:clamp(8px,0.9cqw,11px);letter-spacing:1px;}
+  .right-panel{gap:clamp(3px,0.6cqh,8px);}
+  .rp-header{padding:clamp(1px,0.15cqh,3px) 6px clamp(1px,0.2cqh,4px) 8px;}
+  .ctag{font-size:clamp(11px,1.6cqw,18px);}
+  .wtag{font-size:clamp(8px,0.9cqw,11px);}
+  /* Allow wrapping so text isn't cut off */
+  .row{font-size:clamp(9px,0.95cqw,11px);line-height:1.45;white-space:normal;overflow:visible;}
+  #med-list,#eng-list{padding:3px 10px;}
+  .loading-line{font-size:clamp(8px,0.8cqw,10px);}
 }
 
 /* ══════════════════════════════════════════════════════
@@ -149,8 +149,9 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   .body{padding:0 10cqw;gap:2cqw;}
   .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
   .ctag{font-size:clamp(13px,2.0cqw,22px);}
-  .blk-header{padding:clamp(8px,1.2cqh,20px) 14px;}
+  .blk-header{padding:clamp(6px,1.0cqh,14px) 14px;}
   .row{font-size:clamp(11px,1.1cqw,13px);}
+  .right-panel{gap:clamp(4px,1.2cqh,16px);}
 }
 
 /* ══════════════════════════════════════════════════════
