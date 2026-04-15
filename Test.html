@@ -27,7 +27,6 @@
   --text: #fff;
 }
 *{margin:0;padding:0;box-sizing:border-box;cursor:crosshair;}
-/* html background: backstop for iOS Safari dvh resize — must match --bg */
 html{background:var(--bg);}
 body{background:var(--bg);margin:0;display:flex;justify-content:center;align-items:center;width:100vw;height:100dvh;overflow:hidden;font-family:var(--font-display);color:var(--text);}
 .shell,.shelf{display:contents;}
@@ -40,7 +39,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 /* ═══════════════════════════════════════════════════════
    KEYFRAMES
    ═══════════════════════════════════════════════════════ */
-/* Header/footer glow — very slow, synced to planet orbit */
 @keyframes glowHdr{
   0%,100%{letter-spacing:clamp(3px,0.5cqw,8px); text-shadow:none;}
   50%    {letter-spacing:clamp(5px,0.9cqw,13px);text-shadow:0 0 18px rgba(255,255,255,0.7),0 0 40px rgba(77,232,184,0.25);}
@@ -49,7 +47,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   0%,100%{letter-spacing:clamp(5px,0.9cqw,13px);text-shadow:0 0 18px rgba(255,255,255,0.7),0 0 40px rgba(77,232,184,0.25);}
   50%    {letter-spacing:clamp(3px,0.5cqw,8px); text-shadow:none;}
 }
-/* Panel fills breathe — floor lowered so minimum is more transparent, peaks unchanged */
 @keyframes bfMap{0%{background:rgba(var(--accent-rgb),0.000);}100%{background:rgba(var(--accent-rgb),0.04);}}
 @keyframes bfMed{0%{background:rgba(var(--accent-rgb),0.003);}100%{background:rgba(var(--accent-rgb),0.05);}}
 @keyframes bfEng{0%{background:rgba(var(--accent-rgb),0.002);}100%{background:rgba(var(--accent-rgb),0.045);}}
@@ -58,7 +55,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 @keyframes bdotBlink{0%{opacity:0.08;box-shadow:none;}100%{opacity:1;box-shadow:0 0 8px rgba(var(--accent-rgb),1.0),0 0 16px rgba(var(--accent-rgb),0.5);}}
 @keyframes pillBlink{0%{color:rgba(255,255,255,0.15);text-shadow:none;}100%{color:#fff;text-shadow:0 0 10px rgba(255,255,255,0.7),0 0 20px rgba(var(--accent-rgb),0.35);}}
 @keyframes dotP{0%,100%{opacity:1;box-shadow:0 0 10px rgba(var(--accent-rgb),1.0),0 0 20px rgba(var(--accent-rgb),0.5);}50%{opacity:0.05;box-shadow:none;}}
-/* Panel float — border animations removed entirely to kill shine flash on resize */
 @keyframes floatMap{0%{transform:translate3d(0,-7px,0) rotateX(0.4deg);}100%{transform:translate3d(0,7px,0) rotateX(-0.4deg);}}
 @keyframes floatMed{0%{transform:translate3d(0,-3px,0) rotateX(0.2deg);}100%{transform:translate3d(0,3px,0) rotateX(-0.2deg);}}
 @keyframes floatEng{0%{transform:translate3d(0,-3px,0) rotateX(0.15deg);}100%{transform:translate3d(0,3px,0) rotateX(-0.15deg);}}
@@ -66,25 +62,17 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 @keyframes pulse-out{0%{r:0;opacity:0.9;stroke-width:2}100%{r:28;opacity:0;stroke-width:0}}
 @keyframes lblGlow{0%{color:rgba(var(--accent-rgb),0.45);text-shadow:none;}100%{color:rgba(var(--accent-rgb),0.75);text-shadow:0 0 4px rgba(var(--accent-rgb),0.18);}}
 
-/* ── HEADER — 90s glow cycle, -22.5s delay so movement visible soon after load ── */
-/* EDIT: city name — change .wg span in HTML below */
+/* ── HEADER ── */
 .trap-head{flex-shrink:0;height:14dvh;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.6cqh;padding:0 10cqw;line-height:1.2;}
 .hdr-title{font-family:var(--font-display);font-weight:700;font-size:var(--fs-xl);text-transform:uppercase;color:var(--text);display:inline-block;white-space:nowrap;animation:glowHdr 90s ease-in-out infinite;animation-delay:-22.5s;}
 .wg{color:var(--accent)!important;text-shadow:0 0 12px rgba(var(--accent-rgb),0.4);}
 .ticker-wrap{width:100%;overflow:hidden;height:22px;margin-top:6px;display:flex;align-items:center;}
 .ticker-track{display:inline-flex;white-space:nowrap;}
 .ticker-half{display:inline-flex;gap:48px;padding-right:48px;}
-/* EDIT: ticker text lives in the two .ticker-half divs in HTML */
 .ticker-half span{font-family:var(--font-display)!important;font-size:var(--fs-s);font-weight:400;color:rgba(255,255,255,0.5);letter-spacing:clamp(2px,0.35cqw,4px);text-transform:uppercase;text-shadow:0 0 10px rgba(255,255,255,0.6);line-height:1.4;flex-shrink:0;white-space:nowrap;}
 
 .body{flex:1;display:grid;grid-template-columns:60% 40%;min-height:0;padding:0 10cqw;gap:2cqw;}
 
-/*
- * Static border — borderMap / borderSide animations REMOVED.
- * Any animated border-color flashes whenever the browser
- * recomputes keyframes (on resize, orientation change, etc).
- * Static value = no flash ever.
- */
 .map-panel,.blk{
   border-radius:16px;
   border:1px solid rgba(255,255,255,0.08);
@@ -96,8 +84,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   box-shadow:0 8px 36px rgba(0,0,0,0.35);
   transform-style:preserve-3d;
 }
-/* On touch devices remove backdrop-filter — MUST come after base rule above.
-   Fixes GPU compositing artefacts and panel clipping on iPad and iPhone. */
 @media (hover:none){
   .map-panel,.blk{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,14,18,0.85);}
 }
@@ -113,8 +99,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 .bdot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 6px rgba(var(--accent-rgb),0.7);animation:bdotBlink 0.4s ease-in-out infinite alternate;flex-shrink:0;}
 .status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(var(--accent-rgb),0.8);animation:dotP 1s ease-in-out infinite;}
 
-/* Float only — no border animation */
-/* will-change:transform promotes each panel to its own GPU layer — smoother float on mobile */
 .map-panel{animation:floatMap 7s ease-in-out infinite alternate;padding:18px 12px 12px;touch-action:none;height:100%;will-change:transform;}
 .blk      {animation:floatMed 7s ease-in-out infinite alternate;animation-delay:-6s; flex:1;min-height:0;will-change:transform;}
 .blk.eng  {animation:floatEng 7s ease-in-out infinite alternate;animation-delay:-12s;will-change:transform;}
@@ -127,10 +111,8 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 #map-mover{position:absolute;top:0;left:0;width:100%;height:100%;transform-origin:0 0;}
 #rj{width:100%;height:100%;display:block;}
 
-/* District paths — transition fill+stroke only (not all) */
 .dist{fill:rgba(255,255,255,0.02);stroke:rgba(255,255,255,0.07);stroke-width:0.5;cursor:pointer;transition:fill .25s,stroke .25s;}
 .dist:hover{fill:rgba(var(--accent-rgb),0.1);stroke:rgba(var(--accent-rgb),0.35);}
-/* No filter on .dist.on — drop-shadow was the click-shine flash */
 .dist.on{fill:rgba(var(--accent-rgb),0.35)!important;stroke:rgba(var(--accent-rgb),1);stroke-width:1.2;}
 
 .lbl{fill:rgba(255,255,255,1.0);font-size:8px;text-anchor:middle;pointer-events:none;text-transform:uppercase;letter-spacing:0.8px;dominant-baseline:middle;opacity:0;transition:opacity 0.2s ease,fill 0.2s ease;font-weight:bold;filter:drop-shadow(0 0 3px rgba(0,0,0,0.9)) drop-shadow(0 1px 2px rgba(0,0,0,1));}
@@ -140,7 +122,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 .state-boundary{fill:none;stroke:#fff;stroke-width:2.5;pointer-events:none;}
 
 /* ── RIGHT PANEL ── */
-/* EDIT: sub-label city name is .wtag div in HTML */
 .right-panel{display:flex;flex-direction:column;gap:2cqh;min-height:0;overflow:hidden;height:100%;}
 .wtag{font-family:var(--font-display);font-size:var(--fs-m);letter-spacing:clamp(0.5px,0.2cqw,2px);color:var(--accent);text-transform:uppercase;font-weight:400;white-space:nowrap;line-height:1.4;}
 .ctag{font-family:var(--font-display);font-size:var(--fs-l);font-weight:700;letter-spacing:clamp(1px,0.25cqw,2px);text-transform:uppercase;color:var(--text);display:flex;align-items:baseline;gap:2px;line-height:1.3;}
@@ -154,7 +135,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 #med-list::-webkit-scrollbar-thumb,#eng-list::-webkit-scrollbar-thumb{border-radius:10px;background:var(--accent);}
 #med-list::-webkit-scrollbar-track,#eng-list::-webkit-scrollbar-track{background:rgba(var(--accent-rgb),0.03);border-radius:10px;margin:5px 0;}
 
-/* ── ROWS — stagger 150ms, transition 0.38s ── */
+/* ── ROWS ── */
 .row{font-family:var(--font-content);font-weight:200;font-size:clamp(11px,1.0cqw,12px);line-height:1.7;color:rgba(255,255,255,0.75);padding:3px 0;letter-spacing:0.03em;white-space:nowrap;overflow:hidden;display:none;}
 .row .emoji{color:#fff;opacity:1;}
 .row:last-child{border:none;}
@@ -163,8 +144,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 .loading-line{font-family:var(--font-content)!important;font-size:var(--fs-s);font-weight:400;color:var(--accent);letter-spacing:clamp(2px,0.35cqw,4px);text-transform:uppercase;text-shadow:0 0 10px rgba(var(--accent-rgb),0.9);display:none;overflow:hidden;white-space:nowrap;padding:5px 14px 0 14px;line-height:1.4;}
 .loading-line.active{display:block;animation:typeload 0.9s steps(22) forwards;}
 
-/* ── FOOTER — 90s glow cycle, -45s offset (half-phase from header) ── */
-/* EDIT: city name — change .wg span in HTML below */
+/* ── FOOTER ── */
 .trap-foot-wrap{flex-shrink:0;height:12dvh;min-height:44px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0.5cqh;padding:0 10cqw;}
 .fsub{display:block;transform-origin:center center;font-family:var(--font-display);font-size:var(--fs-m);font-weight:400;color:rgba(255,255,255,0.5);text-transform:uppercase;text-align:center;line-height:1.4;white-space:nowrap;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
 .fmain{display:block;transform-origin:center center;font-family:var(--font-display);font-weight:700;font-size:var(--fs-l);text-transform:uppercase;color:#fff;text-align:center;white-space:nowrap;animation:glowFtr 90s ease-in-out infinite;animation-delay:-45s;}
@@ -172,74 +152,100 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 
 /* ══════════════════════════════════════════════════════
-   LAYOUT BREAKPOINTS — ASPECT RATIO BASED
+   LAYOUT BREAKPOINTS — THREE TIERS
    ──────────────────────────────────────────────────────
-   STACKED (vertical scroll): when screen is portrait-ish
-   Trigger: aspect-ratio < 2/3 (width < 0.667× height)
-   Covers: all phones in portrait (390×844 = 0.46, etc.)
-
-   HORIZONTAL GRID (60/40, fits in 100dvh): everything else
-   Covers:
-     • iPad portrait  (768×1024 = 0.75) ← horizontal ✅
-     • iPad landscape (1024×768 = 1.33) ← horizontal ✅
-     • Phone landscape (844×390 = 2.16) ← horizontal ✅
-     • Desktop (any) ← horizontal ✅
-
-   Landscape NEVER stacks — always horizontal grid, no scroll.
+   1. STACKED (portrait phone): aspect-ratio < 2/3
+   2. LANDSCAPE PHONE: aspect ≥ 2/3 AND height ≤ 440px
+      → Option A: map 50% left, stacked lists right
+      → No ticker, no "you belong" line
+   3. HORIZONTAL GRID (iPad + desktop): everything else
    ══════════════════════════════════════════════════════ */
 
-/* ── STACKED: portrait phones only ── */
+/* ── 1. STACKED: portrait phones (aspect < 2/3) ── */
 @media (max-aspect-ratio:2/3){
 
   html,body{overflow-y:auto!important;height:auto!important;min-height:100dvh;background:var(--bg);align-items:flex-start!important;}
   .card{height:auto;min-height:100dvh;overflow:visible;display:block;background:transparent;}
   .card-inner{height:auto;display:flex;flex-direction:column;position:relative;}
 
-  /* Canvas fixed to viewport in stacked mode — does not scroll with content */
   canvas#c{position:fixed;top:0;left:0;width:100vw;height:100dvh;}
 
-  /* Header — 8dvh, min 44px */
+  /* Header — compact, no ticker */
   .trap-head{height:8dvh;min-height:44px;padding:0 5vw;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
   .hdr-title{font-size:clamp(10px,3.5vw,16px);text-align:center;width:100%;}
+  .ticker-wrap{display:none!important;}
 
-  /* Body: single column — larger gap between map block and legends block */
   .body{display:flex;flex-direction:column;padding:8px 5vw;gap:20px;flex:none;height:auto;}
 
-  /* Map panel — 45% of available (available = 86dvh - 82px fixed overhead) */
   .map-panel{width:100%;flex:none;height:calc(38.7dvh - 37px);min-height:100px;touch-action:none;}
 
-  /* Right panel */
   .right-panel{height:auto;display:flex;flex-direction:column;gap:8px;overflow:visible;}
   .rp-header{padding:4px 10px 3px 10px;flex-shrink:0;}
   .wtag{font-size:clamp(7px,2.2vw,10px);white-space:normal;}
   .ctag{font-size:clamp(11px,3.5vw,17px);}
 
-  /* Block heights — 55% of available split ÷2; each blk = calc(23.65dvh - 23px) */
   .blk,.blk.eng{flex:none;height:clamp(75px,calc(23.65dvh - 23px),200px);min-height:0;}
 
-  /* Block internals */
   .blk-header{padding:8px 12px;}
   .blk-title{font-size:clamp(9px,2.5vw,12px);}
   .row{white-space:nowrap;font-size:clamp(10px,2.8vw,13px);}
   .loading-line{font-size:clamp(8px,2.2vw,11px);letter-spacing:1px;}
   .lbl,.lbl.on{font-size:22px!important;}
 
-  /* Footer — 6dvh, proportional */
+  /* Footer — no "you belong" line */
   .trap-foot-wrap{height:6dvh;min-height:44px;padding:0 5vw 12px;border-top:1px solid rgba(255,255,255,0.05);display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .fsub{display:none!important;}
   .fmain{font-size:clamp(11px,3.5vw,16px);}
-  .fsub{font-size:clamp(8px,2vw,11px);}
   .ticker-half span{font-size:clamp(6px,1.8vw,9px);letter-spacing:1px;}
-  .ticker-wrap{margin-top:2px;}
 }
 
-/* ── HORIZONTAL GRID: iPad portrait, iPad landscape, phone landscape, desktop ──
-   Applies when aspect-ratio ≥ 2/3 (covers everything except portrait phones).
-   Card stays 100dvh, overflow hidden, no scroll — always fits in one screen.
-   Padding: 10% each side (symmetric).
-   Font sizes boosted for mid-size screens (iPad etc) where cqw can be small. ── */
-@media (min-aspect-ratio:2/3) and (max-width:1180px){
+/* ── 2. LANDSCAPE PHONE: wide + short (aspect ≥ 2/3, height ≤ 440px) ──
+   Map 50% left. District name + two list blocks stacked right.
+   Single-line header/footer slivers. No ticker, no "you belong". ── */
+@media (min-aspect-ratio:2/3) and (max-height:440px){
+
+  html,body{overflow:hidden!important;height:100dvh!important;}
+  .card{height:100dvh;overflow:hidden;}
+
+  canvas#c{position:absolute;}
+
+  /* Header — single line sliver */
+  .trap-head{height:28px;min-height:28px;padding:0 12px;flex-direction:row;gap:0;}
+  .hdr-title{font-size:clamp(10px,2.2vw,14px);animation:none;letter-spacing:2px;}
+  .ticker-wrap{display:none!important;}
+
+  /* Body — 50/50 grid */
+  .body{display:grid;grid-template-columns:50% 50%;padding:0 8px;gap:6px;flex:1;min-height:0;}
+
+  /* Map panel — tighter padding for landscape */
+  .map-panel{padding:10px 8px 8px;height:100%;border-radius:10px;}
+  .map-label{font-size:clamp(7px,1.6vw,10px);letter-spacing:1.5px;margin-bottom:6px;padding:2px 6px;}
+
+  /* Right panel — district + 2 blocks */
+  .right-panel{gap:4px;height:100%;overflow:hidden;}
+  .rp-header{padding:2px 6px 1px 8px;}
+  .wtag{font-size:clamp(7px,1.4vw,9px);letter-spacing:0.5px;}
+  .ctag{font-size:clamp(10px,2.2vw,15px);}
+
+  .blk,.blk.eng{flex:1;min-height:0;border-radius:10px;}
+  .blk-header{padding:5px 10px;}
+  .blk-title{font-size:clamp(7px,1.5vw,10px);letter-spacing:1.5px;}
+  .row{font-size:clamp(9px,1.8vw,12px);line-height:1.5;padding:1px 0;}
+  #med-list,#eng-list{padding:4px 10px;}
+  .loading-line{font-size:clamp(7px,1.4vw,9px);letter-spacing:1px;padding:3px 10px 0;}
+  .lbl,.lbl.on{font-size:16px!important;}
+
+  /* Footer — single line, no "you belong" */
+  .trap-foot-wrap{height:24px;min-height:24px;padding:0 12px;gap:0;}
+  .fsub{display:none!important;}
+  .fmain{font-size:clamp(9px,1.8vw,13px);}
+}
+
+/* ── 3. HORIZONTAL GRID: iPad + desktop ──
+   aspect ≥ 2/3 AND height > 440px AND width ≤ 1180px
+   (wider than 1180px uses default token sizes) ── */
+@media (min-aspect-ratio:2/3) and (min-height:441px) and (max-width:1180px){
   .body{padding:0 10cqw;gap:2cqw;}
-  /* Boost font sizes where container is narrower than full desktop */
   .hdr-title{font-size:clamp(15px,2.4cqw,28px);}
   .ctag{font-size:clamp(13px,2.0cqw,22px);}
   .blk-header{padding:clamp(8px,1.2cqh,20px) 14px;}
@@ -256,10 +262,8 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   <div class="card-inner">
 
     <!-- ══ HEADER ══════════════════════════════════════════════════ -->
-    <!-- EDIT: city name — change "ALLEN Sikar" in .wg span         -->
     <div class="trap-head">
       <div class="hdr-title"><span class="wg">ALLEN Sikar</span>&nbsp;TOPPER ATLAS</div>
-      <!-- EDIT: ticker — both .ticker-half divs must be identical   -->
       <div class="ticker-wrap"><div class="ticker-track">
         <div class="ticker-half">
           <span>REAL STUDENTS · AUTHENTIC RESULTS.</span><span>ALLEN = SUCCESS IN NEET AND JEE.</span><span>#1 QUALITY. #1 QUANTITY.</span><span>POWER OF SYSTEM.</span><span>38 YEARS OF PERFECTION.</span><span>RESULTS THAT SPEAK FOR THEMSELVES.</span><span>NATIONAL COMPETITION · NATIONAL BENCHMARKING.</span><span>1 IN 3 IITIANS FROM ALLEN.</span><span>1 IN 4 GMC DOCTORS ARE ALLENITES.</span>
@@ -282,7 +286,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
       </div>
       <div class="right-panel">
         <div class="rp-header">
-          <!-- EDIT: sub-label city name -->
           <div class="wtag">ALLEN SIKAR LEGENDS FROM:</div>
           <div class="ctag"><span id="ctag">SELECT A DISTRICT</span></div>
         </div>
@@ -302,7 +305,6 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
     </div>
 
     <!-- ══ FOOTER ════════════════════════════════════════════════════ -->
-    <!-- EDIT: city name — change "ALLEN Sikar" in .wg span           -->
     <div class="trap-foot-wrap">
       <div class="fsub">You belong to this list of legends</div>
       <div class="fmain">JOIN <span class="wg">ALLEN Sikar</span> TODAY</div>
@@ -325,31 +327,20 @@ function wrapEmojis(html){
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 2 — FACT BASE  (DATA)
-   ═══════════════════════════════════════════════════════════════════
-   HOW TO UPDATE:
-   ❶ Key = district name. Must EXACTLY match "district" in GeoJSON (Section 7).
-   ❷ m:[] = Medical (NEET/AIIMS/GMC).  e:[] = Engineering (JEE/IIT/NIT).
-   ❸ Raw HTML strings. <b>Name</b> for bold. Emojis fine.
-   ❹ Add district: new key matching GeoJSON name.
-   ❺ Remove district: delete the key entirely.
    ═══════════════════════════════════════════════════════════════════ */
 const DATA={
-  /* ── BARMER ─────────────────────────────────────────────────── */
   "Barmer":{
     m:["<b>Deraj Ram</b>: AIR 285 → AIIMS Jodhpur ('25) 🔥","<b>17 Allenites</b> scored ≥600 in NEET ('22-'25)","<b>9 Allenites</b> cracked GMC Barmer ('24) 🏆","<b>18 Allenites</b> in GMCs pan-India ('22-'25)","<b>Tiloka Ram</b>: AIR 1,186 (685/720) ('23)","<b>Bharat Kumar</b>: AIR 4,466 → RUHS CMS Jaipur ('25)","<b>Kamal Kishor</b>: GMC Washim ('25)","<b>Khinya Ram</b>: GMC Sirohi ('25)","<b>Ramesh Choudhary</b>: IGGMC Nagpur ('25)","<b>Sohan Godara</b>: AIIMS Madurai ('25)","<b>Dinesh Kumar</b>: GMC Mahabubabad ('24)","<b>Hemakshi Pooniya</b>: GMC Sirohi ('24)","<b>Khet Singh</b>: GMC Churachandpur ('24)","<b>Santosh</b>: JLN MC Ajmer ('24)","<b>Priya Sharma</b>: AIIMS Jodhpur ('24)","<b>Ravi Kumar</b>: GMC Bikaner ('24)","<b>Sunita Devi</b>: SMS Medical College ('24)","<b>Arjun Singh</b>: GMC Kota ('23)","<b>Meena Kumari</b>: RNT Medical College ('23)","<b>Lokesh Patel</b>: AIR 3,210 → AIIMS Bhopal ('23)","<b>Kavita Bishnoi</b>: GMC Pali ('23)","<b>Deepak Nayak</b>: GMC Barmer ('23)","<b>Anita Choudhary</b>: JLN MC Ajmer ('22)","<b>Suresh Godara</b>: GMC Sirohi ('22)"],
     e:["<b>Vineet Jatol</b>: IIT Ropar CS ('25)","<b>Poonam</b>: IIT Kanpur Civil (Balotra) ('25)","<b>Rohit Sharma</b>: IIT Delhi Mechanical ('25)","<b>Ankita Verma</b>: IIT Bombay EE ('24)","<b>Sunil Kumar</b>: IIT Madras CS ('24)","<b>Neha Singh</b>: IIT Kharagpur ('24)","<b>Manish Yadav</b>: NIT Jaipur CS ('23)","<b>Pooja Bishnoi</b>: IIT Roorkee ('23)","<b>Rakesh Patel</b>: IIT Hyderabad ('23)","<b>Geeta Choudhary</b>: IIT BHU ('22)","<b>Vijay Nayak</b>: NIT Surat ('22)","<b>Sunita Kumari</b>: IIT Guwahati ('22)"]
   },
-  /* ── JALORE ──────────────────────────────────────────────────── */
   "Jalore":{
     m:["<b>3 Allenites</b> scored ≥650 in NEET ('22-'25)","<b>6 Allenites</b> in GMCs pan-India ('22-'25)","<b>Jeevika Choudhary</b>: AIR 2,310 (675/720) ('23)","<b>Kamlesh Choudhary</b>: SLN MC Koraput ('25)","<b>Chetna Charan</b>: GMC Sirohi ('24)","<b>Deva Ram</b>: GMC Vadodara ('24)"],
     e:["<b>Vineet Jatol</b>: IIT Ropar CS (Barmer) ('25)"]
   }
-  /* , "DistrictName": { m:[...], e:[...] } */
 };
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 3 — AUDIO
-   All three tracks pre-unlocked on first touch/click (iOS fix).
    ═══════════════════════════════════════════════════════════════════ */
 const bg=document.getElementById('snd-bg');
 const zoomSfx=document.getElementById('snd-zoom');
@@ -366,22 +357,6 @@ document.addEventListener('click',unlockAudio,{once:true});
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 4 — SESSION TRACKER
-   ═══════════════════════════════════════════════════════════════════
-   SESSION DEFINITION:
-   • Starts on first qualifying interaction.
-   • Extends on every subsequent qualifying interaction.
-   • "Last touch" = last qualifying event before the 10s gap.
-   • Duration = first qualifying → last qualifying event.
-   • Ends when 10 continuous seconds pass with no qualifying event.
-
-   Qualifying (counted once per gesture, not per frame/pixel):
-     select — district tap/click  (touchHandled prevents double-count)
-     drag   — pan gesture         (once per drag start)
-     pinch  — pinch-zoom          (once per pinch start)
-     wheel  — scroll-wheel        (debounced 300ms = one count)
-
-   NOT counted: auto-reset, silent initial load, opts.silent selects.
-   window.SESSION_STATS is kept live for tracker.js.
    ═══════════════════════════════════════════════════════════════════ */
 const SESSION={
   active:false,startTime:0,lastTime:0,interactions:0,_timer:null,IDLE_MS:10000,
@@ -402,8 +377,6 @@ const SESSION={
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 5 — INACTIVITY RESET
-   Smooth 700ms zoom-out, then silent re-select of initial district.
-   Aurora fires AFTER the reset completes — "wake-up" signal.
    ═══════════════════════════════════════════════════════════════════ */
 const INITIAL_DISTRICT='Barmer';
 
@@ -415,14 +388,12 @@ function doReset(){
   setTimeout(()=>{
     mover.style.transition='';
     select(INITIAL_DISTRICT,{silent:true});
-    /* Aurora fires after re-select, not before — confirms screen is live again */
     setTimeout(()=>{if(typeof triggerAurora==='function')triggerAurora();},120);
   },720);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 6 — STREAMING FACT DISPLAY
-   STAGGER_MS : gap between rows appearing. Tune here.
    ═══════════════════════════════════════════════════════════════════ */
 const STAGGER_MS=150;
 
@@ -444,43 +415,26 @@ function stream(id,facts,token){
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 7 — DISTRICT GeoJSON
-   ═══════════════════════════════════════════════════════════════════
-   HOW TO UPDATE DISTRICT MAP:
-   Replace features[] with real polygons exported from mapshaper.org.
-   properties.district must EXACTLY match a key in DATA above.
-   Coordinates in [longitude, latitude] order.
    ═══════════════════════════════════════════════════════════════════ */
 const districtGJ={
   "type":"FeatureCollection","features":[
     {"type":"Feature","properties":{"district":"Barmer"},"geometry":{"type":"Polygon","coordinates":[[[70.04,24.62],[71.15,24.62],[71.15,26.54],[70.04,26.54],[70.04,24.62]]]}},
     {"type":"Feature","properties":{"district":"Jalore"},"geometry":{"type":"Polygon","coordinates":[[[71.16,24.59],[73.10,24.59],[73.10,25.81],[71.16,25.81],[71.16,24.59]]]}}
-    /* add more district features here */
   ]
 };
 
 /* ═══════════════════════════════════════════════════════════════════
-   SECTION 8 — STATE GeoJSON (boundary overlay)
-   ═══════════════════════════════════════════════════════════════════
-   HOW TO UPDATE STATE BOUNDARY:
-   Replace features[] with actual state outline polygons.
-   properties.state = any label (not used for data lookup).
-   These get white .state-boundary stroke + SVG feGaussianBlur
-   glow filter (native SVG — works on iOS Safari).
+   SECTION 8 — STATE GeoJSON
    ═══════════════════════════════════════════════════════════════════ */
 const stateGJ={
   "type":"FeatureCollection","features":[
     {"type":"Feature","properties":{"state":"Rajasthan"},"geometry":{"type":"Polygon","coordinates":[[[69.48,23.30],[78.17,23.30],[78.17,30.12],[69.48,30.12],[69.48,23.30]]]}},
     {"type":"Feature","properties":{"state":"Haryana"},"geometry":{"type":"Polygon","coordinates":[[[74.45,27.65],[77.60,27.65],[77.60,30.55],[74.45,30.55],[74.45,27.65]]]}}
-    /* add more state features here */
   ]
 };
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 9 — DISTRICT SELECTION
-   select(name, opts)
-     opts.silent=true → no aurora, no sound, no session count,
-                        no 500ms debounce (used by reset + initial load)
-   touchHandled flag prevents ghost click after touchend on mobile.
    ═══════════════════════════════════════════════════════════════════ */
 const centroids={};
 let currentToken=0;
@@ -513,8 +467,6 @@ function select(name,opts){
   document.getElementById('eng-list').innerHTML='';
   const mL=document.getElementById('med-loading'),eL=document.getElementById('eng-loading');
   [mL,eL].forEach(lo=>{lo.classList.remove('active');void lo.offsetWidth;lo.classList.add('active');lo.style.display='block';});
-  /* Plain setTimeout — no async/await. iOS Safari throttles setTimeout inside async
-     functions after the first await when the call is no longer in a user gesture context. */
   setTimeout(()=>{
     if(currentToken!==myToken)return;
     mL.style.display='none';mL.classList.remove('active');
@@ -540,9 +492,6 @@ function addPulse(cx,cy){
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 11 — MAP PAN / ZOOM
-   zoomSfx plays on drag-start, pinch-start, wheel (throttled 300ms).
-   SESSION.touch called once per gesture.
-   touchHandled suppresses ghost click after touchend.
    ═══════════════════════════════════════════════════════════════════ */
 (function(){
   const viewport=document.getElementById('map-viewport');
@@ -552,7 +501,6 @@ function addPulse(cx,cy){
 
   function playZoom(){
     const now=Date.now();
-    /* Defer audio to next tick — Web Audio API call on touch event blocks compositor on iOS/iPadOS */
     if(now-lastPlayTime>300){lastPlayTime=now;setTimeout(()=>{zoomSfx.currentTime=0;zoomSfx.volume=0.15;zoomSfx.play().catch(()=>{});},0);}
   }
 
@@ -596,18 +544,18 @@ function addPulse(cx,cy){
   viewport.addEventListener('touchstart',e=>{
     if(e.touches.length===1){
       drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=tx;sty=ty;
-      dragCounted=false; /* reset — drag only counted on first actual move, not on tap */
+      dragCounted=false;
       playZoom();
     } else if(e.touches.length===2){
       drag=false;
       lastDist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
       SESSION.touch('pinch');
     }
-  },{passive:false});  /* passive:false — needed so touchmove can preventDefault on iOS */
+  },{passive:false});
 
   viewport.addEventListener('touchmove',e=>{
     if(e.touches.length===1&&drag){
-      if(!dragCounted){dragCounted=true;SESSION.touch('drag');} /* count drag once on first actual move */
+      if(!dragCounted){dragCounted=true;SESSION.touch('drag');}
       tx=stx+(e.touches[0].clientX-sx);ty=sty+(e.touches[0].clientY-sy);apply();
     } else if(e.touches.length===2){
       e.preventDefault();
@@ -619,7 +567,7 @@ function addPulse(cx,cy){
         const factor=dist/lastDist;
         const ns=Math.min(12,Math.max(0.3,scale*factor));
         tx=mx-(mx-tx)*(ns/scale);ty=my-(my-ty)*(ns/scale);scale=ns;
-        apply(); /* playZoom removed from here — audio during touchmove causes jank on iOS */
+        apply();
       }
       lastDist=dist;
     }
@@ -632,8 +580,6 @@ function addPulse(cx,cy){
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 12 — GeoJSON RENDERER
-   Builds SVG district paths and state boundary paths.
-   Initial select() fires AFTER all centroids are populated (no race).
    ═══════════════════════════════════════════════════════════════════ */
 (function(){
   const svg=document.getElementById('rj');
@@ -651,7 +597,6 @@ function addPulse(cx,cy){
   const px=lo=>ox+(lo-x0)*sc, py=la=>oy+(y1-la)*sc;
   function ringToD(ring){return ring.map(([lo,la],i)=>(i?'L':'M')+px(lo).toFixed(1)+','+py(la).toFixed(1)).join('')+'Z';}
 
-  /* SVG glow filter — native SVG, works on iOS Safari */
   const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
   defs.innerHTML=`<filter id="state-glow" x="-50%" y="-50%" width="200%" height="200%">
     <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur1"/>
@@ -700,7 +645,6 @@ function addPulse(cx,cy){
     svg.appendChild(sp);
   });
 
-  /* Fire initial select AFTER centroids are fully built */
   select(INITIAL_DISTRICT,{silent:true});
 })();
 </script>
@@ -708,8 +652,6 @@ function addPulse(cx,cy){
 <script>
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 13 — TICKER + AURORA INIT
-   Glow overlay sweep canvas REMOVED (was causing border light sweep).
-   glowOverlay div kept in HTML but nothing drawn into it.
    ═══════════════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded',function(){
 
@@ -722,16 +664,23 @@ document.addEventListener('DOMContentLoaded',function(){
   }
   (document.fonts?document.fonts.ready:Promise.resolve()).then(initTicker);
 
-  /* aurora section below */
+  /* ═══════════════════════════════════════════════════════════════
+     SECTION 14 — AURORA CANVAS
+     ─────────────────────────────────────────────────────────────
+     AURORA FIX for iPad/mobile:
+     The old touch path used 'source-over' on the offscreen canvas,
+     which killed the additive glow (overlapping wave colours didn't
+     mix — they just painted over each other).
 
-  /* SECTION 14 — AURORA CANVAS
-     TOUCH PERFORMANCE — two changes that fix slowness on iOS/iPadOS:
-     1. Offscreen 300x200 canvas for touch. Waves computed at small size,
-        blitted scaled to full screen in one drawImage call. ~13x less work.
-     2. shadowBlur=0 on touch. On iOS WebKit, ANY non-zero shadowBlur
-        triggers a full offscreen texture + Gaussian blur of the ENTIRE
-        canvas per stroke — 4 waves = 4 full-canvas blur passes per frame.
-        Replaced with 3 layered strokes (fast GPU path, same visual). */
+     FIX: Now uses 'lighter' compositing on the small offscreen
+     canvas (300×200), then blits to the full-size main canvas with
+     'source-over'. This gives correct additive colour mixing while
+     keeping the performance benefit of small-canvas rendering.
+
+     shadowBlur is still 0 on touch — replaced with 3 layered
+     strokes (wide halo → medium glow → bright core) which the GPU
+     handles as fast fill operations, not Gaussian blur passes.
+     ═══════════════════════════════════════════════════════════════ */
   const aCanvas=document.getElementById('page-aurora'),ax=aCanvas.getContext('2d');
   let aW,aH;
   function resizeAurora(){aW=aCanvas.width=window.innerWidth;aH=aCanvas.height=window.innerHeight;}
@@ -771,11 +720,13 @@ document.addEventListener('DOMContentLoaded',function(){
         x===0?ctx.moveTo(x,cH+wobble):ctx.lineTo(x,cH+wobble);
       }
       if(isTouch){
-        /* source-over only — 'lighter' forces GPU readback on iOS tile GPUs (same cost as shadowBlur).
-           2 strokes: soft wide halo + bright core. shadowBlur=0. */
+        /* 3 layered strokes — no shadowBlur, no GPU Gaussian penalty.
+           The 'lighter' compositing on the offscreen canvas makes
+           overlapping waves additively mix their colours. */
         ctx.shadowBlur=0;
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.22})`;ctx.lineWidth=widR*e*2.8;ctx.stroke();
-        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.85})`;ctx.lineWidth=widR*e*0.5;ctx.stroke();
+        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.18})`;ctx.lineWidth=widR*e*3.0;ctx.stroke();
+        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.45})`;ctx.lineWidth=widR*e*1.2;ctx.stroke();
+        ctx.strokeStyle=`rgba(${w.color},${w.alpha*e*0.85})`;ctx.lineWidth=widR*e*0.4;ctx.stroke();
       } else {
         ctx.strokeStyle=`rgba(${w.color},${w.alpha*e})`;ctx.lineWidth=widR*e;
         ctx.shadowBlur=widR*4.5*e;ctx.shadowColor=`rgba(${w.color},${w.alpha*e*0.95})`;ctx.stroke();
@@ -793,10 +744,12 @@ document.addEventListener('DOMContentLoaded',function(){
     }
     const e=aEnergy;
     if(isTouch){
-      /* Draw on small offscreen canvas with source-over — no 'lighter' on touch */
+      /* FIX: 'lighter' on offscreen → 'source-over' blit to main.
+         Offscreen is only 300×200 so 'lighter' cost is minimal.
+         The blit scales it to full viewport in one GPU drawImage. */
       offCtx.globalCompositeOperation='source-over';offCtx.clearRect(0,0,OFF_W,OFF_H);
+      offCtx.globalCompositeOperation='lighter';
       renderWaves(offCtx,OFF_W,OFF_H,e,Math.min(1,OFF_W/900));
-      /* Blit to main canvas with source-over — single GPU scale operation */
       ax.globalCompositeOperation='source-over';ax.clearRect(0,0,aW,aH);
       ax.drawImage(offCanvas,0,0,aW,aH);
     } else {
@@ -811,19 +764,11 @@ document.addEventListener('DOMContentLoaded',function(){
 
 /* ═══════════════════════════════════════════════════════════════════
    SECTION 15 — BACKGROUND CANVAS  (starfield + planets)
-
-   Stars: 120. document.hidden throttle ~10fps saves battery.
-
-   RIM: drawn as ~120 short segments with edge-fade alpha so the canvas
-   clip boundary is invisible. rimStart oscillates slowly for organic
-   light-shift (lit side migrates very slowly over time).
    ═══════════════════════════════════════════════════════════════════ */
 let _canvasLoopId=null;
 function initCanvas(){
   if(_canvasLoopId){cancelAnimationFrame(_canvasLoopId);_canvasLoopId=null;}
   const cv=document.getElementById('c'),stage=document.getElementById('stage');
-  /* In stacked mode canvas is position:fixed — use viewport dimensions.
-     In desktop/horizontal mode canvas is position:absolute inside card — use card dimensions. */
   const isFixed=getComputedStyle(cv).position==='fixed';
   const W=isFixed?window.innerWidth:(stage.getBoundingClientRect().width||stage.offsetWidth||700);
   const H=isFixed?window.innerHeight:(stage.getBoundingClientRect().height||stage.offsetHeight||560);
@@ -839,17 +784,10 @@ function initCanvas(){
     vx:(Math.random()-0.5)*0.10,vy:(Math.random()-0.5)*0.075
   }));
 
-  /*
-   * rx reduced W*0.08→W*0.04 — left planet orbit tighter so it
-   * never swings into a position where its rim would visibly clip.
-   * rimA boosted so rim is actually visible with the edge-fade logic.
-   */
   const P=[
     {bx:W*-0.20,by:H*0.08,r:W*0.42,ax:0.00028,ay:0.000168,rx:W*0.04,ry:H*0.06,ph:0,  rimA:0.30,rimW:0.9},
     {bx:W*0.74, by:H*1.02,r:W*0.14,ax:0.00036,ay:0.000273,rx:W*0.05,ry:H*0.025,ph:2.1,rimA:0.30,rimW:0.9}
   ];
-
-  /* Planet orbital periods — ax/ay in rad/frame at 60fps */
 
   function drawPlanet(p,t){
     const ppx=p.bx+Math.sin(t*p.ax+(p.ph||0))*p.rx;
@@ -857,11 +795,9 @@ function initCanvas(){
     const r=p.r;
     cx.save();cx.beginPath();cx.rect(0,0,W,H);cx.clip();
 
-    /* Dark sphere */
     cx.fillStyle='rgba(2,12,10,0.96)';
     cx.beginPath();cx.arc(ppx,ppy,r,0,Math.PI*2);cx.fill();
 
-    /* Atmospheric glow — pulled inward so diffusion sits on surface, not outside */
     const innerG=cx.createRadialGradient(ppx,ppy,r*0.82,ppx,ppy,r*0.99);
     innerG.addColorStop(0,'transparent');
     innerG.addColorStop(0.72,'rgba(77,232,184,0.03)');
@@ -869,12 +805,6 @@ function initCanvas(){
     innerG.addColorStop(1.0,`rgba(77,232,184,${p.rimA*0.05})`);
     cx.fillStyle=innerG;cx.beginPath();cx.arc(ppx,ppy,r*1.02,0,Math.PI*2);cx.fill();
 
-    /*
-     * Rim — segment-by-segment with edge-fade alpha.
-     * rimStart has two oscillation terms for organic light-shift:
-     *   term1: coupled to orbital angle (short cycle)
-     *   term2: very slow independent drift (~3370s period) — cosmic shift
-     */
     const STEP=Math.PI/60;
     const EDGE_FADE=r*0.28;
     const rimStart=Math.PI*0.85
@@ -905,7 +835,7 @@ function initCanvas(){
   }
 
   const isTouchBg=(navigator.maxTouchPoints||0)>0;
-  const BG_INTERVAL=isTouchBg?33:0; /* 30fps on touch, 60fps on desktop */
+  const BG_INTERVAL=isTouchBg?33:0;
   let t=0,lastFrameTime=0;
   const IDLE_INTERVAL=100;
   function loop(ts){
@@ -934,11 +864,6 @@ let _bgResizeTimer=null;
 window.addEventListener('resize',()=>{clearTimeout(_bgResizeTimer);_bgResizeTimer=setTimeout(()=>requestAnimationFrame(initCanvas),120);});
 </script>
 
-<!--
-  tracker.js — optional external analytics.
-  Reads window.SESSION_STATS (populated by Section 4).
-  async + onerror suppressed — missing file = zero console errors.
--->
 <script async src="tracker.js" onerror="void 0"></script>
 </body>
 </html>
