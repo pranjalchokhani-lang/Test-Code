@@ -127,7 +127,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 .blk,.blk.eng{min-height:0;flex:1;}
 .blk-header{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;position:relative;z-index:2;background:transparent;padding:10px 16px 10px;border-bottom:1px solid rgba(var(--accent-rgb),0.05);box-shadow:none;}
 .blk-title{font-family:var(--font-display);font-size:clamp(10px,1.0cqw,13px);letter-spacing:clamp(0.5px,0.15cqw,1.5px);text-transform:uppercase;font-weight:700;line-height:1.3;color:rgba(var(--accent-rgb),0.9);animation:lblGlow 2.1s ease-in-out infinite alternate;}
-#med-list,#eng-list{flex:1;overflow-y:scroll;overflow-x:hidden;min-height:0;position:relative;z-index:1;background:transparent;padding:8px 16px 28px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+#med-list,#eng-list{flex:1;overflow-y; autol:scroll;overflow-x:hidden;min-height:0;position:relative;z-index:1;background:transparent;padding:8px 16px 32px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 
 #med-list::-webkit-scrollbar,#eng-list::-webkit-scrollbar{width:4px;}
 #med-list::-webkit-scrollbar-thumb,#eng-list::-webkit-scrollbar-thumb{border-radius:10px;background:var(--accent);}
@@ -152,7 +152,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
    Two-column layout preserved. Comfortable spacing.
    ══════════════════════════════════════════════════════ */
 @media (min-width:601px) and (min-height:900px) and (max-width:850px){
-  .trap-head{height:9dvh;min-height:52px;padding:0 6vw;}
+  .trap-head{height:12dvh;min-height:52px;padding-top:0 6vw;}
   .hdr-title{font-size:clamp(15px,2.8vw,22px);letter-spacing:clamp(2px,0.4vw,5px);}
   .ticker-wrap{display:flex!important;}
   .ticker-half span{font-size:clamp(8px,1.1vw,11px);}
@@ -160,10 +160,10 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   .fsub{display:block!important;font-size:clamp(9px,1.2vw,12px);}
   .fmain{font-size:clamp(13px,2.0vw,18px);}
   /* 70% height, 85% width, centred — equal columns */
-  .body{width:85%;margin:0 auto;gap:2vw;grid-template-columns:1fr 1fr;display:grid;align-items:stretch;flex:0 0 60dvh;min-height:0;padding:0;}
+  .body{width:85%;margin:0 auto;gap:2vw;grid-template-columns:65% 35%;display:grid;align-items:stretch;flex:0 0 60dvh;min-height:0;padding:0;}
   /* map fills grid cell fully */
-  .map-panel{width:65%;min-height:0;height:100%;align-self:stretch;}
-  .blk,.blk.eng{width:35%;flex:1;min-height:0;max-height:none;}
+  .map-panel{min-height:0;height:100%;align-self:stretch;}
+  .blk,.blk.eng{flex:1;min-height:0;max-height:none;}
   .map-label{font-size:clamp(9px,1.2vw,12px);letter-spacing:2px;}
   .right-panel{gap:clamp(12px,1.2dvh,16px);justify-content:flex-start;}
   .rp-header{padding:clamp(4px,0.6dvh,8px) 10px clamp(3px,0.4dvh,6px) 12px;}
@@ -193,43 +193,33 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
    Full-height. Map top ~38%, two data panels side-by-side below.
    Everything fixed in viewport, no scrolling.
    ══════════════════════════════════════════════════════ */
-@media (max-width:600px) and (orientation:portrait){
-  html,body{overflow:hidden!important;height:100dvh!important;background:var(--bg);}
-  .card{height:100dvh;overflow:hidden;display:flex;flex-direction:column;background:transparent;}
-  .card-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
-  canvas#c{position:fixed;top:0;left:0;width:100vw;height:100dvh;}
+@media (min-width:601px) and (min-height:900px) and (max-width:850px){
+  /* Move Header Down */
+  .trap-head{
+    height:12dvh;
+    padding-top:40px; 
+    justify-content:flex-start;
+  }
 
-  /* Header */
-  .trap-head{flex-shrink:0;height:52px;min-height:52px;padding:0 4vw;flex-direction:row;align-items:center;justify-content:center;gap:0;}
-  .hdr-title{font-size:clamp(12px,4vw,16px);letter-spacing:clamp(1px,0.5vw,3px);text-align:center;white-space:nowrap;}
-  .ticker-wrap{display:none!important;}
+  /* Move Footer Up */
+  .trap-foot-wrap{
+    height:10dvh;
+    padding-bottom:35px; 
+    justify-content:flex-end;
+  }
 
-  /* Body — pure vertical stack */
-  .body{flex:1;min-height:0;display:flex;flex-direction:column;padding:8px 4vw;gap:10px;overflow:hidden;}
+  /* 65-35 Width Ratio */
+  .body{
+    width:90%;
+    margin:0 auto;
+    grid-template-columns: 65% 35%; 
+    display:grid;
+    flex:1;
+  }
 
-  /* Map — top 36% */
-  .map-panel{flex:0 0 38%;min-height:0;touch-action:none;padding:8px 8px 6px;border-radius:14px;}
-  .map-label{font-size:clamp(8px,2.2vw,10px);margin-bottom:4px;padding:2px 6px;letter-spacing:1.5px;}
-  .lbl,.lbl.on{font-size:20px!important;}
-
-  /* District label row */
-  .rp-header{flex-shrink:0;padding:12px 4px 4px;display:flex;flex-direction:column;gap:0;}
-  .wtag{font-size:clamp(7px,2vw,9px);white-space:nowrap;}
-  .ctag{font-size:clamp(11px,3.5vw,15px);line-height:1.2;}
-
-  /* Two data panels — vertical stack, equal height */
-  .right-panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;overflow:hidden;height:auto;max-height:100%;}
-  .blk,.blk.eng{flex:1;min-height:0;height:auto!important;border-radius:14px;}
-  .blk-header{padding:8px 10px;}
-  .blk-title{font-size:clamp(9px,2.5vw,12px);letter-spacing:1.5px;}
-  .row{white-space:nowrap;font-size:clamp(8px,2.1vw,10px);line-height:1.5;padding:1px 0;}
-  #med-list,#eng-list{padding:6px 10px 28px;}
-  .loading-line{font-size:clamp(7px,2vw,9px);letter-spacing:1px;padding:3px 8px 0;}
-
-  /* Footer */
-  .trap-foot-wrap{flex-shrink:0;height:42px;min-height:42px;padding:0 4vw;justify-content:center;border-top:1px solid rgba(255,255,255,0.05);}
-  .fsub{display:none!important;}
-  .fmain{font-size:clamp(10px,3vw,13px);letter-spacing:clamp(1px,0.5vw,3px);}
+  /* Prevent Bottom Cut-off */
+  .blk.eng{ margin-bottom:8px; }
+  #med-list,#eng-list{ padding:6px 10px 45px; }
 }
 
 /* ══════════════════════════════════════════════════════
