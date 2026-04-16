@@ -152,30 +152,44 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
    Two-column layout preserved. Comfortable spacing.
    ══════════════════════════════════════════════════════ */
 @media (min-width:601px) and (min-height:900px) and (max-width:850px){
-  .trap-head{height:12dvh;min-height:52px;padding-top:0 6vw;}
-  .hdr-title{font-size:clamp(15px,2.8vw,22px);letter-spacing:clamp(2px,0.4vw,5px);}
-  .ticker-wrap{display:flex!important;}
-  .ticker-half span{font-size:clamp(8px,1.1vw,11px);}
-  .trap-foot-wrap{height:8dvh;min-height:44px;padding:0 6vw;}
-  .fsub{display:block!important;font-size:clamp(9px,1.2vw,12px);}
-  .fmain{font-size:clamp(13px,2.0vw,18px);}
-  /* 70% height, 85% width, centred — equal columns */
-  .body{width:85%;margin:0 auto;gap:2vw;grid-template-columns:65% 35%;display:grid;align-items:stretch;flex:0 0 60dvh;min-height:0;padding:0;}
-  /* map fills grid cell fully */
-  .map-panel{min-height:0;height:100%;align-self:stretch;}
-  .blk,.blk.eng{flex:1;min-height:0;max-height:none;}
-  .map-label{font-size:clamp(9px,1.2vw,12px);letter-spacing:2px;}
-  .right-panel{gap:clamp(12px,1.2dvh,16px);justify-content:flex-start;}
-  .rp-header{padding:clamp(4px,0.6dvh,8px) 10px clamp(3px,0.4dvh,6px) 12px;}
-  .wtag{font-size:clamp(9px,1.3vw,12px);letter-spacing:clamp(1px,0.2vw,2px);}
-  .ctag{font-size:clamp(14px,2.2vw,20px);letter-spacing:clamp(1px,0.2vw,2px);}
-  .blk-header{padding:clamp(6px,0.8dvh,12px) 14px clamp(6px,0.8dvh,12px);}
-  .blk-title{font-size:clamp(10px,1.4vw,13px);letter-spacing:clamp(1px,0.25vw,2.5px);}
-  .row{font-size:clamp(9px,1.1vw,11px);line-height:1.6;white-space:normal;overflow:visible;}
-  #med-list,#eng-list{padding:6px 10px 28px;overflow-y:auto;overflow-x:hidden;}
-  .loading-line{font-size:clamp(9px,1.1vw,11px);letter-spacing:clamp(1.5px,0.3vw,3px);}
-}
+  /* 1. Header takes exactly 20% height */
+  .trap-head {
+    height: 20dvh;
+    min-height: 20dvh;
+    padding-top: 40px; 
+    justify-content: flex-start;
+  }
 
+  /* 2. Body takes exactly 50% height, 60/40 Split, and 5% sides */
+  .body {
+    height: 50dvh;
+    min-height: 50dvh;
+    width: 90%;          /* Leaves 5% on left and 5% on right */
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 60% 40%; 
+    gap: 2vw;
+    padding: 0;
+    align-items: stretch;
+  }
+
+  /* 3. Footer takes exactly 20% height */
+  .trap-foot-wrap {
+    height: 20dvh;
+    min-height: 20dvh;
+    padding-bottom: 40px;
+    justify-content: flex-end;
+  }
+
+  /* Ensure map and blocks fill the 50dvh container exactly */
+  .map-panel, .right-panel {
+    height: 100%;
+  }
+
+  /* Internal fixes to prevent cutting with the new height */
+  .blk.eng { margin-bottom: 8px; }
+  #med-list, #eng-list { padding-bottom: 45px !important; }
+}
 /* ══════════════════════════════════════════════════════
    BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
    ══════════════════════════════════════════════════════ */
