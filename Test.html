@@ -147,16 +147,14 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 /* ══════════════════════════════════════════════════════
-   BP2 — iPad PORTRAIT ONLY 
-   Strictly isolated: 601px to 850px AND Vertical only.
-   This "Fence" prevents it from affecting Phones or Landscape.
+   REVISED BP2 — iPad PORTRAIT ONLY 
+   (Only kicks in between 601px and 850px)
    ══════════════════════════════════════════════════════ */
 @media screen 
   and (min-width: 601px) 
   and (max-width: 850px) 
   and (orientation: portrait) {
   
-  /* 1. Reset Body to Grid (Overrides Mobile Vertical Stack) */
   .body {
     display: grid !important;
     grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
@@ -167,71 +165,22 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
     padding: 15px 0 !important;
     overflow: visible !important;
     flex: none !important;
-    flex-direction: unset !important; /* Force stops the mobile column stack */
   }
 
-  /* 2. Header: Centered in top 20% zone */
-  .trap-head {
+  .trap-head, .trap-foot-wrap {
     height: 20dvh !important;
-    min-height: 20dvh !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important; 
     align-items: center !important;
     padding: 0 !important;
-    flex-shrink: 0 !important;
   }
 
-  .hdr-title {
-    font-size: 26px !important; 
-    letter-spacing: 6px !important;
-    white-space: nowrap !important;
-  }
+  .hdr-title { font-size: 26px !important; letter-spacing: 6px !important; }
+  .fmain { font-size: 20px !important; }
 
-  .ticker-wrap {
-    margin-top: 10px !important;
-    display: flex !important;
-    height: 22px !important;
-  }
-
-  /* 3. Footer: Centered in bottom 20% zone */
-  .trap-foot-wrap {
-    height: 20dvh !important;
-    min-height: 20dvh !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    padding: 0 !important;
-    border: none !important;
-    flex-shrink: 0 !important;
-  }
-
-  .fmain {
-    font-size: 20px !important;
-    letter-spacing: 4px !important;
-  }
-
-  /* 4. Panels: Ensuring side-by-side behavior */
-  .map-panel, .right-panel {
-    height: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    min-width: 0 !important;
-    flex: none !important; /* Prevents mobile flex rules from applying */
-  }
-
-  .right-panel {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 15px !important;
-  }
-
-  /* Internal list safety */
-  #med-list, #eng-list { 
-    padding-bottom: 50px !important; 
-    height: 100% !important;
-  }
+  .map-panel, .right-panel { height: 100% !important; width: 100% !important; }
+  #med-list, #eng-list { padding-bottom: 50px !important; }
 }
 /* ══════════════════════════════════════════════════════
    BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
@@ -246,37 +195,45 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 }
 
 /* ══════════════════════════════════════════════════════
-   BP4 — PHONE PORTRAIT (≤600px wide, portrait)
-   Full-height. Map top ~38%, two data panels side-by-side below.
-   Everything fixed in viewport, no scrolling.
+   REVISED BP4 — PHONE PORTRAIT 
+   (Only kicks in for screens 600px and narrower)
    ══════════════════════════════════════════════════════ */
-@media (min-width:601px) and (min-height:900px) and (max-width:850px){
-  /* Move Header Down */
-  .trap-head{
-    height:12dvh;
-    padding-top:40px; 
-    justify-content:flex-start;
+@media screen and (max-width: 600px) and (orientation: portrait) {
+  html, body { overflow: hidden !important; height: 100dvh !important; }
+  .card { height: 100dvh; display: flex; flex-direction: column; }
+  
+  /* Force vertical stack for mobile */
+  .body {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 8px 4vw !important;
+    gap: 10px !important;
+    flex: 1 !important;
+    height: auto !important;
+    width: 100% !important;
   }
 
-  /* Move Footer Up */
-  .trap-foot-wrap{
-    height:10dvh;
-    padding-bottom:35px; 
-    justify-content:flex-end;
+  /* Map takes top portion */
+  .map-panel {
+    flex: 0 0 38% !important;
+    width: 100% !important;
+    height: auto !important;
   }
 
-  /* 65-35 Width Ratio */
-  .body{
-    width:90%;
-    margin:0 auto;
-    grid-template-columns: 65% 35%; 
-    display:grid;
-    flex:1;
+  /* Data boxes stack underneath */
+  .right-panel {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
   }
 
-  /* Prevent Bottom Cut-off */
-  .blk.eng{ margin-bottom:8px; }
-  #med-list,#eng-list{ padding:6px 10px 45px; }
+  .blk, .blk.eng { flex: 1 !important; height: auto !important; }
+
+  .trap-head { height: 52px; padding: 0 4vw; flex-direction: row; }
+  .hdr-title { font-size: 14px; letter-spacing: 2px; }
+  .ticker-wrap { display: none !important; }
+  .trap-foot-wrap { height: 42px; padding: 0 4vw; }
 }
 
 /* ══════════════════════════════════════════════════════
