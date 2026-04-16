@@ -148,33 +148,34 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 /* ══════════════════════════════════════════════════════
    BP2 — iPad PORTRAIT ONLY 
-   Strictly isolated: ONLY kicks in between 601px and 850px.
-   Will NOT affect Phones (0-600px) or Landscape (>850px).
+   Strictly isolated: 601px to 850px AND Vertical only.
+   This "Fence" prevents it from affecting Phones or Landscape.
    ══════════════════════════════════════════════════════ */
 @media screen 
   and (min-width: 601px) 
   and (max-width: 850px) 
   and (orientation: portrait) {
   
-  /* Force a reset to ensure mobile vertical stack rules don't interfere */
+  /* 1. Reset Body to Grid (Overrides Mobile Vertical Stack) */
   .body {
     display: grid !important;
-    flex-direction: unset !important;
+    grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
     height: 60dvh !important;
     width: 96% !important;
     margin: 0 auto !important;
-    grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
     gap: 15px !important;
     padding: 15px 0 !important;
     overflow: visible !important;
     flex: none !important;
+    flex-direction: unset !important; /* Force stops the mobile column stack */
   }
 
-  /* Header 20% height */
+  /* 2. Header: Centered in top 20% zone */
   .trap-head {
     height: 20dvh !important;
     min-height: 20dvh !important;
     display: flex !important;
+    flex-direction: column !important;
     justify-content: center !important; 
     align-items: center !important;
     padding: 0 !important;
@@ -184,34 +185,53 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   .hdr-title {
     font-size: 26px !important; 
     letter-spacing: 6px !important;
+    white-space: nowrap !important;
   }
 
-  /* Footer 20% height */
+  .ticker-wrap {
+    margin-top: 10px !important;
+    display: flex !important;
+    height: 22px !important;
+  }
+
+  /* 3. Footer: Centered in bottom 20% zone */
   .trap-foot-wrap {
     height: 20dvh !important;
     min-height: 20dvh !important;
     display: flex !important;
+    flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     padding: 0 !important;
+    border: none !important;
     flex-shrink: 0 !important;
   }
 
-  .fmain { font-size: 20px !important; }
+  .fmain {
+    font-size: 20px !important;
+    letter-spacing: 4px !important;
+  }
 
-  /* Ensure the stack doesn't turn into a mobile-style column */
+  /* 4. Panels: Ensuring side-by-side behavior */
+  .map-panel, .right-panel {
+    height: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    flex: none !important; /* Prevents mobile flex rules from applying */
+  }
+
   .right-panel {
     display: flex !important;
     flex-direction: column !important;
-    height: 100% !important;
+    gap: 15px !important;
   }
 
-  .map-panel {
+  /* Internal list safety */
+  #med-list, #eng-list { 
+    padding-bottom: 50px !important; 
     height: 100% !important;
-    flex: none !important; /* Overrides mobile flex: 0 0 38% */
   }
-
-  #med-list, #eng-list { padding-bottom: 50px !important; }
 }
 /* ══════════════════════════════════════════════════════
    BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
