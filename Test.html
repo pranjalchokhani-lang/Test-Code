@@ -147,9 +147,11 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 /* ══════════════════════════════════════════════════════
-   Bp2 — iPad PORTRAIT 
-@media (min-width:601px) and (min-height:900px) and (max-width:850px){
-  /* 1. Header: 20% height, vertically centered, locked font size */
+   BP2 — iPad PORTRAIT ONLY (Lock: 20/60/20 & 60/40 Split)
+   ══════════════════════════════════════════════════════ */
+@media (min-width: 601px) and (max-width: 850px) and (orientation: portrait) {
+  
+  /* 1. HEADER: Fixed 20% height, Content Centered */
   .trap-head {
     height: 20dvh !important;
     min-height: 20dvh !important;
@@ -158,17 +160,18 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
     justify-content: center !important; 
     align-items: center !important;
     padding: 0 !important;
+    flex-shrink: 0 !important;
   }
 
   .hdr-title {
-    font-size: 26px !important;    /* Increased and locked */
+    font-size: 26px !important; 
     letter-spacing: 6px !important;
     white-space: nowrap !important;
-    animation: none !important;     /* Optional: stops shrinking/growing animation */
   }
 
   .ticker-wrap {
     margin-top: 10px !important;
+    display: flex !important;
   }
 
   .ticker-half span {
@@ -176,25 +179,26 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
     letter-spacing: 2px !important;
   }
 
-  /* 2. Body: 60% height, 96% width (Wide), 60/40 Split */
+  /* 2. BODY: Fixed 60% height, 96% width, 60/40 Split */
   .body {
     height: 60dvh !important;
-    width: 96% !important;         /* Only 2% gap on each side */
+    min-height: 60dvh !important;
+    width: 96% !important;         /* Edge-to-edge look */
     margin: 0 auto !important;
     display: grid !important;
-    /* Calculated split to prevent right-side overflow */
+    /* Split with calculation to account for the gap */
     grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
     gap: 15px !important;
     align-items: stretch !important;
     
-    /* GLOW FIX: overflow visible lets neon borders breathe */
+    /* GLOW PROTECTION: padding prevents top/bottom border cut-off */
     overflow: visible !important; 
-    padding: 15px 0 !important;    /* Added buffer for top/bottom neon borders */
+    padding: 15px 0 !important;    
     box-sizing: border-box !important;
     flex: none !important;
   }
 
-  /* 3. Footer: 20% height, vertically centered, locked font size */
+  /* 3. FOOTER: Fixed 20% height, Content Centered */
   .trap-foot-wrap {
     height: 20dvh !important;
     min-height: 20dvh !important;
@@ -204,6 +208,7 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
     align-items: center !important;
     padding: 0 !important;
     border: none !important;
+    flex-shrink: 0 !important;
   }
 
   .fmain {
@@ -217,18 +222,22 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
     display: block !important;
   }
 
-  /* 4. Panels & Internal Safety */
+  /* 4. PANEL SIZING & OVERFLOW FIXES */
   .map-panel, .right-panel {
     height: 100% !important;
     width: 100% !important;
     box-sizing: border-box !important;
     min-width: 0 !important;
-    overflow: hidden;
   }
-
-  /* Deeper padding for the lists to prevent cut-off at very bottom */
+  
+  /* Ensure the list has space to breathe at the very bottom */
   #med-list, #eng-list { 
     padding-bottom: 50px !important; 
+    height: 100% !important;
+  }
+
+  .blk.eng {
+    margin-bottom: 0 !important; /* Managed by .body padding instead */
   }
 }
 /* ══════════════════════════════════════════════════════
