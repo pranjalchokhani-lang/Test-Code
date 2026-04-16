@@ -147,63 +147,54 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 
-/* ══════════════════════════════════════════════════════
-   BP2 — iPad PORTRAIT (601–850px wide, 900px+ tall)
-   Two-column layout preserved. Comfortable spacing.
-   ══════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════
-   BP2 — iPad PORTRAIT (90% Width / 60% Height Blocks)
-   ══════════════════════════════════════════════════════ */
 @media (min-width:601px) and (min-height:900px) and (max-width:850px){
   
-  /* 1. Header: 20% height, content vertically centered */
+  /* 1. Reset sizing for this block */
+  .body, .blk, .map-panel, .right-panel {
+    box-sizing: border-box !important;
+  }
+
+  /* 2. Header: Centered in top 20% */
   .trap-head {
     height: 20dvh !important;
-    min-height: 20dvh !important;
     display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important; 
-    align-items: center !important;
-    padding: 0 !important;
-    flex-shrink: 0;
-  }
-
-  /* 2. Body: 60% height, 90% width, 60/40 Split */
-  .body {
-    height: 60dvh !important;       /* Block height set to 60% */
-    min-height: 60dvh !important;
-    width: 90% !important;          /* Horizontal fill set to 90% */
-    margin: 0 auto !important;      /* Centers the 90% (5% gap on each side) */
-    display: grid !important;
-    grid-template-columns: 60% 40% !important; /* The 60/40 Split */
-    gap: 2vw !important;
-    align-items: stretch !important;
-    padding: 0 !important;
-    flex: none !important;
-    overflow: hidden;
-  }
-
-  /* 3. Footer: 20% height, content vertically centered */
-  .trap-foot-wrap {
-    height: 20dvh !important;
-    min-height: 20dvh !important;
-    display: flex !important;
-    flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     padding: 0 !important;
-    flex-shrink: 0;
   }
 
-  /* Ensure map and right panel fill the 60dvh height */
+  /* 3. Body: 60% Height, 90% Width, Split Fix */
+  .body {
+    height: 60dvh !important;
+    width: 90% !important; /* This creates the 5% margin on each side */
+    margin: 0 auto !important;
+    display: grid !important;
+    /* Use calc to subtract the gap from the percentage to prevent overflow */
+    grid-template-columns: calc(60% - 10px) calc(40% - 10px) !important;
+    gap: 20px !important;
+    align-items: stretch !important;
+    overflow: visible !important; /* Allow glowing borders to bleed slightly */
+  }
+
+  /* 4. Footer: Centered in bottom 20% */
+  .trap-foot-wrap {
+    height: 20dvh !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 !important;
+  }
+
+  /* 5. Force the panels to stay within the lines */
   .map-panel, .right-panel {
     height: 100% !important;
-    min-height: 0 !important;
+    max-width: 100% !important; 
+    min-width: 0 !important; /* Prevents flex-shrink issues */
   }
 
-  /* Maintain internal scroll safety for Engineering box */
+  /* Fix for the internal list to prevent bottom cut */
   #med-list, #eng-list { 
-    padding-bottom: 40px !important; 
+    padding-bottom: 45px !important; 
   }
 }
 /* ══════════════════════════════════════════════════════
