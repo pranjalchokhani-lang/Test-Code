@@ -148,17 +148,33 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
 #page-aurora{position:fixed;inset:0;width:100vw;height:100dvh;pointer-events:none;z-index:9999;will-change:transform;}
 /* ══════════════════════════════════════════════════════
    BP2 — iPad PORTRAIT ONLY 
-   Strictly isolated to 601px-850px in Portrait mode.
-   Vertical: 20/60/20 | Horizontal: 96% Fill | Split: 60/40
+   Strictly isolated: ONLY kicks in between 601px and 850px.
+   Will NOT affect Phones (0-600px) or Landscape (>850px).
    ══════════════════════════════════════════════════════ */
-@media (min-width: 601px) and (max-width: 850px) and (orientation: portrait) {
+@media screen 
+  and (min-width: 601px) 
+  and (max-width: 850px) 
+  and (orientation: portrait) {
   
-  /* 1. HEADER: Centered in top 20% */
+  /* Force a reset to ensure mobile vertical stack rules don't interfere */
+  .body {
+    display: grid !important;
+    flex-direction: unset !important;
+    height: 60dvh !important;
+    width: 96% !important;
+    margin: 0 auto !important;
+    grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
+    gap: 15px !important;
+    padding: 15px 0 !important;
+    overflow: visible !important;
+    flex: none !important;
+  }
+
+  /* Header 20% height */
   .trap-head {
     height: 20dvh !important;
     min-height: 20dvh !important;
     display: flex !important;
-    flex-direction: column !important;
     justify-content: center !important; 
     align-items: center !important;
     padding: 0 !important;
@@ -168,80 +184,34 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
   .hdr-title {
     font-size: 26px !important; 
     letter-spacing: 6px !important;
-    white-space: nowrap !important;
   }
 
-  .ticker-wrap {
-    margin-top: 10px !important;
-    display: flex !important;
-    height: 22px !important;
-  }
-
-  .ticker-half span {
-    font-size: 11px !important;
-    letter-spacing: 2px !important;
-  }
-
-  /* 2. BODY: 60% Height, 96% Wide, 60/40 Split */
-  .body {
-    height: 60dvh !important;
-    min-height: 60dvh !important;
-    width: 96% !important;
-    margin: 0 auto !important;
-    display: grid !important;
-    /* Calculated to handle the 15px gap precisely */
-    grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
-    gap: 15px !important;
-    align-items: stretch !important;
-    
-    /* GLOW PROTECTION: padding allows neon borders to be visible */
-    overflow: visible !important; 
-    padding: 15px 0 !important;    
-    box-sizing: border-box !important;
-    flex: none !important;
-  }
-
-  /* 3. FOOTER: Centered in bottom 20% */
+  /* Footer 20% height */
   .trap-foot-wrap {
     height: 20dvh !important;
     min-height: 20dvh !important;
     display: flex !important;
-    flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
     padding: 0 !important;
-    border: none !important;
     flex-shrink: 0 !important;
   }
 
-  .fmain {
-    font-size: 20px !important;
-    letter-spacing: 4px !important;
-  }
+  .fmain { font-size: 20px !important; }
 
-  .fsub {
-    font-size: 11px !important;
-    margin-bottom: 5px !important;
-    display: block !important;
-  }
-
-  /* 4. PANEL SIZING */
-  .map-panel, .right-panel {
-    height: 100% !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    min-width: 0 !important;
-  }
-  
-  /* Internal scroll padding fix */
-  #med-list, #eng-list { 
-    padding-bottom: 50px !important; 
+  /* Ensure the stack doesn't turn into a mobile-style column */
+  .right-panel {
+    display: flex !important;
+    flex-direction: column !important;
     height: 100% !important;
   }
 
-  .blk.eng {
-    margin-bottom: 0 !important; 
+  .map-panel {
+    height: 100% !important;
+    flex: none !important; /* Overrides mobile flex: 0 0 38% */
   }
+
+  #med-list, #eng-list { padding-bottom: 50px !important; }
 }
 /* ══════════════════════════════════════════════════════
    BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
