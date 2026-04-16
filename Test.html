@@ -152,43 +152,48 @@ canvas#c{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display
    Two-column layout preserved. Comfortable spacing.
    ══════════════════════════════════════════════════════ */
 @media (min-width:601px) and (min-height:900px) and (max-width:850px){
-  /* 1. Header takes exactly 20% height */
+  /* 1. Header: 20% height, content vertically centered */
   .trap-head {
-    height: 20dvh;
-    min-height: 20dvh;
-    padding-top: 40px; 
-    justify-content: flex-start;
+    height: 20dvh !important;
+    min-height: 20dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important; /* Vertical center */
+    align-items: center !important;
+    padding: 0 !important; /* Remove top padding to keep it centered */
   }
 
-  /* 2. Body takes exactly 50% height, 60/40 Split, and 5% sides */
+  /* 2. Body: 50% height, 60/40 Split, 5% Side Gutters */
   .body {
-    height: 50dvh;
-    min-height: 50dvh;
-    width: 90%;          /* Leaves 5% on left and 5% on right */
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 60% 40%; 
-    gap: 2vw;
-    padding: 0;
-    align-items: stretch;
+    height: 50dvh !important;
+    min-height: 50dvh !important;
+    width: 90% !important; /* 5% gap on each side (100 - 90 = 10 / 2) */
+    margin: 0 auto !important;
+    display: grid !important;
+    grid-template-columns: 60% 40% !important; /* Forced 60/40 split */
+    gap: 2vw !important;
+    align-items: stretch !important;
+    flex: none !important;
   }
 
-  /* 3. Footer takes exactly 20% height */
+  /* 3. Footer: 20% height, content vertically centered */
   .trap-foot-wrap {
-    height: 20dvh;
-    min-height: 20dvh;
-    padding-bottom: 40px;
-    justify-content: flex-end;
+    height: 20dvh !important;
+    min-height: 20dvh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important; /* Vertical center */
+    align-items: center !important;
+    padding: 0 !important;
+    border-top: none !important;
   }
 
-  /* Ensure map and blocks fill the 50dvh container exactly */
-  .map-panel, .right-panel {
-    height: 100%;
-  }
-
-  /* Internal fixes to prevent cutting with the new height */
-  .blk.eng { margin-bottom: 8px; }
-  #med-list, #eng-list { padding-bottom: 45px !important; }
+  /* 4. Fix Engineering box internal scroll & edge */
+  .blk.eng { margin-bottom: 0 !important; }
+  #med-list, #eng-list { padding-bottom: 40px !important; }
+  
+  /* Ensure map and right panel containers fill the 50dvh height */
+  .map-panel, .right-panel { height: 100% !important; }
 }
 /* ══════════════════════════════════════════════════════
    BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
