@@ -23,6 +23,35 @@
   --bg:#08090c;
   --text:#fff;
 }
+/* ══════════════ GLOBAL NEON SAFETY RULES ══════════════ */
+
+/* 1. Prevent "Scissors" Clipping: Allow glows to bleed outside boxes */
+.body, .right-panel, .map-panel, .blk {
+  overflow: visible !important;
+}
+
+/* 2. Top/Bottom Buffers: Pushes boxes away from Header/Footer so borders show */
+.map-panel, .blk {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+/* 3. The "Last Box" Rule: Specific lift for the Engineering box at screen bottom */
+.blk.eng {
+  margin-bottom: 25px !important; 
+}
+
+/* 4. Scroll Buffer: Prevents list text from overlapping the bottom neon line */
+#med-list, #eng-list {
+  padding-bottom: 50px !important;
+}
+
+/* 5. Right-Side Safety: Prevents boxes from touching the right screen edge */
+.body {
+  padding-right: 15px !important;
+}
+/* ══════════════════════════════════════════════════════ */
+  
 *{margin:0;padding:0;box-sizing:border-box;cursor:crosshair;}
 html{background:var(--bg);}
 body{background:var(--bg);margin:0;display:flex;justify-content:center;align-items:center;width:100vw;height:100dvh;overflow:hidden;font-family:var(--font-display);color:var(--text);}
