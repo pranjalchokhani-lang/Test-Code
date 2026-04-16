@@ -626,9 +626,9 @@ function initCanvas(){
   const isMobileCanvas = W <= 850;
   const starCount = isMobileCanvas ? 40 : 120;
   
-  const stars=Array.from({length:starCount},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.2,o:Math.random()*0.40+0.10,do:(Math.random()*0.004+0.001)*(Math.random()<0.5?1:-1),vx:(Math.random()-0.5)*0.10,vy:(Math.random()-0.5)*0.075}));
-  const P=[{bx:W*-0.20,by:H*0.08,r:W*0.42,ax:0.00028,ay:0.000168,rx:W*0.04,ry:H*0.06,ph:0,rimA:0.30,rimW:0.9},{bx:W*0.74,by:H*1.02,r:W*0.14,ax:0.00036,ay:0.000273,rx:W*0.05,ry:H*0.025,ph:2.1,rimA:0.30,rimW:0.9}];
-  
+  const stars=Array.from({length:starCount},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+0.2,o:Math.random()*0.40+0.10,do:(Math.random()*0.004+0.001)*(Math.random()<0.5?1:-1),vx:(Math.random()-0.5)*0.20,vy:(Math.random()-0.5)*0.3}));
+const P=[{bx:W*-0.20,by:H*0.08,r:W*0.42,ax:0.0015,ay:0.001,rx:W*0.04,ry:H*0.06,ph:0,rimA:0.30,rimW:0.9},
+         {bx:W*0.74,by:H*1.02,r:W*0.14,ax:0.002,ay:0.0015,rx:W*0.05,ry:H*0.025,ph:2.1,rimA:0.30,rimW:0.9}];  
   function drawPlanet(p,t){
     const ppx=p.bx+Math.sin(t*p.ax+(p.ph||0))*p.rx,ppy=p.by+Math.cos(t*p.ay+(p.ph||0)*0.7)*p.ry,r=p.r;
     cx.save();cx.beginPath();cx.rect(0,0,W,H);cx.clip();
