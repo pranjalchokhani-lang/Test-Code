@@ -153,11 +153,15 @@ document.addEventListener('touchstart', (e) => {
 }, { passive: true });
 
 // Every other interaction type — all call onInteraction()
+// Window listeners ensure mobile scrolls/swipes/hovers are caught globally.
+window.addEventListener('touchmove',     () => onInteraction(), { passive: true });
+window.addEventListener('pointermove',   () => onInteraction(), { passive: true });
+window.addEventListener('scroll',        () => onInteraction(), { passive: true });
+
 document.addEventListener('mousemove',   () => onInteraction(), { passive: true });
-document.addEventListener('pointermove', () => onInteraction(), { passive: true });
 document.addEventListener('wheel',       () => onInteraction(), { passive: true });
-document.addEventListener('touchmove',   () => onInteraction(), { passive: true });
 document.addEventListener('pointerdown', () => onInteraction(), { passive: true });
+document.addEventListener('touchstart',  () => onInteraction(), { passive: true });
 document.addEventListener('keydown',     () => onInteraction(), { passive: true });
 
 if (viewport) {
