@@ -1,0 +1,2193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;600;700&family=Inter:ital,opsz,wght@0,14..32,200..900;1,14..32,200..900&display=swap" rel="stylesheet">
+	<style>
+	@font-face {
+		font-family: 'Chakra Petch';
+		font-style: normal;
+		font-weight: 700;
+		src: url('https://fonts.gstatic.com/s/chakrapetch/v11/cIf6MapbsEk7TDLdtEz1BwkWmpLZQosKl60.woff2') format('woff2');
+	}
+	
+	@font-face {
+		font-family: 'Chakra Petch';
+		font-style: normal;
+		font-weight: 600;
+		src: url('https://fonts.gstatic.com/s/chakrapetch/v11/cIf6MapbsEk7TDLdtEz1BwkWmLHZQosKl60.woff2') format('woff2');
+	}
+	
+	@font-face {
+		font-family: 'Chakra Petch';
+		font-style: normal;
+		font-weight: 400;
+		src: url('https://fonts.gstatic.com/s/chakrapetch/v11/cIf4MapbsEk7TDLdtEz1BwkmmKBhSL7Y1Q.woff2') format('woff2');
+	}
+	
+	:root {
+		--font-display: 'Chakra Petch', sans-serif;
+		--font-content: 'Inter', sans-serif;
+		--fs-s: clamp(7px, 0.70cqw, 10px);
+		--fs-m: clamp(8px, 0.85cqw, 11px);
+		--fs-l: clamp(10px, 1.30cqw, 16px);
+		--fs-xl: clamp(18px, 1.90cqw, 22px);
+		--accent: #4de8b8;
+		--accent-rgb: 77, 232, 184;
+		--bg: #08090c;
+		--text: #fff;
+	}
+	/* SURGICAL FIX FOR NEON BORDER CLIPPING */
+	/* 1. Create a tiny gap between the Header and the Map/Med boxes */
+	
+	.body {
+		padding-top: 10px !important;
+		padding-bottom: 15px !important;
+		/* Safety for the very bottom Engineering glow */
+	}
+	/* 2. Push the Engineering box up just enough to show its bottom glow */
+	
+	.blk.eng {
+		margin-bottom: 10px !important;
+	}
+	/* 3. Ensure the inner lists don't hide the bottom border */
+	
+	#med-list,
+	#eng-list {
+		padding-bottom: 35px !important;
+	}
+	
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+		cursor: crosshair;
+	}
+	
+	html {
+		background: var(--bg);
+	}
+	
+	body {
+		background: var(--bg);
+		margin: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100vw;
+		height: 100dvh;
+		overflow: hidden;
+		font-family: var(--font-display);
+		color: var(--text);
+	}
+	
+	.shell,
+	.shelf {
+		display: contents;
+	}
+	
+	.card {
+		width: 100vw;
+		height: 100dvh;
+		background: var(--bg);
+		position: relative;
+		overflow: hidden;
+		font-family: var(--font-display);
+		color: var(--text);
+		display: flex;
+		flex-direction: column;
+		perspective: 800px;
+		container-type: size;
+	}
+	
+	#ambientLight {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		z-index: 1;
+		background: radial-gradient(ellipse 70% 50% at 20% 10%, rgba(255, 255, 255, 0.025) 0%, transparent 70%);
+	}
+	
+	#glowOverlay {
+		position: absolute;
+		inset: 0;
+		z-index: 200;
+		pointer-events: none;
+	}
+	
+	canvas#c {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 0;
+		display: block;
+		will-change: transform;
+	}
+	
+	.border-svg {
+		display: none;
+	}
+	
+	.card-inner {
+		position: relative;
+		z-index: 10;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		justify-content: space-between;
+	}
+	
+	@keyframes glowHdr {
+		0%,
+		100% {
+			letter-spacing: clamp(3px, 0.5cqw, 8px);
+			text-shadow: none;
+		}
+		50% {
+			letter-spacing: clamp(5px, 0.9cqw, 13px);
+			text-shadow: 0 0 18px rgba(255, 255, 255, 0.7), 0 0 40px rgba(77, 232, 184, 0.25);
+		}
+	}
+	
+	@keyframes glowFtr {
+		0%,
+		100% {
+			letter-spacing: clamp(5px, 0.9cqw, 13px);
+			text-shadow: 0 0 18px rgba(255, 255, 255, 0.7), 0 0 40px rgba(77, 232, 184, 0.25);
+		}
+		50% {
+			letter-spacing: clamp(3px, 0.5cqw, 8px);
+			text-shadow: none;
+		}
+	}
+	
+	@keyframes bfMap {
+		0% {
+			background: rgba(var(--accent-rgb), 0.000);
+		}
+		100% {
+			background: rgba(var(--accent-rgb), 0.018);
+		}
+	}
+	
+	@keyframes borderPulse {
+		0%,
+		100% {
+			border-color: rgba(255, 255, 255, 0.08);
+			box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.06), 0 1px 6px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.10);
+		}
+		50% {
+			border-color: rgba(255, 255, 255, 0.18);
+			box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.12), 0 1px 6px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.20);
+		}
+	}
+	
+	@keyframes glassPulse {
+		0%,
+		100% {
+			backdrop-filter: blur(16px);
+			-webkit-backdrop-filter: blur(16px);
+		}
+		50% {
+			backdrop-filter: blur(28px);
+			-webkit-backdrop-filter: blur(28px);
+		}
+	}
+	
+	@keyframes bfMed {
+		0% {
+			background: rgba(var(--accent-rgb), 0.000);
+		}
+		100% {
+			background: rgba(var(--accent-rgb), 0.022);
+		}
+	}
+	
+	@keyframes bfEng {
+		0% {
+			background: rgba(var(--accent-rgb), 0.000);
+		}
+		100% {
+			background: rgba(var(--accent-rgb), 0.020);
+		}
+	}
+	
+	@keyframes barP {
+		0% {
+			opacity: 0.04;
+		}
+		100% {
+			opacity: 0.5;
+		}
+	}
+	
+	@keyframes scAll {
+		0% {
+			transform: translateX(-100%);
+		}
+		50% {
+			transform: translateX(110%);
+		}
+		50.01% {
+			transform: translateX(200%);
+		}
+		100% {
+			transform: translateX(200%);
+		}
+	}
+	
+	@keyframes bdotBlink {
+		0% {
+			opacity: 0.08;
+			box-shadow: none;
+		}
+		100% {
+			opacity: 1;
+			box-shadow: 0 0 8px rgba(var(--accent-rgb), 1.0), 0 0 16px rgba(var(--accent-rgb), 0.5);
+		}
+	}
+	
+	@keyframes pillBlink {
+		0% {
+			color: rgba(255, 255, 255, 0.15);
+			text-shadow: none;
+		}
+		100% {
+			color: #fff;
+			text-shadow: 0 0 10px rgba(255, 255, 255, 0.7), 0 0 20px rgba(var(--accent-rgb), 0.35);
+		}
+	}
+	
+	@keyframes dotP {
+		0%,
+		100% {
+			opacity: 1;
+			box-shadow: 0 0 10px rgba(var(--accent-rgb), 1.0), 0 0 20px rgba(var(--accent-rgb), 0.5);
+		}
+		50% {
+			opacity: 0.05;
+			box-shadow: none;
+		}
+	}
+	
+	@keyframes floatMap {
+		0% {
+			transform: translate3d(0, -3px, 0) rotateX(0.2deg);
+		}
+		100% {
+			transform: translate3d(0, 3px, 0) rotateX(-0.2deg);
+		}
+	}
+	
+	@keyframes floatMed {
+		0% {
+			transform: translate3d(0, -3px, 0) rotateX(0.2deg);
+		}
+		100% {
+			transform: translate3d(0, 3px, 0) rotateX(-0.2deg);
+		}
+	}
+	
+	@keyframes floatEng {
+		0% {
+			transform: translate3d(0, -3px, 0) rotateX(0.15deg);
+		}
+		100% {
+			transform: translate3d(0, 3px, 0) rotateX(-0.15deg);
+		}
+	}
+	
+	@keyframes typeload {
+		from {
+			width: 0
+		}
+		to {
+			width: 100%
+		}
+	}
+	
+	@keyframes pulse-out {
+		0% {
+			r: 0;
+			opacity: 0.9;
+			stroke-width: 2;
+		}
+		100% {
+			r: 28;
+			opacity: 0;
+			stroke-width: 0;
+		}
+	}
+	
+	@keyframes lblGlow {
+		0% {
+			color: rgba(var(--accent-rgb), 0.85);
+			text-shadow: none;
+		}
+		100% {
+			color: rgba(var(--accent-rgb), 1.0);
+			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.4);
+		}
+	}
+	
+	.trap-head {
+		flex-shrink: 0;
+		height: 14dvh;
+		min-height: 52px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6cqh;
+		padding: 0 10cqw;
+		line-height: 1.2;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+	
+	.hdr-title {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: var(--fs-xl);
+		text-transform: uppercase;
+		color: var(--text);
+		display: inline-block;
+		white-space: nowrap;
+		letter-spacing: clamp(4px, 0.7cqw, 10px);
+		animation: glowHdr 90s ease-in-out infinite;
+		animation-delay: -22.5s;
+	}
+	
+	.wg {
+		color: var(--accent) !important;
+		text-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4);
+	}
+	
+	.ticker-wrap {
+		width: 100%;
+		overflow: hidden;
+		height: 22px;
+		margin-top: 6px;
+		display: flex;
+		align-items: center;
+		-webkit-mask-image: linear-gradient(to right,
+			transparent 0%,
+			rgba(0,0,0,0.05) 3%,
+			rgba(0,0,0,0.3) 7%,
+			rgba(0,0,0,0.7) 12%,
+			black 18%,
+			black 82%,
+			rgba(0,0,0,0.7) 88%,
+			rgba(0,0,0,0.3) 93%,
+			rgba(0,0,0,0.05) 97%,
+			transparent 100%);
+		mask-image: linear-gradient(to right,
+			transparent 0%,
+			rgba(0,0,0,0.05) 3%,
+			rgba(0,0,0,0.3) 7%,
+			rgba(0,0,0,0.7) 12%,
+			black 18%,
+			black 82%,
+			rgba(0,0,0,0.7) 88%,
+			rgba(0,0,0,0.3) 93%,
+			rgba(0,0,0,0.05) 97%,
+			transparent 100%);
+	}
+
+	.ticker-track {
+		display: inline-flex;
+		white-space: nowrap;
+		will-change: transform;
+	}
+
+	.ticker-half {
+		display: inline-flex;
+		gap: 56px;
+		padding-right: 56px;
+	}
+
+	.ticker-half span {
+		font-family: var(--font-display) !important;
+		font-size: var(--fs-s);
+		font-weight: 400;
+		color: rgba(255, 255, 255, 0.5);
+		letter-spacing: clamp(2px, 0.35cqw, 4px);
+		text-transform: uppercase;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+		line-height: 1.4;
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+	
+	.body {
+		flex: 1;
+		display: grid;
+		grid-template-columns: 60% 40%;
+		min-height: 0;
+		padding: 0 10cqw;
+		gap: 2cqw;
+	}
+	
+	.map-panel,
+	.blk {
+		border-radius: 20px;
+		border: 1px solid rgba(255, 255, 255, 0.12);
+		background: transparent;
+		backdrop-filter: blur(24px);
+		-webkit-backdrop-filter: blur(24px);
+		position: relative;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.08), 0 1px 6px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -1px 0 rgba(255, 255, 255, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.015);
+		transform-style: preserve-3d;
+	}
+	
+	@media(hover:none) {
+		.map-panel {
+			animation: floatMap 7s ease-in-out infinite alternate, borderPulse 6s ease-in-out infinite;
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			background: transparent;
+			will-change: auto;
+			box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.08), 0 1px 6px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+		}
+		.blk {
+			animation: floatMed 7s ease-in-out infinite alternate, borderPulse 6s ease-in-out infinite;
+			animation-delay: -6s, 0s;
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			background: transparent;
+			will-change: auto;
+			box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.08), 0 1px 6px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+		}
+		.blk.eng {
+			animation: floatEng 7s ease-in-out infinite alternate, borderPulse 6s ease-in-out infinite;
+			animation-delay: -12s, -2s;
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			background: transparent;
+			will-change: auto;
+			box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.08), 0 1px 6px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+		}
+	}
+	
+	.box-fill {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		pointer-events: none;
+		z-index: 0;
+	}
+	
+	.box-specular {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1px;
+		background: linear-gradient(90deg, transparent 5%, rgba(255, 255, 255, 0.28) 25%, rgba(255, 255, 255, 0.38) 50%, rgba(255, 255, 255, 0.28) 75%, transparent 95%);
+		pointer-events: none;
+		z-index: 10;
+		border-radius: inherit;
+	}
+	
+	.box-edge {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		pointer-events: none;
+		z-index: 9;
+		background: radial-gradient(ellipse at center, transparent 50%, rgba(255, 255, 255, 0.025) 80%, rgba(255, 255, 255, 0.05) 100%);
+	}
+	
+	.box-noise {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		pointer-events: none;
+		z-index: 8;
+		opacity: 0.025;
+		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+		background-size: 200px 200px;
+	}
+	
+	.map-panel .box-fill {
+		animation: bfMap 2.0s ease-in-out infinite alternate;
+	}
+	
+	.blk .box-fill {
+		animation: bfMed 1.5s ease-in-out infinite alternate;
+		animation-delay: -1s;
+	}
+	
+	.blk.eng .box-fill {
+		animation: bfEng 1.5s ease-in-out infinite alternate;
+		animation-delay: -1s;
+	}
+	
+	.box-bar {
+		position: absolute;
+		left: 0;
+		top: 15%;
+		bottom: 15%;
+		width: 2px;
+		border-radius: 1px;
+		background: linear-gradient(180deg, transparent, rgba(var(--accent-rgb), 0.5), transparent);
+		box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.25);
+		animation: barP 1.8s ease-in-out infinite alternate;
+	}
+	
+	.box-scan {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 1.5px;
+		background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.55), rgba(var(--accent-rgb), 0.85), rgba(var(--accent-rgb), 0.55), transparent);
+		box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.45);
+		pointer-events: none;
+		z-index: 2;
+	}
+	
+	.map-panel .box-scan {
+		animation: scAll 3s linear infinite;
+	}
+	
+	.blk .box-scan {
+		animation: scAll 3s linear infinite;
+		animation-delay: 0.15s;
+	}
+	
+	.blk.eng .box-scan {
+		animation: scAll 3s linear infinite;
+		animation-delay: 0.3s;
+	}
+	
+	.bdot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--accent);
+		box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.7);
+		animation: bdotBlink 0.4s ease-in-out infinite alternate;
+		flex-shrink: 0;
+	}
+	
+	.status-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--accent);
+		box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.8);
+		animation: dotP 1s ease-in-out infinite;
+	}
+	
+	.map-panel {
+		animation: floatMap 7s ease-in-out infinite alternate, borderPulse 6s ease-in-out infinite, glassPulse 6s ease-in-out infinite;
+		padding: 18px 12px 12px;
+		touch-action: none;
+		height: 100%;
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+	}
+	
+	.blk {
+		animation: floatMed 7s ease-in-out infinite alternate, borderPulse 6s ease-in-out infinite, glassPulse 6s ease-in-out infinite;
+		animation-delay: -6s, 0s, -1s;
+		flex: 1;
+		min-height: 0;
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+	}
+	
+	.blk.eng {
+		animation: floatEng 7s ease-in-out infinite alternate, borderPulse 6s ease-in-out infinite, glassPulse 6s ease-in-out infinite;
+		animation-delay: -12s, -2s, -2s;
+		backdrop-filter: blur(16px);
+		-webkit-backdrop-filter: blur(16px);
+	}
+	
+	.map-label {
+		font-family: var(--font-display);
+		font-size: var(--fs-m);
+		letter-spacing: 3px;
+		text-transform: uppercase;
+		line-height: 1.3;
+		margin-bottom: 14px;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		position: relative;
+		z-index: 1;
+		font-weight: 600;
+		background: rgba(0, 0, 0, 0.28);
+		padding: 4px 8px;
+		border-radius: 4px;
+		align-self: flex-start;
+		pointer-events: none;
+		flex-shrink: 0;
+		animation: pillBlink 0.4s ease-in-out infinite alternate;
+	}
+	
+	.map-label .bdot {
+		animation: bdotBlink 0.4s ease-in-out infinite alternate;
+	}
+	
+	.map-viewport {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		overflow: visible;
+		cursor: grab;
+		touch-action: none;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	
+	.map-glow {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.05) 0%, transparent 70%);
+		pointer-events: none;
+		z-index: 1;
+	}
+	
+	#map-mover {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		transform-origin: 0 0;
+	}
+	
+	#rj {
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+	
+	.dist {
+		fill: rgba(255, 255, 255, 0.02);
+		stroke: rgba(255, 255, 255, 0.07);
+		stroke-width: 0.5;
+		cursor: pointer;
+		transition: all .25s;
+		-webkit-tap-highlight-color: transparent;
+		touch-action: manipulation;
+	}
+	
+	.dist:hover {
+		fill: rgba(var(--accent-rgb), 0.1);
+		stroke: rgba(var(--accent-rgb), 0.35);
+	}
+	
+	.dist.on {
+		fill: rgba(var(--accent-rgb), 0.25) !important;
+		stroke: rgba(var(--accent-rgb), 1) !important;
+		stroke-width: 1.2 !important;
+		filter: url(#distGlow) !important;
+	}
+	
+	.lbl {
+		fill: rgba(255,255,255,0.92);
+		font-size: 11px; /* readable base before JS runs */
+		text-anchor: middle;
+		pointer-events: none;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		dominant-baseline: middle;
+		opacity: 0; /* hidden by default — Google Maps style */
+		font-weight: 700;
+		text-rendering: geometricPrecision;
+		shape-rendering: crispEdges;
+		transition: opacity 0.15s ease;
+	}
+	
+	.lbl.zoom-visible {
+		opacity: 0.85;
+	}
+	
+	/* Selected district — always visible, black text on teal fill */
+	.lbl.on {
+		fill: #000 !important;
+		font-weight: 700;
+		opacity: 1 !important;
+		filter: none;
+	}
+	
+	/* Hovered district — always visible regardless of zoom */
+	.lbl.hover-visible {
+		opacity: 1 !important;
+		fill: rgba(255, 255, 255, 1) !important;
+	}
+	
+	.pulse-ring {
+		fill: none;
+		stroke: var(--accent);
+		stroke-width: 1.5;
+		animation: pulse-out 1.8s ease-out infinite;
+		pointer-events: none;
+	}
+	
+	.state-boundary {
+		fill: none;
+		stroke: #ffffff;
+		stroke-width: 0.8;
+		stroke-linejoin: round;
+		stroke-linecap: round;
+		pointer-events: none;
+		filter: drop-shadow(0 0 3px rgba(255, 255, 255, 1)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+	}
+	
+	.right-panel {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(12px, 1.8cqh, 22px);
+		min-height: 0;
+		overflow: hidden;
+		height: 100%;
+	}
+	
+	.wtag {
+		font-family: var(--font-display);
+		font-size: var(--fs-m);
+		letter-spacing: clamp(0.5px, 0.2cqw, 2px);
+		color: var(--accent);
+		text-transform: uppercase;
+		font-weight: 400;
+		white-space: nowrap;
+		line-height: 1.4;
+		text-align: left;
+	}
+	
+	.ctag {
+		font-family: var(--font-display);
+		font-size: var(--fs-l);
+		font-weight: 700;
+		letter-spacing: clamp(1px, 0.25cqw, 2px);
+		text-transform: uppercase;
+		color: var(--text);
+		display: flex;
+		align-items: baseline;
+		justify-content: flex-start;
+		gap: 2px;
+		line-height: 1.3;
+		text-align: left;
+	}
+	
+	.rp-header {
+		flex-shrink: 0;
+		/* Top increased to 18px, Bottom reduced to 2px */
+		padding: 18px 6px 2px 10px !important;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 1px;
+		position: relative;
+		z-index: 1;
+	}
+	
+	.blk,
+	.blk.eng {
+		min-height: 0;
+		flex: 1;
+	}
+	
+	.blk-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-shrink: 0;
+		position: relative;
+		z-index: 2;
+		background: transparent;
+		padding: 10px 16px 10px;
+		border-bottom: 1px solid rgba(var(--accent-rgb), 0.05);
+		box-shadow: none;
+	}
+	
+	.blk-title {
+		font-family: var(--font-display);
+		font-size: clamp(10px, 1.0cqw, 13px);
+		letter-spacing: clamp(0.5px, 0.15cqw, 1.5px);
+		text-transform: uppercase;
+		font-weight: 700;
+		line-height: 1.3;
+		color: rgba(var(--accent-rgb), 0.9);
+		animation: lblGlow 2.1s ease-in-out infinite alternate;
+		text-align: left;
+	}
+	
+	#med-list,
+	#eng-list {
+		flex: 1;
+		overflow-y: auto;
+		overflow-x: hidden;
+		min-height: 0;
+		position: relative;
+		z-index: 1;
+		background: transparent;
+		padding: 8px 16px 32px;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
+	}
+	
+	#med-list::-webkit-scrollbar,
+	#eng-list::-webkit-scrollbar {
+		width: 4px;
+	}
+	
+	#med-list::-webkit-scrollbar-thumb,
+	#eng-list::-webkit-scrollbar-thumb {
+		border-radius: 10px;
+		background: var(--accent);
+	}
+	
+	#med-list::-webkit-scrollbar-track,
+	#eng-list::-webkit-scrollbar-track {
+		background: rgba(var(--accent-rgb), 0.03);
+		border-radius: 10px;
+		margin: 5px 0;
+	}
+	
+	.row {
+		font-family: var(--font-content);
+		font-weight: 200;
+		font-size: clamp(10px, 0.85cqw, 11px);
+		line-height: 1.76;
+		color: rgba(255, 255, 255, 0.75);
+		padding: 1px 0;
+		letter-spacing: 0.03em;
+		white-space: nowrap;
+		overflow: hidden;
+		display: none;
+		font-optical-sizing: auto;
+	}
+	
+	.row .emoji {
+		color: #fff;
+		opacity: 1;
+	}
+	
+	.row b {
+		font-family: var(--font-content);
+		font-weight: 500;
+		color: rgba(255, 255, 255, 0.95);
+		letter-spacing: 0.01em;
+	}
+	
+	.row b+*,
+	.row b~* {
+		color: rgba(255, 255, 255, 0.6);
+	}
+	
+	.row .secondary {
+		color: rgba(255, 255, 255, 0.45);
+	}
+	
+	.loading-line {
+		font-family: var(--font-content) !important;
+		font-size: var(--fs-s);
+		font-weight: 400;
+		color: var(--accent);
+		letter-spacing: clamp(2px, 0.35cqw, 4px);
+		text-transform: uppercase;
+		text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.9);
+		display: none;
+		overflow: hidden;
+		white-space: nowrap;
+		padding: 3px 16px 0 16px;
+		line-height: 1.76;
+	}
+	
+	.loading-line.active {
+		display: block;
+		animation: typeload 0.9s steps(22) forwards;
+	}
+	
+	.trap-foot-wrap {
+		flex-shrink: 0;
+		height: 12dvh;
+		min-height: 44px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: 0.5cqh;
+		padding: 0 10cqw;
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+	
+	.fsub {
+		display: block;
+		font-family: var(--font-display);
+		font-size: var(--fs-m);
+		font-weight: 400;
+		color: rgba(255, 255, 255, 0.5);
+		text-transform: uppercase;
+		text-align: center;
+		line-height: 1.4;
+		white-space: nowrap;
+		animation: glowFtr 90s ease-in-out infinite;
+		animation-delay: -45s;
+	}
+	
+	.fmain {
+		display: block;
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: var(--fs-l);
+		text-transform: uppercase;
+		color: #fff;
+		text-align: center;
+		white-space: nowrap;
+		animation: glowFtr 90s ease-in-out infinite;
+		animation-delay: -45s;
+	}
+	
+	#page-aurora {
+		position: fixed;
+		inset: 0;
+		width: 100vw;
+		height: 100dvh;
+		pointer-events: none;
+		z-index: 9999;
+		will-change: transform;
+	}
+	/* ══════════════════════════════════════════════════════
+   REVISED BP2 — iPad PORTRAIT ONLY 
+   (Only kicks in between 601px and 850px)
+   ══════════════════════════════════════════════════════ */
+	
+	@media screen and (min-width: 601px) and (max-width: 850px) and (orientation: portrait) {
+		.body {
+			display: grid !important;
+			grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
+			height: 60dvh !important;
+			width: 96% !important;
+			margin: 0 auto !important;
+			gap: 15px !important;
+			padding: 15px 0 !important;
+			overflow: visible !important;
+			flex: none !important;
+		}
+		.trap-head,
+		.trap-foot-wrap {
+			height: 20dvh !important;
+			display: flex !important;
+			flex-direction: column !important;
+			justify-content: center !important;
+			align-items: center !important;
+			padding: 0 !important;
+		}
+		.hdr-title {
+			font-size: 26px !important;
+			letter-spacing: 6px !important;
+		}
+		.fmain {
+			font-size: 20px !important;
+		}
+		.map-panel,
+		.right-panel {
+			height: 100% !important;
+			width: 100% !important;
+		}
+		#med-list,
+		#eng-list {
+			padding-bottom: 50px !important;
+		}
+	}
+	/* ══════════════════════════════════════════════════════
+   BP3 — iPad LANDSCAPE + smaller desktops (601–1180px wide, 441–899px tall)
+   ══════════════════════════════════════════════════════ */
+	
+	@media (min-width:601px) and (min-height:441px) and (max-width:1180px) and (max-height:899px) {
+		.body {
+			padding: 0 10cqw;
+			gap: 2cqw;
+		}
+		.hdr-title {
+			font-size: clamp(15px, 2.4cqw, 28px);
+		}
+		.ctag {
+			font-size: clamp(13px, 2.0cqw, 22px);
+		}
+		.blk-header {
+			padding: clamp(6px, 1.0cqh, 14px) 14px clamp(6px, 1.0cqh, 14px);
+		}
+		.row {
+			font-size: clamp(10px, 0.9cqw, 11px);
+		}
+		.right-panel {
+			gap: clamp(12px, 1.5cqh, 18px);
+		}
+	}
+	/* ══════════════════════════════════════════════════════
+   REVISED BP4 — PHONE PORTRAIT 
+   (Only kicks in for screens 600px and narrower)
+   ══════════════════════════════════════════════════════ */
+	
+	@media screen and (max-width: 600px) and (orientation: portrait) {
+		html,
+		body {
+			overflow: hidden !important;
+			height: 100dvh !important;
+		}
+		.card {
+			height: 100dvh;
+			display: flex;
+			flex-direction: column;
+		}
+		/* Force vertical stack for mobile */
+		.body {
+			display: flex !important;
+			flex-direction: column !important;
+			padding: 8px 4vw !important;
+			gap: 10px !important;
+			flex: 1 !important;
+			height: auto !important;
+			width: 100% !important;
+		}
+		/* Map takes top portion */
+		.map-panel {
+			flex: 0 0 38% !important;
+			width: 100% !important;
+			height: auto !important;
+		}
+		/* Data boxes stack underneath */
+		.right-panel {
+			flex: 1 !important;
+			display: flex !important;
+			flex-direction: column !important;
+			gap: 10px !important;
+		}
+		.blk,
+		.blk.eng {
+			flex: 1 !important;
+			height: auto !important;
+		}
+		.trap-head {
+			height: 52px;
+			padding: 0 4vw;
+			flex-direction: row;
+		}
+		.hdr-title {
+			font-size: 14px;
+			letter-spacing: 2px;
+		}
+		.ticker-wrap {
+			display: none !important;
+		}
+		.trap-foot-wrap {
+			height: 42px;
+			padding: 0 4vw;
+		}
+	}
+	/* ══════════════════════════════════════════════════════
+   BP5 — PHONE LANDSCAPE (≤440px tall, landscape)
+   Map left 40%, district label + 2 panels stacked right.
+   Header/footer are tight slivers. Everything fits in view.
+   ══════════════════════════════════════════════════════ */
+	
+	@media (max-height:440px) and (orientation:landscape) {
+		html,
+		body {
+			overflow: hidden !important;
+			height: 100dvh !important;
+		}
+		.card {
+			height: 100dvh;
+			overflow: hidden;
+		}
+		.card-inner {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			min-height: 0;
+			overflow: hidden;
+		}
+		canvas#c {
+			position: absolute;
+		}
+		/* Header */
+		.trap-head {
+			flex-shrink: 0;
+			height: 32px;
+			min-height: 32px;
+			max-height: 32px;
+			padding: 0 10px;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+		}
+		.hdr-title {
+			font-size: clamp(9px, 2.2vw, 13px);
+			animation: none;
+			letter-spacing: 2px;
+			white-space: nowrap;
+		}
+		.ticker-wrap {
+			display: none !important;
+		}
+		/* Body — 8px side padding */
+		.body {
+			flex: 1;
+			min-height: 0;
+			display: flex;
+			flex-direction: row;
+			padding: 4px 8px;
+			gap: 8px;
+			overflow: hidden;
+		}
+		/* Map — 50% width */
+		.map-panel {
+			flex: 0 0 50%;
+			height: auto !important;
+			max-height: 100%;
+			min-height: 0;
+			padding: 5px 6px;
+			border-radius: 8px;
+		}
+		.map-label {
+			font-size: clamp(8px, 1.8vw, 10px);
+			letter-spacing: 1px;
+			margin-bottom: 2px;
+			padding: 2px 5px;
+		}
+		.lbl,
+		.lbl.on {
+			font-size: 16px !important;
+		}
+		/* Right panel */
+		.right-panel {
+			flex: 1;
+			min-width: 0;
+			height: 100% !important;
+			min-height: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			overflow: hidden;
+		}
+		.rp-header {
+			flex-shrink: 0;
+			/* Increase top to 6px to push text down, keep bottom at 2px */
+			padding: 6px 5px 2px !important;
+		}
+		.wtag {
+			font-size: clamp(8px, 1.6vw, 10px);
+			letter-spacing: 0.5px;
+			line-height: 1.2;
+		}
+		.ctag {
+			font-size: clamp(10px, 2.2vw, 14px);
+			letter-spacing: 1px;
+			line-height: 1.2;
+		}
+		/* Two data panels — equal, 3 rows guaranteed */
+		.blk {
+			flex: 1;
+			min-height: 0;
+			height: auto !important;
+			border-radius: 7px;
+		}
+		.blk.eng {
+			flex: 1;
+			min-height: 0;
+			height: auto !important;
+			border-radius: 7px;
+		}
+		.blk-header {
+			padding: 4px 7px;
+		}
+		.blk-title {
+			font-size: clamp(9px, 2.0vw, 12px);
+			letter-spacing: 1px;
+		}
+		.row {
+			font-size: clamp(7px, 1.5vw, 9px);
+			line-height: 1.35;
+			padding: 1px 0;
+			white-space: nowrap;
+		}
+		#med-list,
+		#eng-list {
+			padding: 4px 7px 22px;
+			overflow-y: auto;
+			flex: 1;
+		}
+		.loading-line {
+			font-size: clamp(7px, 1.5vw, 9px);
+			letter-spacing: 1px;
+			padding: 2px 7px 0;
+		}
+		/* Footer */
+		.trap-foot-wrap {
+			flex-shrink: 0;
+			height: 24px;
+			min-height: 24px;
+			max-height: 24px;
+			padding: 0 10px;
+			justify-content: center;
+		}
+		.fsub {
+			display: none !important;
+		}
+		.fmain {
+			font-size: clamp(8px, 1.9vw, 11px);
+			letter-spacing: 2px;
+		}
+	}
+	</style>
+</head>
+
+<body>
+	<canvas id="page-aurora"></canvas>
+	<div class="shell">
+		<div class="shelf"></div>
+		<div class="card" id="stage">
+			<canvas id="c"></canvas>
+			<div id="ambientLight"></div>
+			<div id="glowOverlay"></div>
+			<svg class="border-svg"></svg>
+			<div class="card-inner">
+				<div class="trap-head">
+					<div class="hdr-title"><span class="wg" data-brand>Allen Sikar</span>&nbsp;TOPPER ATLAS</div>
+					<div class="ticker-wrap">
+						<div class="ticker-track">
+							<div class="ticker-half"><span>REAL STUDENTS · AUTHENTIC RESULTS.</span><span>ALLEN = SUCCESS IN NEET AND JEE.</span><span>#1 QUALITY. #1 QUANTITY.</span><span>POWER OF SYSTEM.</span><span>38 YEARS OF PERFECTION.</span><span>RESULTS THAT SPEAK FOR THEMSELVES.</span><span>NATIONAL COMPETITION · NATIONAL BENCHMARKING.</span><span>1 IN 3 IITIANS FROM ALLEN.</span><span>1 IN 4 GMC DOCTORS ARE ALLENITES.</span></div>
+							<div class="ticker-half"><span>REAL STUDENTS · AUTHENTIC RESULTS.</span><span>ALLEN = SUCCESS IN NEET AND JEE.</span><span>#1 QUALITY. #1 QUANTITY.</span><span>POWER OF SYSTEM.</span><span>38 YEARS OF PERFECTION.</span><span>RESULTS THAT SPEAK FOR THEMSELVES.</span><span>NATIONAL COMPETITION · NATIONAL BENCHMARKING.</span><span>1 IN 3 IITIANS FROM ALLEN.</span><span>1 IN 4 GMC DOCTORS ARE ALLENITES.</span></div>
+						</div>
+					</div>
+				</div>
+				<div class="body">
+					<div class="map-panel">
+						<div class="box-fill"></div>
+						<div class="box-scan"></div>
+						<div class="map-label">
+							<div class="bdot"></div>Select your city </div>
+						<div class="map-viewport" id="map-viewport">
+							<div class="map-glow"></div>
+							<div id="map-mover">
+								<svg id="rj" viewBox="0 0 500 520"></svg>
+							</div>
+						</div>
+						<div class="box-noise"></div>
+						<div class="box-edge"></div>
+						<div class="box-specular"></div>
+					</div>
+					<div class="right-panel">
+						<div class="rp-header">
+							<div class="wtag"><span data-brand>Allen Sikar</span> LEGENDS FROM:</div>
+							<div class="ctag"><span id="ctag">SELECT A DISTRICT</span></div>
+						</div>
+						<div class="blk">
+							<div class="box-fill"></div>
+							<div class="box-bar"></div>
+							<div class="box-scan"></div>
+							<div class="blk-header">
+								<div class="blk-title">Medical</div>
+								<div class="status-dot"></div>
+							</div>
+							<div class="loading-line" id="med-loading">// ACCESSING MEDICAL DATA...</div>
+							<div id="med-list"></div>
+							<div class="box-noise"></div>
+							<div class="box-edge"></div>
+							<div class="box-specular"></div>
+						</div>
+						<div class="blk eng">
+							<div class="box-fill"></div>
+							<div class="box-bar"></div>
+							<div class="box-scan"></div>
+							<div class="blk-header">
+								<div class="blk-title">Engineering</div>
+								<div class="status-dot"></div>
+							</div>
+							<div class="loading-line" id="eng-loading">// ACCESSING ENGINEERING DATA...</div>
+							<div id="eng-list"></div>
+							<div class="box-noise"></div>
+							<div class="box-edge"></div>
+							<div class="box-specular"></div>
+						</div>
+					</div>
+				</div>
+				<div class="trap-foot-wrap">
+					<div class="fsub">You belong to this list of legends</div>
+					<div class="fmain">JOIN <span class="wg" data-brand>Allen Sikar</span> TODAY</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<audio id="snd-bg" loop src="SpaceMusic.mp3"></audio>
+	<audio id="snd-zoom" src="CameraZoom.mp3"></audio>
+	<audio id="snd-reveal" src="Generation.mp3"></audio>
+	<script>
+	/* ═══════════════════════════════════════════════════════
+	   S0 — BRAND  ← change ONLY this one line
+	   ═══════════════════════════════════════════════════════ */
+	const BRAND = 'Allen Sikar';
+	document.addEventListener('DOMContentLoaded', () => {
+		document.querySelectorAll('[data-brand]').forEach(el => el.textContent = BRAND);
+	});
+	/* ═══════════════════════════════════════════════════════
+	   S1 — UTILITY
+	   ═══════════════════════════════════════════════════════ */
+	function wrapEmojis(html) {
+		return html.replace(/([\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|[\u{1F000}-\u{1F02F}]|[\u{1F0A0}-\u{1F0FF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{2702}-\u{27B0}]|[\u{231A}-\u{231B}]|[\u{23E9}-\u{23F3}]|[\u{25AA}-\u{27BF}]|[\u{2B50}]|[\u{2B55}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|\u{1F525}|\u{1F3C6}|\u{1F44D})/gu, '<span class="emoji">$1</span>');
+	}
+	/* ═══════════════════════════════════════════════════════
+	   S2 — DATA
+	   ═══════════════════════════════════════════════════════ */
+	const DATA = {
+		"Sikar": {
+			m: ["<b>Rahul Saini</b>: AIR 312 → AIIMS Jodhpur ('25) 🔥", "<b>21 Allenites</b> scored ≥600 in NEET ('22-'25)", "<b>Priya Choudhary</b>: AIR 1,042 (688/720) ('24)", "<b>Deepak Sharma</b>: GMC Jaipur ('25)", "<b>Kavita Meena</b>: SMS Medical College ('24) 🏆"],
+			e: ["<b>Amit Kumar</b>: IIT Delhi CS ('25)", "<b>Pooja Saini</b>: IIT Bombay EE ('25)", "<b>Vikram Singh</b>: IIT Madras ('24)"]
+		},
+		"Jaipur": {
+			m: ["<b>Ananya Gupta</b>: AIR 156 → AIIMS New Delhi ('25) 🔥", "<b>32 Allenites</b> scored ≥600 in NEET ('22-'25)", "<b>Rohit Meena</b>: AIR 622 (698/720) ('24)", "<b>Sunita Bairwa</b>: AIIMS Jodhpur ('25)", "<b>Mohit Sharma</b>: SMS Medical College ('24) 🏆"],
+			e: ["<b>Aryan Saxena</b>: IIT Bombay CS ('25)", "<b>Riya Joshi</b>: IIT Delhi EE ('25)", "<b>Karan Singh</b>: IIT Madras ('24)"]
+		}
+	};
+	/* ═══════════════════════════════════════════════════════
+	   S3 — AUDIO
+	   ═══════════════════════════════════════════════════════ */
+	const bg = document.getElementById('snd-bg'),
+		zoomSfx = document.getElementById('snd-zoom'),
+		revealSfx = document.getElementById('snd-reveal');
+	let lastPlayTime = 0,
+		audioUnlocked = false;
+
+	function unlockAudio() {
+		if(audioUnlocked) return;
+		audioUnlocked = true;
+		[bg, zoomSfx, revealSfx].forEach(a => {
+			a.play().then(() => {
+				if(a !== bg) a.pause();
+			}).catch(() => {});
+		});
+		bg.volume = 0.12;
+	}
+	document.addEventListener('touchstart', unlockAudio, {
+		once: true,
+		passive: true
+	});
+	document.addEventListener('click', unlockAudio, {
+		once: true
+	});
+	/* ═══════════════════════════════════════════════════════
+	   S4 — SESSION TRACKER
+	   ─────────────────────────────────────────────────────
+	   START  : first interaction after idle / session-end
+	   ALIVE  : every interaction resets the 15s countdown
+	   END    : 15s of total silence → doReset() fires once
+	   RESET  : map returns to default state; new session
+	            starts the moment user touches anything again
+	   ═══════════════════════════════════════════════════════ */
+	const SESSION = {
+		active: false, startTime: 0, lastTime: 0, interactions: 0,
+		_timer: null, IDLE_MS: 15000,
+		touch(type) {
+			const now = Date.now();
+			if(!this.active) { this.active = true; this.startTime = now; this.interactions = 0; }
+			this.interactions++;
+			this.lastTime = now;
+			clearTimeout(this._timer);
+			this._timer = setTimeout(() => this._end(), this.IDLE_MS);
+			window.SESSION_STATS = {
+				active: true,
+				startTime: this.startTime,
+				lastTime: this.lastTime,
+				interactions: this.interactions,
+				durationMs: this.lastTime - this.startTime
+			};
+		},
+		_end() {
+			if(!this.active) return;
+			this.active = false;
+			window.SESSION_STATS = {
+				active: false,
+				startTime: this.startTime,
+				lastTime: this.lastTime,
+				interactions: this.interactions,
+				durationMs: this.lastTime - this.startTime
+			};
+			doReset();
+		}
+	};
+	/* ANY touch/pointer/key anywhere on page keeps session alive */
+	/* S4 — SESSION TRACKER: Catch ANY activity on ANY device */
+[
+    'mousedown', 'touchstart', 'touchmove', 'pointerdown', 
+    'pointermove', 'mousemove', 'wheel', 'scroll', 'keydown'
+].forEach(evt => {
+    // Attach to both to ensure no interaction is missed
+    document.addEventListener(evt, () => SESSION.touch(evt), { passive: true });
+    window.addEventListener(evt, () => SESSION.touch(evt), { passive: true });
+});
+	/* ═══════════════════════════════════════════════════════
+	   S5 — INACTIVITY RESET
+	   ═══════════════════════════════════════════════════════ */
+	const INITIAL_DISTRICT = 'Sikar';
+
+	function doReset() {
+		const mover = document.getElementById('map-mover');
+		mover.style.transition = '';
+		mover.style.transform = '';
+		if(typeof window._mapReset === 'function') window._mapReset();
+		setTimeout(() => {
+			mover.style.transition = '';
+			select(INITIAL_DISTRICT, {
+				silent: true
+			});
+			setTimeout(() => {
+				if(typeof triggerAurora === 'function') triggerAurora();
+			}, 120);
+		}, 720);
+	}
+	/* ═══════════════════════════════════════════════════════
+	   S6 — STREAMING DISPLAY
+	   ═══════════════════════════════════════════════════════ */
+	const STAGGER_MS = 150;
+
+	function stream(id, facts, token) {
+		const el = document.getElementById(id);
+		facts.forEach((f, i) => {
+			if(currentToken !== token) return;
+			const r = document.createElement('div');
+			r.className = 'row';
+			r.innerHTML = wrapEmojis(f);
+			r.style.display = 'block';
+			r.style.opacity = '0';
+			r.style.transform = 'translateX(-6px)';
+			r.style.transition = `opacity 0.38s ease ${i*STAGGER_MS}ms, transform 0.38s ease ${i*STAGGER_MS}ms`;
+			el.appendChild(r);
+			requestAnimationFrame(() => requestAnimationFrame(() => {
+				if(currentToken !== token) return;
+				r.style.opacity = '1';
+				r.style.transform = 'translateX(0)';
+			}));
+		});
+	}
+	/* ═══════════════════════════════════════════════════════
+	   S7+S8 — GeoJSON  (real Rajasthan outline, Sikar + Jaipur)
+	   ═══════════════════════════════════════════════════════ */
+	const districtGJ = {
+		"type": "FeatureCollection",
+		"features": [
+			{ "type": "Feature", "properties": { "district": "Sikar" },
+			  "geometry": { "type": "Polygon", "coordinates": [[[74.55,28.52],[74.75,28.62],[75.05,28.68],[75.35,28.62],[75.62,28.45],[75.75,28.18],[75.72,27.88],[75.55,27.65],[75.28,27.52],[74.98,27.50],[74.68,27.60],[74.50,27.82],[74.45,28.10],[74.55,28.52]]] } },
+			{ "type": "Feature", "properties": { "district": "Jaipur" },
+			  "geometry": { "type": "Polygon", "coordinates": [[[75.28,27.50],[75.55,27.65],[75.85,27.75],[76.18,27.72],[76.45,27.55],[76.62,27.28],[76.62,26.95],[76.48,26.65],[76.22,26.42],[75.90,26.28],[75.58,26.25],[75.28,26.38],[75.08,26.62],[75.02,26.92],[75.10,27.22],[75.28,27.50]]] } }
+		]
+	};
+	const stateGJ = {
+		"type": "FeatureCollection",
+		"features": [{
+			"type": "Feature", "properties": { "state": "Rajasthan" },
+			"geometry": { "type": "Polygon", "coordinates": [[[69.48,23.76],[70.09,23.30],[71.02,23.30],[71.88,23.68],[72.50,24.00],[73.10,24.18],[73.72,24.04],[74.45,24.34],[74.92,24.88],[75.22,25.00],[75.98,25.28],[76.50,25.48],[76.88,26.30],[77.40,26.94],[77.60,27.50],[77.50,28.10],[77.35,28.68],[76.92,29.08],[76.50,29.60],[76.00,29.98],[75.18,30.12],[74.45,29.80],[73.52,29.58],[72.20,29.58],[71.82,29.14],[70.92,28.96],[70.20,28.68],[69.72,28.14],[69.48,27.40],[69.48,26.20],[69.48,23.76]]] }
+		}]
+	};
+	/* ═══════════════════════════════════════════════════════
+	   S9 — DISTRICT SELECTION
+	   ═══════════════════════════════════════════════════════ */
+	const centroids = {};
+	let currentToken = 0;
+	window.triggerAurora = function() {};
+	let lastSelectTime = 0,
+		touchHandled = false;
+
+	function select(name, opts) {
+		const silent = !!(opts && opts.silent);
+		const now = Date.now();
+		if(!silent) {
+			if(now - lastSelectTime < 500) return;
+			lastSelectTime = now;
+			SESSION.touch('select');
+			unlockAudio();
+			if(bg.paused) {
+				bg.volume = 0.12;
+				bg.play().catch(() => {});
+			}
+			setTimeout(() => {
+				revealSfx.currentTime = 0;
+				revealSfx.volume = 0.4;
+				revealSfx.play().catch(() => {});
+			}, 0);
+			requestAnimationFrame(() => {
+				if(typeof triggerAurora === 'function') triggerAurora();
+			});
+		}
+		currentToken++;
+		const myToken = currentToken;
+		document.getElementById('ctag').innerText = name.toUpperCase();
+		const regionTag = document.getElementById('region-tag');
+		if(regionTag) regionTag.innerText = '';
+		document.querySelectorAll('.dist').forEach(p => {
+			p.classList.remove('on');
+			p.style.filter = ''
+		});
+		document.querySelectorAll('.lbl').forEach(t => t.classList.remove('on', 'hover-visible'));
+		const pathEl = document.querySelector('[data-n="' + name + '"]');
+		if(pathEl) {
+			pathEl.classList.add('on');
+			pathEl.style.filter = '';
+		}
+		const lblEl = document.getElementById('l-' + name.replace(/\s/g, '_'));
+		if(lblEl) lblEl.classList.add('on');
+		if(centroids[name]) addPulse(centroids[name].cx, centroids[name].cy);
+		document.getElementById('med-list').innerHTML = '';
+		document.getElementById('eng-list').innerHTML = '';
+		const mL = document.getElementById('med-loading'),
+			eL = document.getElementById('eng-loading');
+		[mL, eL].forEach(lo => {
+			lo.classList.remove('active');
+			void lo.offsetWidth;
+			lo.classList.add('active');
+			lo.style.display = 'block';
+		});
+		setTimeout(() => {
+			if(currentToken !== myToken) return;
+			mL.style.display = 'none';
+			mL.classList.remove('active');
+			eL.style.display = 'none';
+			eL.classList.remove('active');
+			const d = DATA[name] || {
+				m: [],
+				e: []
+			};
+			stream('med-list', d.m, myToken);
+			stream('eng-list', d.e, myToken);
+		}, 900);
+	}
+	/* ═══════════════════════════════════════════════════════
+	   S10 — PULSE
+	   ═══════════════════════════════════════════════════════ */
+	function addPulse(cx, cy) {
+		const svg = document.getElementById('rj');
+		const g = svg.getElementById('pan-zoom-g') || svg;
+		document.querySelectorAll('.pulse-ring').forEach(e => e.remove());
+		[0, 0.6].forEach(delay => {
+			const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+			c.setAttribute('class', 'pulse-ring');
+			c.setAttribute('cx', cx);
+			c.setAttribute('cy', cy);
+			c.setAttribute('r', '0');
+			c.style.animationDelay = delay + 's';
+			g.appendChild(c);
+		});
+	}
+	/* ═══════════════════════════════════════════════════════
+	   S11 — MAP PAN / ZOOM
+	   ═══════════════════════════════════════════════════════ */
+	(function() {
+		const viewport = document.getElementById('map-viewport'),
+			mover = document.getElementById('map-mover');
+		let scale = 1,
+			tx = 0,
+			ty = 0,
+			lastDist = null,
+			drag = false,
+			sx = 0,
+			sy = 0,
+			stx = 0,
+			sty = 0,
+			lastApplyScale = -1;
+
+		function playZoom() {
+			const now = Date.now();
+			if(now - lastPlayTime > 300) {
+				lastPlayTime = now;
+				setTimeout(() => {
+					zoomSfx.currentTime = 0;
+					zoomSfx.volume = 0.15;
+					zoomSfx.play().catch(() => {});
+				}, 0);
+			}
+		}
+
+		/* Label zoom threshold — show labels when zoomed in enough (Google Maps style) */
+		const LABEL_ZOOM_THRESHOLD = 2.0;
+
+		let _rafPending = false;
+		function apply() {
+			if(_rafPending) return;
+			_rafPending = true;
+			requestAnimationFrame(() => {
+				_rafPending = false;
+				const svg = document.getElementById('rj');
+				let g = svg.getElementById('pan-zoom-g');
+				if(!g) {
+					g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+					g.setAttribute('id', 'pan-zoom-g');
+					while(svg.firstChild) g.appendChild(svg.firstChild);
+					svg.appendChild(g);
+				}
+				g.setAttribute('transform', `translate(${tx},${ty}) scale(${scale})`);
+				mover.style.transform = '';
+				/* Counter-scale labels: constant ~16px screen size at any zoom, crisp */
+				const svgRect = svg.getBoundingClientRect();
+				const w = svgRect.width || 400;
+				const fs = (11 / scale).toFixed(2);
+				document.querySelectorAll('.lbl').forEach(lbl => {
+					lbl.setAttribute('font-size', fs);
+					/* Google Maps style: show when zoomed enough OR hovered OR selected.
+					   .on and .hover-visible override via CSS opacity:1 !important already,
+					   but we still add zoom-visible so unselected labels appear at zoom 2x+ */
+					if(scale >= LABEL_ZOOM_THRESHOLD) {
+						lbl.classList.add('zoom-visible');
+					} else {
+						lbl.classList.remove('zoom-visible');
+					}
+				});
+			});
+		}
+		viewport.addEventListener('wheel', e => {
+			e.preventDefault();
+			const rect = viewport.getBoundingClientRect(),
+				mx = e.clientX - rect.left, my = e.clientY - rect.top,
+				factor = e.deltaY < 0 ? 1.12 : 0.89,
+				ns = Math.min(12, Math.max(0.3, scale * factor));
+			tx = mx - (mx - tx) * (ns / scale);
+			ty = my - (my - ty) * (ns / scale);
+			scale = ns; playZoom(); SESSION.touch('wheel'); apply();
+		}, { passive: false });
+		viewport.addEventListener('mousedown', e => {
+			e.preventDefault(); /* prevents double/triple-click text-select jitter */
+			drag = true; sx = e.clientX; sy = e.clientY; stx = tx; sty = ty;
+			viewport.style.cursor = 'grabbing'; playZoom();
+		});
+		window.addEventListener('mousemove', e => {
+			if(!drag) return;
+			tx = stx + (e.clientX - sx); ty = sty + (e.clientY - sy);
+			SESSION.touch('drag'); apply();
+		});
+		window.addEventListener('mouseup', () => { drag = false; viewport.style.cursor = 'grab'; });
+		viewport.addEventListener('touchstart', e => {
+			if(e.touches.length === 1) {
+				drag = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY; stx = tx; sty = ty; playZoom();
+			} else if(e.touches.length === 2) {
+				drag = false;
+				lastDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+				SESSION.touch('pinch');
+			}
+		}, { passive: false });
+		viewport.addEventListener('touchmove', e => {
+			if(e.touches.length === 1 && drag) {
+				tx = stx + (e.touches[0].clientX - sx); ty = sty + (e.touches[0].clientY - sy);
+				SESSION.touch('drag'); apply();
+			} else if(e.touches.length === 2) {
+				e.preventDefault();
+				const t1 = e.touches[0], t2 = e.touches[1],
+					dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+				if(lastDist) {
+					const rect = viewport.getBoundingClientRect(),
+						mx = (t1.clientX + t2.clientX) / 2 - rect.left,
+						my = (t1.clientY + t2.clientY) / 2 - rect.top,
+						factor = dist / lastDist,
+						ns = Math.min(12, Math.max(0.3, scale * factor));
+					tx = mx - (mx - tx) * (ns / scale); ty = my - (my - ty) * (ns / scale);
+					scale = ns; apply();
+				}
+				lastDist = dist;
+			}
+		}, { passive: false });
+		viewport.addEventListener('touchend', () => { drag = false; lastDist = null; });
+		window.mapApply = apply;
+		window._mapReset = () => { scale = 1; tx = 0; ty = 0; apply(); };
+	})();
+	/* ═══════════════════════════════════════════════════════
+	   S12 — GeoJSON RENDERER
+	   ═══════════════════════════════════════════════════════ */
+	(function() {
+		const svg = document.getElementById('rj');
+		svg.style.overflow = 'visible';
+		svg.style.textRendering = 'geometricPrecision';
+		svg.style.shapeRendering = 'geometricPrecision';
+		document.getElementById('map-mover').style.overflow = 'visible';
+		const VW = 500,
+			VH = 520;
+		/* Use STATE bounding box for projection — districts must sit correctly inside state */
+		let x0 = Infinity,
+			x1 = -Infinity,
+			y0 = Infinity,
+			y1 = -Infinity;
+		stateGJ.features.forEach(f => {
+			const rings = f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates.flat(1);
+			rings.forEach(ring => ring.forEach(([lo, la]) => {
+				if(lo < x0) x0 = lo;
+				if(lo > x1) x1 = lo;
+				if(la < y0) y0 = la;
+				if(la > y1) y1 = la;
+			}));
+		});
+		const padding = 40,
+			sc = Math.min((VW - padding) / (x1 - x0), (VH - padding) / (y1 - y0)),
+			ox = (VW - (x1 - x0) * sc) / 2,
+			oy = (VH - (y1 - y0) * sc) / 2;
+		const px = lo => ox + (lo - x0) * sc,
+			py = la => oy + (y1 - la) * sc;
+
+		function ringToD(ring) {
+			return ring.map(([lo, la], i) => (i ? 'L' : 'M') + px(lo).toFixed(1) + ',' + py(la).toFixed(1)).join('') + 'Z';
+		}
+		districtGJ.features.forEach(f => {
+			const name = f.properties.district,
+				geom = f.geometry;
+			const d = geom.type === 'Polygon' ? geom.coordinates.map(ringToD).join(' ') : geom.coordinates.map(poly => poly.map(ringToD).join(' ')).join(' ');
+			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+			path.setAttribute('class', 'dist');
+			path.setAttribute('data-n', name);
+			path.setAttribute('d', d);
+			path.addEventListener('mouseenter', () => {
+				const lbl = document.getElementById('l-' + name.replace(/\s/g, '_'));
+				if(lbl) {
+					lbl.classList.add('hover-visible');
+					window.mapApply();
+				}
+			});
+			path.addEventListener('mouseleave', () => {
+				const lbl = document.getElementById('l-' + name.replace(/\s/g, '_'));
+				if(lbl) {
+					lbl.classList.remove('hover-visible');
+					window.mapApply();
+				}
+			});
+			path._tX = 0;
+			path._tY = 0;
+			path.addEventListener('touchstart', e => {
+				if(e.touches.length > 0) {
+					path._tX = e.touches[0].clientX;
+					path._tY = e.touches[0].clientY;
+				}
+			}, { passive: true });
+			path.addEventListener('touchend', e => {
+				if(e.changedTouches.length > 0) {
+					const dx = e.changedTouches[0].clientX - path._tX,
+						dy = e.changedTouches[0].clientY - path._tY;
+					if(Math.sqrt(dx * dx + dy * dy) < 10) {
+						if(e.cancelable) e.preventDefault();
+						touchHandled = true;
+						select(name); /* touch path — counted once here */
+						setTimeout(() => { touchHandled = false; }, 500);
+					}
+				}
+			}, { passive: false });
+			path.addEventListener('click', e => {
+				if(touchHandled) return; /* block synthetic click after touch */
+				select(name); /* mouse path — counted once here */
+			});
+			svg.appendChild(path);
+			const coords = geom.coordinates[0]; /* outer ring */
+			let sumX = 0, sumY = 0;
+			coords.forEach(([lo, la]) => { sumX += lo; sumY += la; });
+			const cLon = sumX / coords.length, cLat = sumY / coords.length;
+			const cxPx = px(cLon), cyPx = py(cLat);
+			centroids[name] = {
+				cx: cxPx,
+				cy: cyPx
+			};
+			const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+			t.setAttribute('class', 'lbl');
+			t.setAttribute('id', 'l-' + name.replace(/\s/g, '_'));
+			t.setAttribute('data-name', name);
+			t.setAttribute('x', cxPx.toFixed(1));
+			t.setAttribute('y', cyPx.toFixed(1));
+			t.setAttribute('text-anchor', 'middle');
+			t.textContent = name.toUpperCase();
+			svg.appendChild(t);
+		});
+		/* Add a clipPath so state boundary stays within the map viewBox */
+		const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+		/* District glow filter — SVG filters work inside overflow:hidden unlike CSS filters */
+		const distGlowFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+		distGlowFilter.setAttribute('id', 'distGlow');
+		distGlowFilter.setAttribute('x', '-40%');
+		distGlowFilter.setAttribute('y', '-40%');
+		distGlowFilter.setAttribute('width', '180%');
+		distGlowFilter.setAttribute('height', '180%');
+		distGlowFilter.innerHTML = '<feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#4de8b8" flood-opacity="0.9"/><feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#4de8b8" flood-opacity="0.5"/>';
+		defs.appendChild(distGlowFilter);
+		const stateGlowFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
+		stateGlowFilter.setAttribute('id', 'stateGlow');
+		stateGlowFilter.setAttribute('x', '-50%');
+		stateGlowFilter.setAttribute('y', '-50%');
+		stateGlowFilter.setAttribute('width', '200%');
+		stateGlowFilter.setAttribute('height', '200%');
+		stateGlowFilter.innerHTML = '<feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ffffff" flood-opacity="1" result="s1"/><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ffffff" flood-opacity="0.6" result="s2"/><feMerge><feMergeNode in="s2"/><feMergeNode in="s1"/><feMergeNode in="SourceGraphic"/></feMerge>';
+		defs.appendChild(stateGlowFilter);
+		const cp = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+		cp.setAttribute('id', 'mapClip');
+		const cr = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+		cr.setAttribute('x', '-50');
+		cr.setAttribute('y', '-50');
+		cr.setAttribute('width', '600');
+		cr.setAttribute('height', '620');
+		cp.appendChild(cr);
+		defs.appendChild(cp);
+		svg.insertBefore(defs, svg.firstChild);
+		stateGJ.features.forEach(f => {
+			const geom = f.geometry;
+			const d = geom.type === 'Polygon' ? geom.coordinates.map(ringToD).join(' ') : geom.coordinates.map(poly => poly.map(ringToD).join(' ')).join(' ');
+			const sp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+			sp.setAttribute('class', 'state-boundary');
+			sp.setAttribute('d', d);
+			sp.setAttribute('filter', 'url(#stateGlow)');
+			svg.appendChild(sp);
+		});
+		select(INITIAL_DISTRICT, { silent: true });
+		/* Size labels after paint — double rAF ensures SVG has real dimensions */
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			if(typeof window.mapApply === 'function') window.mapApply();
+		}));
+	})();
+	</script>
+	<script>
+	/* ═══════════════════════════════════════════════════════
+	   S13 — TICKER
+	   ═══════════════════════════════════════════════════════ */
+	document.addEventListener('DOMContentLoaded', function() {
+		function initTicker() {
+			const track = document.querySelector('.ticker-track'),
+				half = document.querySelector('.ticker-half');
+			if(!track || !half) return;
+			const hw = half.getBoundingClientRect().width || half.offsetWidth || 600;
+			track.style.width = (hw * 2) + 'px';
+			track.animate([{
+				transform: 'translateX(0)'
+			}, {
+				transform: `translateX(-${hw}px)`
+			}], {
+				duration: 42000,
+				iterations: Infinity,
+				easing: 'linear'
+			});
+		}
+		(document.fonts ? document.fonts.ready : Promise.resolve()).then(initTicker);
+		/* ═══════════════════════════════════════════════════════
+		   S14 — AURORA (mobile-optimised)
+		   ═══════════════════════════════════════════════════════ */
+		const aCanvas = document.getElementById('page-aurora'),
+			ax = aCanvas.getContext('2d');
+		let aW, aH;
+
+		function resizeAurora() {
+			aW = aCanvas.width = window.innerWidth;
+			aH = aCanvas.height = window.innerHeight;
+		}
+		resizeAurora();
+		window.addEventListener('resize', resizeAurora);
+		let aEnergy = 0,
+			aT = 0,
+			aRaf = null,
+			aFrame = 0;
+		const waveSeeds = [
+			[2.31, 5.17, 1.83, 4.42, 0.91, 3.67],
+			[1.14, 3.89, 6.02, 2.55, 5.33, 0.77],
+			[4.66, 1.22, 3.14, 5.88, 2.09, 4.31],
+			[0.55, 4.73, 2.61, 1.39, 5.94, 3.02],
+			[3.21, 0.88, 4.55, 2.17, 6.11, 1.44],
+			[5.77, 2.43, 0.66, 4.88, 1.55, 3.99],
+			[1.89, 3.44, 5.21, 0.73, 4.17, 2.88],
+			[4.02, 1.67, 3.55, 5.43, 0.29, 2.14],
+			[0.91, 4.12, 2.88, 5.67, 1.33, 3.77],
+			[3.54, 0.22, 4.91, 2.05, 5.78, 1.62]
+		];
+		const waves = [{
+			speed: 0.025,
+			amp: 40,
+			color: '77,232,184',
+			alpha: 0.52,
+			width: 85,
+			fr: [1.00, 1.67, 0.53, 2.09, 1.43, 0.89]
+		}, {
+			speed: 0.022,
+			amp: 45,
+			color: '66,133,244',
+			alpha: 0.45,
+			width: 85,
+			fr: [1.00, 1.73, 0.61, 2.41, 0.37, 1.19]
+		}, {
+			speed: 0.018,
+			amp: 55,
+			color: '185,43,227',
+			alpha: 0.45,
+			width: 95,
+			fr: [1.00, 1.41, 2.23, 0.67, 1.89, 0.53]
+		}, {
+			speed: 0.045,
+			amp: 25,
+			color: '180,240,220',
+			alpha: 0.22,
+			width: 60,
+			fr: [1.00, 2.13, 0.79, 1.57, 0.43, 2.87]
+		}];
+
+		function getAuroraTier() {
+			const w = window.innerWidth,
+				h = window.innerHeight;
+			if(h <= 440 || (w <= 600)) return 'phone';
+			if(w <= 1024) return 'tablet';
+			return 'desktop';
+		}
+		/* Quadratic bezier smoothing — eliminates sharp angles at any step size */
+		function drawSmoothWave(e, w, ph, fr, ampR, step) {
+			const pts = [];
+			for(let x = 0; x <= aW; x += step) {
+				const nx = x / aW;
+				const wobble = e * (Math.sin(nx * 3.7 + aT * w.speed * 60 * fr[0] + ph[0]) * ampR * 0.40 + Math.sin(nx * 7.3 + aT * w.speed * 60 * fr[1] + ph[1]) * ampR * 0.30 + Math.sin(nx * 13.1 + aT * w.speed * 60 * fr[2] + ph[2]) * ampR * 0.22 + Math.sin(nx * 19.7 + aT * w.speed * 60 * fr[3] + ph[3]) * ampR * 0.16 + Math.sin(nx * 31.4 + aT * w.speed * 60 * fr[4] + ph[4]) * ampR * 0.12 + Math.sin(nx * 47.3 + aT * w.speed * 60 * fr[5] + ph[5]) * ampR * 0.08);
+				pts.push([x, aH + wobble]);
+			}
+			ax.beginPath();
+			ax.moveTo(pts[0][0], pts[0][1]);
+			for(let i = 1; i < pts.length - 1; i++) {
+				const cpx = (pts[i][0] + pts[i + 1][0]) / 2;
+				const cpy = (pts[i][1] + pts[i + 1][1]) / 2;
+				ax.quadraticCurveTo(pts[i][0], pts[i][1], cpx, cpy);
+			}
+			if(pts.length > 1) ax.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+		}
+
+		function drawAurora() {
+			aFrame++;
+			const tier = getAuroraTier();
+			if(tier === 'phone' && aFrame % 2 !== 0) {
+				aEnergy *= 0.94;
+				aT++;
+				aRaf = requestAnimationFrame(drawAurora);
+				return;
+			}
+			if(tier === 'tablet' && aFrame % 3 !== 0) {
+				aEnergy *= 0.957;
+				aT++;
+				aRaf = requestAnimationFrame(drawAurora);
+				return;
+			}
+			ax.globalCompositeOperation = 'source-over';
+			ax.clearRect(0, 0, aW, aH);
+			if(aEnergy < 0.01) {
+				aEnergy = 0;
+				aRaf = null;
+				return;
+			}
+			const e = aEnergy,
+				rScale = Math.min(1, aW / 900);
+			const waveCount = tier === 'phone' ? 2 : tier === 'tablet' ? 3 : 4;
+			/* bezier smoothing means we can use fewer points and still get silky curves */
+			const step = tier === 'phone' ? 18 : tier === 'tablet' ? 14 : 10;
+			const decayRate = tier === 'phone' ? 0.94 : tier === 'tablet' ? 0.92 : 0.94;
+			const shadowMult = tier === 'desktop' ? 1.0 : tier === 'tablet' ? 0.45 : 0.25;
+			const whiteAlpha = tier === 'desktop' ? 0.9 : tier === 'tablet' ? 0.55 : 0.35;
+			ax.globalCompositeOperation = 'lighter';
+			for(let wi = 0; wi < waveCount; wi++) {
+				const w = waves[wi],
+					ph = waveSeeds[wi],
+					fr = w.fr;
+				const ampR = w.amp * rScale,
+					widR = w.width * rScale;
+				/* coloured wave */
+				drawSmoothWave(e, w, ph, fr, ampR, step);
+				ax.strokeStyle = `rgba(${w.color},${w.alpha*e})`;
+				ax.lineWidth = widR * e;
+				ax.lineCap = 'round';
+				ax.lineJoin = 'round';
+				ax.shadowBlur = widR * 4.5 * e * shadowMult;
+				ax.shadowColor = `rgba(${w.color},${w.alpha*e*0.95})`;
+				ax.stroke();
+				/* white highlight on all devices — dimmer on mobile/tablet */
+				drawSmoothWave(e, w, ph, fr, ampR, step);
+				ax.strokeStyle = `rgba(255,255,255,${w.alpha*e*whiteAlpha})`;
+				ax.lineWidth = widR * 0.20 * e;
+				ax.shadowBlur = widR * 1.0 * e * shadowMult;
+				ax.shadowColor = 'rgba(255,255,255,1)';
+				ax.stroke();
+			}
+			aEnergy *= decayRate;
+			aT++;
+			aRaf = requestAnimationFrame(drawAurora);
+		}
+		window.triggerAurora = () => {
+			aEnergy = 1.0;
+			if(!aRaf) drawAurora();
+		};
+	});
+	/* ═══════════════════════════════════════════════════════
+	   S15 — OPTIMIZED BACKGROUND CANVAS (starfield + planets)
+	   ═══════════════════════════════════════════════════════ */
+	let _canvasLoopId = null;
+
+	function initCanvas() {
+		if(_canvasLoopId) {
+			cancelAnimationFrame(_canvasLoopId);
+			_canvasLoopId = null;
+		}
+		const cv = document.getElementById('c'),
+			stage = document.getElementById('stage');
+		const isFixed = getComputedStyle(cv).position === 'fixed';
+		const W = isFixed ? window.innerWidth : (stage.getBoundingClientRect().width || stage.offsetWidth || 700);
+		const H = isFixed ? window.innerHeight : (stage.getBoundingClientRect().height || stage.offsetHeight || 560);
+		if(W < 50) {
+			requestAnimationFrame(initCanvas);
+			return;
+		}
+		cv.width = W;
+		cv.height = H;
+		cv.style.width = W + 'px';
+		cv.style.height = H + 'px';
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		cv.width = W * dpr;
+		cv.height = H * dpr;
+		cv.style.width = W + 'px';
+		cv.style.height = H + 'px';
+		const cx = cv.getContext('2d');
+		cx.scale(dpr, dpr);
+		const isMobileCanvas = W <= 850;
+		const starCount = isMobileCanvas ? 40 : 120;
+		const stars = Array.from({
+			length: starCount
+		}, () => ({
+			x: Math.random() * W,
+			y: Math.random() * H,
+			r: Math.random() * 1.5 + 0.2,
+			o: Math.random() * 0.40 + 0.10,
+			do: (Math.random() * 0.004 + 0.001) * (Math.random() < 0.5 ? 1 : -1),
+			vx: (Math.random() - 0.5) * 0.20,
+			vy: (Math.random() - 0.5) * 0.3
+		}));
+		const P = [{
+			bx: W * -0.20,
+			by: H * 0.08,
+			r: W * 0.42,
+			ax: 0.001275,
+			ay: 0.00085,
+			rx: W * 0.04,
+			ry: H * 0.06,
+			ph: 0,
+			rimA: 0.30,
+			rimW: 0.9
+		}, {
+			bx: W * 0.74,
+			by: H * 1.02,
+			r: W * 0.14,
+			ax: 0.0017,
+			ay: 0.001275,
+			rx: W * 0.05,
+			ry: H * 0.025,
+			ph: 2.1,
+			rimA: 0.30,
+			rimW: 0.9
+		}];
+
+		function drawPlanet(p, t) {
+			const ppx = p.bx + Math.sin(t * p.ax + (p.ph || 0)) * p.rx,
+				ppy = p.by + Math.cos(t * p.ay + (p.ph || 0) * 0.7) * p.ry,
+				r = p.r;
+			cx.save();
+			cx.beginPath();
+			cx.rect(0, 0, W, H);
+			cx.clip();
+			cx.fillStyle = 'rgba(2,12,10,0.96)';
+			cx.beginPath();
+			cx.arc(ppx, ppy, r, 0, Math.PI * 2);
+			cx.fill();
+			const innerG = cx.createRadialGradient(ppx, ppy, r * 0.82, ppx, ppy, r * 0.99);
+			innerG.addColorStop(0, 'transparent');
+			innerG.addColorStop(0.72, 'rgba(77,232,184,0.04)');
+			innerG.addColorStop(0.92, `rgba(77,232,184,${p.rimA*0.25})`);
+			innerG.addColorStop(1.0, `rgba(77,232,184,${p.rimA*0.08})`);
+			cx.fillStyle = innerG;
+			cx.beginPath();
+			cx.arc(ppx, ppy, r * 1.02, 0, Math.PI * 2);
+			cx.fill();
+			const STEP = Math.PI / 60,
+				EDGE_FADE = r * 0.28,
+				rimStart = Math.PI * 0.85 + Math.sin(t * p.ax * 0.3) * 0.30 + Math.sin(t * 0.000031) * 0.18;
+			for(let a = 0; a < Math.PI * 2; a += STEP) {
+				const amid = a + STEP * 0.5,
+					sx = ppx + Math.cos(amid) * r,
+					sy = ppy + Math.sin(amid) * r;
+				const edgeFactor = Math.min(Math.min(sx / EDGE_FADE, (W - sx) / EDGE_FADE), Math.min(sy / EDGE_FADE, (H - sy) / EDGE_FADE), 1.0);
+				if(edgeFactor <= 0) continue;
+				const angDiff = ((amid - rimStart + Math.PI * 3) % (Math.PI * 2)) - Math.PI,
+					brightFactor = Math.max(0, Math.cos(angDiff * 0.9)),
+					dimFactor = Math.max(0, Math.cos(angDiff * 0.9 + Math.PI) * 0.22),
+					arcAlpha = (brightFactor + dimFactor) * edgeFactor * p.rimA;
+				if(arcAlpha < 0.004) continue;
+				cx.beginPath();
+				cx.arc(ppx, ppy, r * 0.997, a, a + STEP + 0.01);
+				cx.strokeStyle = `rgba(77,232,184,${arcAlpha.toFixed(3)})`;
+				cx.lineWidth = p.rimW * (0.5 + brightFactor * 0.5);
+				cx.lineCap = 'round';
+				cx.stroke();
+			}
+			cx.restore();
+		}
+		const isTouchBg = (navigator.maxTouchPoints || 0) > 0,
+			BG_INTERVAL = isTouchBg ? 33 : 0;
+		let t = 0,
+			lastFrameTime = 0;
+		const IDLE_INTERVAL = 100;
+
+		function loop(ts) {
+			if(document.hidden && ts - lastFrameTime < IDLE_INTERVAL) {
+				_canvasLoopId = requestAnimationFrame(loop);
+				return;
+			}
+			if(isTouchBg && ts - lastFrameTime < BG_INTERVAL) {
+				_canvasLoopId = requestAnimationFrame(loop);
+				return;
+			}
+			lastFrameTime = ts;
+			cx.clearRect(0, 0, W, H);
+			cx.fillStyle = '#08090c';
+			cx.fillRect(0, 0, W, H);
+			const n1x = W * 0.08 + Math.sin(t * 0.00042) * W * 0.07,
+				n1y = H * 0.50 + Math.cos(t * 0.00036) * H * 0.09;
+			const nb1 = cx.createRadialGradient(n1x, n1y, 0, n1x, n1y, W * 0.44);
+			nb1.addColorStop(0, 'rgba(18,52,34,0.07)');
+			nb1.addColorStop(0.5, 'rgba(10,30,20,0.04)');
+			nb1.addColorStop(1, 'transparent');
+			cx.fillStyle = nb1;
+			cx.fillRect(0, 0, W, H);
+			P.forEach(p => drawPlanet(p, t));
+			stars.forEach(s => {
+				s.x += s.vx;
+				s.y += s.vy;
+				if(s.x < 0) s.x = W;
+				if(s.x > W) s.x = 0;
+				if(s.y < 0) s.y = H;
+				if(s.y > H) s.y = 0;
+				s.o += s.do;
+				if(s.o > 0.45 || s.o < 0.08) s.do *= -1;
+				cx.beginPath();
+				cx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+				cx.fillStyle = `rgba(255,255,255,${s.o.toFixed(3)})`;
+				cx.fill();
+			});
+			t += 2;
+			_canvasLoopId = requestAnimationFrame(loop);
+		}
+		_canvasLoopId = requestAnimationFrame(loop);
+	}
+	requestAnimationFrame(() => requestAnimationFrame(initCanvas));
+	let _bgResizeTimer = null;
+	window.addEventListener('resize', () => {
+		clearTimeout(_bgResizeTimer);
+		_bgResizeTimer = setTimeout(() => requestAnimationFrame(initCanvas), 120);
+	});
+	document.querySelector('clipPath rect').remove();
+	</script>
+	<script async src="tracker.js" onerror="void 0"></script>
+</body>
+</html>
