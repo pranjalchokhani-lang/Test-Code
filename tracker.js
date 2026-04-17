@@ -154,12 +154,16 @@ document.addEventListener('touchstart', (e) => {
 
 // Every other interaction type — all call onInteraction()
 document.addEventListener('mousemove',   () => onInteraction(), { passive: true });
+document.addEventListener('pointermove', () => onInteraction(), { passive: true });
 document.addEventListener('wheel',       () => onInteraction(), { passive: true });
+document.addEventListener('touchmove',   () => onInteraction(), { passive: true });
 document.addEventListener('pointerdown', () => onInteraction(), { passive: true });
+document.addEventListener('keydown',     () => onInteraction(), { passive: true });
 
 if (viewport) {
     viewport.addEventListener('touchstart',  () => onInteraction(), { passive: true });
     viewport.addEventListener('touchmove',   () => onInteraction(), { passive: true });
+    viewport.addEventListener('pointermove', () => onInteraction(), { passive: true });
     viewport.addEventListener('wheel',       () => onInteraction(), { passive: true });
     viewport.addEventListener('pointerdown', () => onInteraction(), { passive: true });
 }
