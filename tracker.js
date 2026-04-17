@@ -119,7 +119,7 @@ function finalizeSession() {
 
     // 6. Reset district silently
     revealSfx.volume = 0;
-    select(HOME_DISTRICT);
+select(HOME_DISTRICT, { silent: true });
     revealSfx.volume = 0.4;
 
     // 7. Release
