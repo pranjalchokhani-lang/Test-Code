@@ -119,8 +119,7 @@ function finalizeSession() {
 
     // 6. Reset district silently
     revealSfx.volume = 0;
-select(HOME_DISTRICT, { silent: true });
-    revealSfx.volume = 0.4;
+// select(HOME_DISTRICT, { silent: true }); // REMOVED: Let Jaipur.htm's internal timer handle the visual reset    revealSfx.volume = 0.4;
 
     // 7. Release
     isResetting = false;
