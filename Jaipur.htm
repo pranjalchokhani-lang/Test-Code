@@ -348,6 +348,8 @@
 		gap: 0.6cqh;
 		padding: 0 10cqw;
 		line-height: 1.2;
+		padding-top: 0;
+		padding-bottom: 0;
 	}
 	
 	.hdr-title {
@@ -375,21 +377,42 @@
 		margin-top: 6px;
 		display: flex;
 		align-items: center;
-		-webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
-		mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to right,
+			transparent 0%,
+			rgba(0,0,0,0.05) 3%,
+			rgba(0,0,0,0.3) 7%,
+			rgba(0,0,0,0.7) 12%,
+			black 18%,
+			black 82%,
+			rgba(0,0,0,0.7) 88%,
+			rgba(0,0,0,0.3) 93%,
+			rgba(0,0,0,0.05) 97%,
+			transparent 100%);
+		mask-image: linear-gradient(to right,
+			transparent 0%,
+			rgba(0,0,0,0.05) 3%,
+			rgba(0,0,0,0.3) 7%,
+			rgba(0,0,0,0.7) 12%,
+			black 18%,
+			black 82%,
+			rgba(0,0,0,0.7) 88%,
+			rgba(0,0,0,0.3) 93%,
+			rgba(0,0,0,0.05) 97%,
+			transparent 100%);
 	}
-	
+
 	.ticker-track {
 		display: inline-flex;
 		white-space: nowrap;
+		will-change: transform;
 	}
-	
+
 	.ticker-half {
 		display: inline-flex;
-		gap: 48px;
-		padding-right: 48px;
+		gap: 56px;
+		padding-right: 56px;
 	}
-	
+
 	.ticker-half span {
 		font-family: var(--font-display) !important;
 		font-size: var(--fs-s);
@@ -678,7 +701,7 @@
 	
 	.lbl {
 		fill: rgba(255,255,255,0.92);
-		font-size: 4px; /* base; overridden by JS counter-scale */
+		font-size: 11px; /* readable base before JS runs */
 		text-anchor: middle;
 		pointer-events: none;
 		text-transform: uppercase;
@@ -745,6 +768,7 @@
 		font-weight: 400;
 		white-space: nowrap;
 		line-height: 1.4;
+		text-align: left;
 	}
 	
 	.ctag {
@@ -756,8 +780,10 @@
 		color: var(--text);
 		display: flex;
 		align-items: baseline;
+		justify-content: flex-start;
 		gap: 2px;
 		line-height: 1.3;
+		text-align: left;
 	}
 	
 	.rp-header {
@@ -766,6 +792,7 @@
 		padding: 18px 6px 2px 10px !important;
 		display: flex;
 		flex-direction: column;
+		align-items: flex-start;
 		gap: 1px;
 		position: relative;
 		z-index: 1;
@@ -799,6 +826,7 @@
 		line-height: 1.3;
 		color: rgba(var(--accent-rgb), 0.9);
 		animation: lblGlow 2.1s ease-in-out infinite alternate;
+		text-align: left;
 	}
 	
 	#med-list,
@@ -898,6 +926,8 @@
 		align-items: center;
 		gap: 0.5cqh;
 		padding: 0 10cqw;
+		padding-top: 0;
+		padding-bottom: 0;
 	}
 	
 	.fsub {
@@ -1602,8 +1632,8 @@
 				mover.style.transform = '';
 				/* Counter-scale labels: constant ~16px screen size at any zoom, crisp */
 				const svgRect = svg.getBoundingClientRect();
-				/* Fixed 8 SVG-unit label — legible at default zoom, grows naturally on zoom-in */
-				const fs = (8 / scale).toFixed(2);
+				const w = svgRect.width || 400;
+				const fs = (11 / scale).toFixed(2);
 				document.querySelectorAll('.lbl').forEach(lbl => {
 					lbl.setAttribute('font-size', fs);
 					/* Google Maps style: show when zoomed enough OR hovered OR selected.
@@ -1811,8 +1841,10 @@
 			svg.appendChild(sp);
 		});
 		select(INITIAL_DISTRICT, { silent: true });
-		/* Size labels immediately on load — apply() normally runs on interaction */
-		requestAnimationFrame(() => { if(typeof window.mapApply === 'function') window.mapApply(); });
+		/* Size labels after paint — double rAF ensures SVG has real dimensions */
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			if(typeof window.mapApply === 'function') window.mapApply();
+		}));
 	})();
 	</script>
 	<script>
@@ -1831,7 +1863,7 @@
 			}, {
 				transform: `translateX(-${hw}px)`
 			}], {
-				duration: 35000,
+				duration: 42000,
 				iterations: Infinity,
 				easing: 'linear'
 			});
@@ -2007,7 +2039,13 @@
 		cv.height = H;
 		cv.style.width = W + 'px';
 		cv.style.height = H + 'px';
+		const dpr = Math.min(window.devicePixelRatio || 1, 2);
+		cv.width = W * dpr;
+		cv.height = H * dpr;
+		cv.style.width = W + 'px';
+		cv.style.height = H + 'px';
 		const cx = cv.getContext('2d');
+		cx.scale(dpr, dpr);
 		const isMobileCanvas = W <= 850;
 		const starCount = isMobileCanvas ? 40 : 120;
 		const stars = Array.from({
@@ -2025,8 +2063,8 @@
 			bx: W * -0.20,
 			by: H * 0.08,
 			r: W * 0.42,
-			ax: 0.0015,
-			ay: 0.001,
+			ax: 0.001275,
+			ay: 0.00085,
 			rx: W * 0.04,
 			ry: H * 0.06,
 			ph: 0,
@@ -2036,8 +2074,8 @@
 			bx: W * 0.74,
 			by: H * 1.02,
 			r: W * 0.14,
-			ax: 0.002,
-			ay: 0.0015,
+			ax: 0.0017,
+			ay: 0.001275,
 			rx: W * 0.05,
 			ry: H * 0.025,
 			ph: 2.1,
