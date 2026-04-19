@@ -1869,11 +1869,12 @@
 		let aW, aH;
 		function resizeAurora() {
 			aW = aCanvas.width  = Math.floor(window.innerWidth * A_SCALE);
-			/* canvas is sized to full CSS height (20% desktop / 14% mobile)
-			   so blur has room above the wave and fades naturally at element top */
 			const hFrac = isMobile ? 0.14 : 0.20;
 			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * hFrac * A_SCALE));
-			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
+			/* Mobile: lower brightness so wave isn't solid white on small canvas.
+			   Laptop: full brightness(22) — larger canvas has subtler gradients. */
+			const bright = isMobile ? 8 : 22;
+			aCanvas.style.filter = `blur(16px) grayscale(1) brightness(${bright}) saturate(0)`;
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
