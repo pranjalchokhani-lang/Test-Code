@@ -927,7 +927,8 @@
 		animation-delay: -45s;
 	}
 	
-	#page-aurora {
+	/* aurora wrapper clips the blur() filter to exact bounds — no upward bleed */
+	#aurora-wrap {
 		position: fixed;
 		bottom: 0;
 		left: 0;
@@ -935,10 +936,23 @@
 		height: 14%;
 		pointer-events: none;
 		z-index: 9999;
-		will-change: transform;
-		image-rendering: pixelated;
+		overflow: hidden;
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
+	}
+	@media screen and (max-width: 850px) {
+		#aurora-wrap { height: 10%; }
+	}
+	#page-aurora {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		will-change: transform;
+		image-rendering: pixelated;
+		filter: blur(16px) grayscale(1) brightness(22.0) saturate(0);
+		-webkit-filter: blur(16px) grayscale(1) brightness(22.0) saturate(0);
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1235,7 +1249,7 @@
 </head>
 
 <body>
-	<canvas id="page-aurora"></canvas>
+	<div id="aurora-wrap"><canvas id="page-aurora"></canvas></div>
 	<div class="shell">
 		<div class="shelf"></div>
 		<div class="card" id="stage">
@@ -1858,18 +1872,15 @@
 		const aCanvas = document.getElementById('page-aurora'),
 			ax = aCanvas.getContext('2d');
 
-		/* tiny canvas — CSS filter does the heavy lifting.
-		 * blur(16px) is CSS pixels — same physical size on all devices.
-		 * The wave must NOT fill the full canvas height or brightness(22)
-		 * turns everything solid white. ampMult kept at ~0.70 so crest
-		 * sits at 30% from canvas top, leaving room for the blur to feather. */
 		const isMobile = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
 		const A_SCALE = 0.30;
 		let aW, aH;
 		function resizeAurora() {
-			aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
-			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
-			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
+			const wrap = document.getElementById('aurora-wrap');
+			const wr = wrap.getBoundingClientRect();
+			/* use actual wrapper pixel size so canvas matches CSS exactly */
+			aW = aCanvas.width  = Math.max(8,  Math.floor((wr.width  || window.innerWidth)  * A_SCALE));
+			aH = aCanvas.height = Math.max(20, Math.floor((wr.height || window.innerHeight * (isMobile ? 0.10 : 0.14)) * A_SCALE));
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
@@ -1878,13 +1889,13 @@
 		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false, aLastTs = 0;
 
 		const aWaves = [
-			{ speed:0.034, offset:0.0, col:[255,255,255], ampMult:0.70, baseOff:0.00,
+			{ speed:0.034, offset:0.0, col:[255,255,255], ampMult:1.00, baseOff:0.00,
 			  terms:[ [1.6,0.55], [4.2,0.42], [9.5,0.22] ] },
-			{ speed:0.030, offset:4.5, col:[255,255,255], ampMult:0.63, baseOff:0.03,
+			{ speed:0.030, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
 			  terms:[ [1.4,0.55], [3.8,0.42], [8.7,0.22] ] },
-			{ speed:0.025, offset:3.1, col:[255,255,255], ampMult:0.60, baseOff:0.05,
+			{ speed:0.025, offset:3.1, col:[255,255,255], ampMult:0.88, baseOff:0.05,
 			  terms:[ [1.9,0.55], [4.7,0.42], [10.3,0.22] ] },
-			{ speed:0.040, offset:1.8, col:[255,255,255], ampMult:0.55, baseOff:0.02,
+			{ speed:0.040, offset:1.8, col:[255,255,255], ampMult:0.78, baseOff:0.02,
 			  terms:[ [2.2,0.55], [5.1,0.42], [11.5,0.22] ] },
 		];
 
