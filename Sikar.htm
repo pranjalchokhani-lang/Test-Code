@@ -932,7 +932,10 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		height: 14%;
+		/* Extra height so blur(16px) has room to fade above the visible portion.
+		   Negative bottom pushes canvas down so only the bottom 14%/8% shows. */
+		height: 20%;
+		bottom: -6%;
 		pointer-events: none;
 		z-index: 9999;
 		will-change: transform;
@@ -941,7 +944,7 @@
 		-webkit-transform: translateZ(0);
 	}
 	@media screen and (max-width: 850px) {
-		#page-aurora { height: 8%; }
+		#page-aurora { height: 14%; bottom: -6%; }
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1866,7 +1869,9 @@
 		let aW, aH;
 		function resizeAurora() {
 			aW = aCanvas.width  = Math.floor(window.innerWidth * A_SCALE);
-			const hFrac = isMobile ? 0.08 : 0.14;
+			/* canvas is sized to full CSS height (20% desktop / 14% mobile)
+			   so blur has room above the wave and fades naturally at element top */
+			const hFrac = isMobile ? 0.14 : 0.20;
 			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * hFrac * A_SCALE));
 			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
@@ -1877,13 +1882,13 @@
 		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false, aLastTs = 0;
 
 		const aWaves = [
-			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:0.51, baseOff:0.00,
+			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:1.00, baseOff:0.00,
 			  terms:[ [1.6,0.50], [4.2,0.32], [9.5,0.18] ] },
-			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:0.46, baseOff:0.03,
+			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
 			  terms:[ [1.4,0.50], [3.8,0.32], [8.7,0.18] ] },
-			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:0.45, baseOff:0.05,
+			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:0.88, baseOff:0.05,
 			  terms:[ [1.9,0.50], [4.7,0.32], [10.3,0.18] ] },
-			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:0.40, baseOff:0.02,
+			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:0.78, baseOff:0.02,
 			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
 		];
 
