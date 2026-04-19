@@ -940,9 +940,13 @@
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
 	}
-	/* Mobile: taller with negative bottom so blur fades above visible area */
+	/* Mobile portrait: taller with negative bottom so blur fades above visible area */
 	@media screen and (max-width: 1024px) and (pointer: coarse) {
 		#page-aurora { height: 18%; bottom: -4%; }
+	}
+	/* Mobile/iPad landscape: reduce height ~35% — less screen real estate vertically */
+	@media screen and (max-width: 1024px) and (pointer: coarse) and (orientation: landscape) {
+		#page-aurora { height: 11%; bottom: -3%; }
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1873,7 +1877,8 @@
 				const dpr = Math.min(window.devicePixelRatio || 1, 2);
 				A_SCALE = dpr;
 				const cssW = window.innerWidth;
-				const cssH = Math.floor(window.innerHeight * 0.18);
+				const isLandscape = window.innerWidth > window.innerHeight;
+				const cssH = Math.floor(window.innerHeight * (isLandscape ? 0.11 : 0.18));
 				aW = aCanvas.width  = Math.floor(cssW * dpr);
 				aH = aCanvas.height = Math.max(20, Math.floor(cssH * dpr));
 				aCanvas.style.width  = cssW + 'px';
