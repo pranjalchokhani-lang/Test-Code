@@ -927,21 +927,23 @@
 		animation-delay: -45s;
 	}
 	
-	/* aurora wrapper clips the blur() filter to exact bounds — no upward bleed */
+	/* aurora wrapper: taller than visible area so blur has room to fade naturally.
+	   mask-image creates soft top fade instead of hard overflow:hidden cut. */
 	#aurora-wrap {
 		position: fixed;
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		height: 14%;
+		height: 22%;
 		pointer-events: none;
 		z-index: 9999;
-		overflow: hidden;
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
+		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%);
+		mask-image: linear-gradient(to bottom, transparent 0%, black 40%);
 	}
 	@media screen and (max-width: 850px) {
-		#aurora-wrap { height: 10%; }
+		#aurora-wrap { height: 16%; }
 	}
 	#page-aurora {
 		position: absolute;
@@ -1878,9 +1880,8 @@
 		function resizeAurora() {
 			const wrap = document.getElementById('aurora-wrap');
 			const wr = wrap.getBoundingClientRect();
-			/* use actual wrapper pixel size so canvas matches CSS exactly */
 			aW = aCanvas.width  = Math.max(8,  Math.floor((wr.width  || window.innerWidth)  * A_SCALE));
-			aH = aCanvas.height = Math.max(20, Math.floor((wr.height || window.innerHeight * (isMobile ? 0.10 : 0.14)) * A_SCALE));
+			aH = aCanvas.height = Math.max(20, Math.floor((wr.height || window.innerHeight * (isMobile ? 0.16 : 0.22)) * A_SCALE));
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
