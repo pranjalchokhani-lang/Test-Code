@@ -937,7 +937,6 @@
 		z-index: 9999;
 		will-change: transform;
 		image-rendering: pixelated;
-		/* own GPU compositing layer — prevents iOS/Android deferred canvas flush */
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
 	}
@@ -1413,7 +1412,8 @@
 	function doReset() {
 		const mover = document.getElementById('map-mover');
 		mover.style.transition = '';
-		mover.style.transform = '';
+		/* Call _mapReset first — it sets the correct transform.
+		   Clearing transform here would wipe the mobile fit. */
 		if(typeof window._mapReset === 'function') window._mapReset();
 		setTimeout(() => {
 			mover.style.transition = '';
@@ -1661,27 +1661,32 @@
 		viewport.addEventListener('touchend', () => { drag = false; lastDist = null; });
 		window.mapApply = apply;
 
-		/* Mobile map auto-fit: scale SVG to fill ~90% of viewport on phone/tablet */
-		function fitMapMobile() {
+		const isMobileMap = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
+
+		function fitMobile() {
+			if(!isMobileMap) return;
 			const vp = document.getElementById('map-viewport');
-			const vw = vp.getBoundingClientRect().width || vp.offsetWidth;
-			const vh = vp.getBoundingClientRect().height || vp.offsetHeight;
+			const r  = vp.getBoundingClientRect();
+			const vw = r.width, vh = r.height;
 			if(vw < 10 || vh < 10) return;
-			const fitScale = Math.min(vw / 500, vh / 520) * 0.92;
-			scale = fitScale;
-			tx = (vw - 500 * fitScale) / 2;
-			ty = (vh - 520 * fitScale) / 2;
+			/* fit SVG viewBox 500×520 into viewport with 5% padding */
+			scale = Math.min(vw / 500, vh / 520) * 0.95;
+			tx = (vw - 500 * scale) / 2;
+			ty = (vh - 520 * scale) / 2;
 			apply();
 		}
-		const isMobileMap = window.innerWidth < 850 || (navigator.maxTouchPoints || 0) > 0;
+
 		window._mapReset = () => {
-			if(isMobileMap) { fitMapMobile(); }
-			else { scale = 1; tx = 0; ty = 0; mover.style.transform = ''; apply(); }
+			if(isMobileMap) {
+				fitMobile();
+			} else {
+				scale = 1; tx = 0; ty = 0;
+				mover.style.transform = '';
+				apply();
+			}
 		};
-		if(isMobileMap) {
-			requestAnimationFrame(() => requestAnimationFrame(fitMapMobile));
-			window.addEventListener('resize', fitMapMobile);
-		}
+
+		window.addEventListener('resize', () => { if(isMobileMap) fitMobile(); });
 	})();
 	/* ═══════════════════════════════════════════════════════
 	   S12 — GeoJSON RENDERER
@@ -1845,9 +1850,10 @@
 			svg.appendChild(sp);
 		});
 		select(INITIAL_DISTRICT, { silent: true });
-		/* Size labels after paint — double rAF ensures SVG has real dimensions */
+		/* Size labels + fit map after paint */
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			if(typeof window.mapApply === 'function') window.mapApply();
+			if(typeof window._mapReset === 'function') window._mapReset();
 		}));
 	})();
 	</script>
@@ -1881,24 +1887,19 @@
 		const aCanvas = document.getElementById('page-aurora'),
 			ax = aCanvas.getContext('2d');
 
-		/* On mobile: A_SCALE=0.60 gives aW=234px so blur(16px)=6.8% of canvas width,
-		   matching laptop's 4.2%. At 0.30 the canvas is only 117px wide — blur(16px)
-		   is 14% of width, killing all gradient detail → solid white band on phone.
-		   With larger canvas, reduce blur+brightness proportionally so the glow
-		   footprint on screen stays the same physical size as laptop. */
-		const isMobile = window.innerWidth < 850 || (navigator.maxTouchPoints || 0) > 0;
-		const A_SCALE = isMobile ? 0.60 : 0.30;
+		/* tiny canvas — CSS filter does the heavy lifting.
+		 * A_SCALE=0.30 on all devices. Mobile gets blur(8px) not blur(16px):
+		 * phone canvas aW=117px — blur(16px)=14% of width destroys gradients.
+		 * blur(8px)=7% matches laptop blur(16px)/384px=4%. Same brightness. */
+		const isMobile = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
+		const A_SCALE = 0.30;
 		let aW, aH;
 		function resizeAurora() {
 			aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
 			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
-			/* Mobile canvas is 2x larger than laptop canvas (A_SCALE 0.60 vs 0.30).
-			   blur and brightness scale down so the glow looks identical on screen. */
-			if(isMobile) {
-				aCanvas.style.filter = 'blur(8px) grayscale(1) brightness(12.0) saturate(0)';
-			} else {
-				aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
-			}
+			aCanvas.style.filter = isMobile
+				? 'blur(8px) grayscale(1) brightness(22.0) saturate(0)'
+				: 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
@@ -1906,15 +1907,25 @@
 
 		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false, aLastTs = 0;
 
+		/*
+		  4 waves — teal, white, purple, blue-violet.
+		  Speed formula kept identical to original S14: aT * w.speed * 60 * fr[n]
+		  Amp: original used ampR = w.amp * rScale (40–55px on 900px canvas).
+		  Here canvas is A_SCALE wide so we scale amp proportionally:
+		  ampPx = w.amp * (aW / 900) — same physical size on screen.
+		  baseY = aH (waves push UP from bottom, same as original pts [x, aH+wobble]).
+		  3 terms only (vs 6 in original) — removes flutter, keeps wave shape.
+		  flutter term weight scales down faster than main wave during decay.
+		*/
 		const aWaves = [
-			{ speed:0.034, offset:0.0, col:[255,255,255], ampMult:1.30, baseOff:0.00,
-			  terms:[ [1.6,0.55], [4.2,0.42], [9.5,0.22] ] },
-			{ speed:0.030, offset:4.5, col:[255,255,255], ampMult:1.18, baseOff:0.03,
-			  terms:[ [1.4,0.55], [3.8,0.42], [8.7,0.22] ] },
-			{ speed:0.025, offset:3.1, col:[255,255,255], ampMult:1.14, baseOff:0.05,
-			  terms:[ [1.9,0.55], [4.7,0.42], [10.3,0.22] ] },
-			{ speed:0.040, offset:1.8, col:[255,255,255], ampMult:1.00, baseOff:0.02,
-			  terms:[ [2.2,0.55], [5.1,0.42], [11.5,0.22] ] },
+			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:1.00, baseOff:0.00,
+			  terms:[ [1.6,0.50], [4.2,0.32], [9.5,0.18] ] },
+			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
+			  terms:[ [1.4,0.50], [3.8,0.32], [8.7,0.18] ] },
+			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:0.88, baseOff:0.05,
+			  terms:[ [1.9,0.50], [4.7,0.32], [10.3,0.18] ] },
+			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:0.78, baseOff:0.02,
+			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
 		];
 
 		/* hotspots — live glow bursts riding wave crests */
@@ -1930,7 +1941,6 @@
 
 			function aGetCrestY(wi, nx) {
 				const w = aWaves[wi];
-				/* aH-relative amplitude — same wave proportion on every screen size */
 				const amp   = aEnergy * w.ampMult * aH;
 				const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - aEnergy));
 				const rollScale2 = Math.pow(aEnergy, 1.8);
@@ -1945,8 +1955,6 @@
 		function aDrawWave(w) {
 			const e = aEnergy;
 			if(e < 0.003) return;
-			/* aH-relative amplitude: phone portrait aW=117 gave rScale=0.43 → flat waves.
-			   ampPx = e * ampMult * aH gives identical wave proportion on every device. */
 			const ampPx = e * w.ampMult * aH;
 			const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - e));
 			/* pre-compute all per-wave scalars OUTSIDE the loop */
@@ -2075,22 +2083,16 @@
 		}
 
 		function drawAurora(ts) {
-			/* delta-time: aT always advances at 60 units/sec regardless of fps.
-			   Without this, mobile GPU throttling (30fps under filter load) makes
-			   waves move at half speed vs laptop. Clamp to 100ms prevents jump
-			   after tab resumes from background. */
 			if(aLastTs) {
 				const dt = Math.min(ts - aLastTs, 100);
 				aT += dt * (60 / 1000);
 			}
 			aLastTs = ts;
-
 			/* grow */
 			if(aGrowing) {
 				aEnergy = Math.min(1.0, aEnergy + 0.045);
 				if(aEnergy >= 1.0) aGrowing = false;
 			} else {
-				/* smooth 4-stage decay — waves settle, never snap */
 				aEnergy *= 0.962;
 			}
 			if(aEnergy < 0.004) {
