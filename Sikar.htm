@@ -1873,23 +1873,27 @@
 		function resizeAurora() {
 			if(isMobile) {
 				const dpr = window.devicePixelRatio || 1;
-				A_SCALE = dpr;
+				A_SCALE = 0.30;
 				const cssW = window.innerWidth;
 				const isLandscape = window.innerWidth > window.innerHeight;
 				const cssH = Math.floor(window.innerHeight * (isLandscape ? 0.11 : 0.18));
-				aW = aCanvas.width  = Math.floor(cssW * dpr);
-				aH = aCanvas.height = Math.max(20, Math.floor(cssH * dpr));
+				/* aW uses 0.30 scale so rScale formula works correctly.
+				   aH uses full CSS height so wave proportions match laptop. */
+				aW = Math.floor(cssW  * A_SCALE);
+				aH = Math.max(20, cssH);
+				/* Physical canvas = logical dims × DPR — no CSS stretch = crisp */
+				aCanvas.width  = aW * dpr;
+				aCanvas.height = aH * dpr;
+				ax.setTransform(dpr, 0, 0, dpr, 0, 0);
 				aCanvas.style.width  = cssW + 'px';
 				aCanvas.style.height = cssH + 'px';
-				/* Scale blur proportionally so it's ~13% of element height (matches laptop).
-				   Landscape: 11%*vh is short, so blur must be smaller to avoid banding. */
 				const blurPx = Math.max(4, Math.round(cssH * 0.13));
 				aCanvas.style.filter = `blur(${blurPx}px) grayscale(1) brightness(22.0) saturate(0)`;
 			} else {
-				/* Laptop: exact original logic — untouched */
 				A_SCALE = 0.30;
 				aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
 				aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
+				ax.setTransform(1, 0, 0, 1, 0, 0);
 				aCanvas.style.width  = '';
 				aCanvas.style.height = '';
 				aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
