@@ -927,34 +927,21 @@
 		animation-delay: -45s;
 	}
 	
-	/* aurora wrapper: taller than visible area so blur has room to fade naturally.
-	   mask-image creates soft top fade instead of hard overflow:hidden cut. */
-	#aurora-wrap {
+	#page-aurora {
 		position: fixed;
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		height: 22%;
+		height: 14%;
 		pointer-events: none;
 		z-index: 9999;
-		transform: translateZ(0);
-		-webkit-transform: translateZ(0);
-		-webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40%);
-		mask-image: linear-gradient(to bottom, transparent 0%, black 40%);
-	}
-	@media screen and (max-width: 850px) {
-		#aurora-wrap { height: 16%; }
-	}
-	#page-aurora {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
 		will-change: transform;
 		image-rendering: pixelated;
-		filter: blur(16px) grayscale(1) brightness(22.0) saturate(0);
-		-webkit-filter: blur(16px) grayscale(1) brightness(22.0) saturate(0);
+		transform: translateZ(0);
+		-webkit-transform: translateZ(0);
+	}
+	@media screen and (max-width: 850px) {
+		#page-aurora { height: 8%; }
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1251,7 +1238,7 @@
 </head>
 
 <body>
-	<div id="aurora-wrap"><canvas id="page-aurora"></canvas></div>
+	<canvas id="page-aurora"></canvas>
 	<div class="shell">
 		<div class="shelf"></div>
 		<div class="card" id="stage">
@@ -1878,10 +1865,10 @@
 		const A_SCALE = 0.30;
 		let aW, aH;
 		function resizeAurora() {
-			const wrap = document.getElementById('aurora-wrap');
-			const wr = wrap.getBoundingClientRect();
-			aW = aCanvas.width  = Math.max(8,  Math.floor((wr.width  || window.innerWidth)  * A_SCALE));
-			aH = aCanvas.height = Math.max(20, Math.floor((wr.height || window.innerHeight * (isMobile ? 0.16 : 0.22)) * A_SCALE));
+			aW = aCanvas.width  = Math.floor(window.innerWidth * A_SCALE);
+			const hFrac = isMobile ? 0.08 : 0.14;
+			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * hFrac * A_SCALE));
+			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
@@ -1890,14 +1877,14 @@
 		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false, aLastTs = 0;
 
 		const aWaves = [
-			{ speed:0.034, offset:0.0, col:[255,255,255], ampMult:0.42, baseOff:0.00,
-			  terms:[ [1.6,0.55], [4.2,0.42], [9.5,0.22] ] },
-			{ speed:0.030, offset:4.5, col:[255,255,255], ampMult:0.38, baseOff:0.03,
-			  terms:[ [1.4,0.55], [3.8,0.42], [8.7,0.22] ] },
-			{ speed:0.025, offset:3.1, col:[255,255,255], ampMult:0.36, baseOff:0.05,
-			  terms:[ [1.9,0.55], [4.7,0.42], [10.3,0.22] ] },
-			{ speed:0.040, offset:1.8, col:[255,255,255], ampMult:0.33, baseOff:0.02,
-			  terms:[ [2.2,0.55], [5.1,0.42], [11.5,0.22] ] },
+			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:1.00, baseOff:0.00,
+			  terms:[ [1.6,0.50], [4.2,0.32], [9.5,0.18] ] },
+			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
+			  terms:[ [1.4,0.50], [3.8,0.32], [8.7,0.18] ] },
+			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:0.88, baseOff:0.05,
+			  terms:[ [1.9,0.50], [4.7,0.32], [10.3,0.18] ] },
+			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:0.78, baseOff:0.02,
+			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
 		];
 
 		/* hotspots — live glow bursts riding wave crests */
@@ -1913,7 +1900,8 @@
 
 			function aGetCrestY(wi, nx) {
 				const w = aWaves[wi];
-				const amp   = aEnergy * w.ampMult * aH;
+				const rScale = Math.min(1, aW / (900 * A_SCALE));
+				const amp   = aEnergy * w.ampMult * w.terms[0][1] * 40 * rScale;
 				const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - aEnergy));
 				const rollScale2 = Math.pow(aEnergy, 1.8);
 				const ph0 =  aT * w.speed * 8       + w.offset;
@@ -1927,14 +1915,12 @@
 		function aDrawWave(w) {
 			const e = aEnergy;
 			if(e < 0.003) return;
-			const ampPx = e * w.ampMult * aH;
+			const rScale = Math.min(1, aW / (900 * A_SCALE));
+			const ampPx = e * w.ampMult * 40 * rScale;
 			const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - e));
-			/* pre-compute all per-wave scalars OUTSIDE the loop */
 			const rollScale = Math.pow(e, 1.8);
-			/* FIX 1: remove *60 multiplier — was causing 1.5 rad/frame phase jump = jitter */
 			const ph0 =  aT * w.speed * 8        + w.offset;
 			const ph1 = -aT * w.speed * 8 * 0.7  + w.offset * 1.5;
-			/* FIX 2: step=1 on tiny canvas for smooth bezier curves, no angular jitter */
 			const step = 2;
 			const pts  = [];
 			let minY = aH;
@@ -1944,10 +1930,9 @@
 				y += Math.sin(nx * w.terms[0][0] * Math.PI + ph0) * w.terms[0][1];
 				y += Math.sin(nx * w.terms[1][0] * Math.PI + ph1) * w.terms[1][1] * rollScale;
 				const py = baseY + y * ampPx;
-				if(py < minY) minY = py; /* FIX 3: track minY inline, no spread operator */
+				if(py < minY) minY = py;
 				pts.push([x, py]);
 			}
-			/* closed filled shape — zero hollow */
 			ax.beginPath();
 			ax.moveTo(0, aH);
 			ax.lineTo(0, pts[0][1]);
@@ -1961,15 +1946,11 @@
 			ax.closePath();
 			const [r,g,b] = w.col;
 			const peak = Math.min(0.80, e * w.ampMult * 0.90);
-			/* gradient starts ABOVE canvas (negative Y) so opacity is already
-			   fading to zero before it reaches the canvas top edge —
-			   blends seamlessly into the black background above */
-			const gradTop = -aH * 0.4; /* start 40% of canvas height above top */
+			const gradTop = -aH * 0.4;
 			const grad = ax.createLinearGradient(0, gradTop, 0, aH);
-			/* map stops relative to gradTop→aH span */
 			const span = aH - gradTop;
-			const s0 = (0      - gradTop) / span; /* canvas top edge */
-			const s1 = (minY   - gradTop) / span; /* wave crest */
+			const s0 = (0    - gradTop) / span;
+			const s1 = (minY - gradTop) / span;
 			const clamp01 = v => Math.max(0, Math.min(1, v));
 			grad.addColorStop(0.00,                         `rgba(${r},${g},${b},0)`);
 			grad.addColorStop(clamp01(Math.min(s0, 0.35)),  `rgba(${r},${g},${b},0)`);
@@ -1978,7 +1959,6 @@
 			grad.addColorStop(1.00,                         `rgba(${r},${g},${b},${peak.toFixed(3)})`);
 			ax.fillStyle = grad;
 			ax.fill();
-			/* mist halo — also fades to zero above */
 			const mist = ax.createLinearGradient(0, minY - aH*0.08, 0, minY + aH*0.15);
 			mist.addColorStop(0.0, `rgba(${r},${g},${b},0)`);
 			mist.addColorStop(0.4, `rgba(${r},${g},${b},${(e * w.ampMult * 0.12).toFixed(3)})`);
