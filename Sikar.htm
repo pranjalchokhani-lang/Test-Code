@@ -936,7 +936,10 @@
 		pointer-events: none;
 		z-index: 9999;
 		will-change: transform;
-		image-rendering: auto;
+		image-rendering: pixelated;
+		/* own GPU compositing layer — prevents iOS/Android deferred canvas flush */
+		transform: translateZ(0);
+		-webkit-transform: translateZ(0);
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1862,18 +1865,20 @@
 		let aW, aH;
 		function resizeAurora() {
 			aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
-			/* clamp aH to min 20px so phone landscape (aH≈16) doesn't break physics */
+			/* min 20px floor — prevents phone landscape from collapsing physics */
 			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
 
-		/* pure white fog — identical on all devices */
+		/* Original filter pipeline — essential for the look on ALL devices.
+		   blur softens raw canvas paint → brightness 22x amplifies to glow.
+		   translateZ(0) in CSS ensures own GPU layer so iOS/Android flush
+		   the canvas every frame without deferred compositing slowdown. */
 		aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
-		/* auto = bilinear smooth upscale; pixelated caused blocky edges on small phones */
-		aCanvas.style.imageRendering = 'auto';
+		aCanvas.style.imageRendering = 'pixelated';
 
-		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false;
+		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false, aLastTs = 0;
 
 		/*
 		  4 waves — teal, white, purple, blue-violet.
@@ -1886,14 +1891,14 @@
 		  flutter term weight scales down faster than main wave during decay.
 		*/
 		const aWaves = [
-			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:1.00, baseOff:0.00,
-			  terms:[ [1.6,0.50], [4.2,0.32], [9.5,0.18] ] },
-			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
-			  terms:[ [1.4,0.50], [3.8,0.32], [8.7,0.18] ] },
-			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:0.88, baseOff:0.05,
-			  terms:[ [1.9,0.50], [4.7,0.32], [10.3,0.18] ] },
-			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:0.78, baseOff:0.02,
-			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
+			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:1.30, baseOff:0.00,
+			  terms:[ [1.6,0.55], [4.2,0.42], [9.5,0.22] ] },
+			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:1.18, baseOff:0.03,
+			  terms:[ [1.4,0.55], [3.8,0.42], [8.7,0.22] ] },
+			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:1.14, baseOff:0.05,
+			  terms:[ [1.9,0.55], [4.7,0.42], [10.3,0.22] ] },
+			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:1.00, baseOff:0.02,
+			  terms:[ [2.2,0.55], [5.1,0.42], [11.5,0.22] ] },
 		];
 
 		/* hotspots — live glow bursts riding wave crests */
@@ -1909,7 +1914,7 @@
 
 			function aGetCrestY(wi, nx) {
 				const w = aWaves[wi];
-				/* same aH-relative amplitude as aDrawWave */
+				/* aH-relative amplitude — same wave proportion on every screen size */
 				const amp   = aEnergy * w.ampMult * aH;
 				const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - aEnergy));
 				const rollScale2 = Math.pow(aEnergy, 1.8);
@@ -1924,11 +1929,8 @@
 		function aDrawWave(w) {
 			const e = aEnergy;
 			if(e < 0.003) return;
-			/* ampPx anchored to aH so wave height proportion is identical on every device.
-			   Original: 40 * rScale where rScale=min(1,aW/270).
-			   Problem:  phone portrait aW=117 → rScale=0.43 → ampPx=17px on 35px canvas = 49%.
-			             laptop aW=384 → rScale=1.0 → ampPx=40px on 37px canvas = 108%.
-			   Fix:      ampPx = e * ampMult * aH → always 100% of canvas height on every device. */
+			/* aH-relative amplitude: phone portrait aW=117 gave rScale=0.43 → flat waves.
+			   ampPx = e * ampMult * aH gives identical wave proportion on every device. */
 			const ampPx = e * w.ampMult * aH;
 			const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - e));
 			/* pre-compute all per-wave scalars OUTSIDE the loop */
@@ -2056,22 +2058,30 @@
 			});
 		}
 
-		function drawAurora() {
+		function drawAurora(ts) {
+			/* delta-time: aT always advances at 60 units/sec regardless of fps.
+			   Without this, mobile GPU throttling (30fps under filter load) makes
+			   waves move at half speed vs laptop. Clamp to 100ms prevents jump
+			   after tab resumes from background. */
+			if(aLastTs) {
+				const dt = Math.min(ts - aLastTs, 100);
+				aT += dt * (60 / 1000);
+			}
+			aLastTs = ts;
+
 			/* grow */
 			if(aGrowing) {
 				aEnergy = Math.min(1.0, aEnergy + 0.045);
 				if(aEnergy >= 1.0) aGrowing = false;
 			} else {
 				/* smooth 4-stage decay — waves settle, never snap */
-				aEnergy *= 0.962; // was: aEnergy > 0.70 ? 0.975
-				         
-				         
-				         
+				aEnergy *= 0.962;
 			}
 			if(aEnergy < 0.004) {
 				aEnergy = 0;
 				ax.clearRect(0, 0, aW, aH);
 				aRaf = null;
+				aLastTs = 0;
 				return;
 			}
 			ax.clearRect(0, 0, aW, aH);
@@ -2080,14 +2090,13 @@
 			ax.globalCompositeOperation = 'screen';
 			aDrawHotspots();
 			ax.globalCompositeOperation = 'source-over';
-			aT++;
 			aRaf = requestAnimationFrame(drawAurora);
 		}
 
 		window.triggerAurora = () => {
 			aGrowing = true;
 			aEnergy = Math.max(aEnergy, 0.35);
-			if(!aRaf) drawAurora();
+			if(!aRaf) { aLastTs = 0; aRaf = requestAnimationFrame(drawAurora); }
 		};
 	});
 	/* ═══════════════════════════════════════════════════════
