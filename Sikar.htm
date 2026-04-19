@@ -1868,14 +1868,13 @@
 			ax = aCanvas.getContext('2d');
 
 		const isMobile = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
-		const A_SCALE = 0.30;
-		/* Mobile paints canvas at 5% alpha so brightness(22) gives a visible glow
-		   not a solid white band. Laptop paints at full alpha — larger canvas. */
 		const PAINT_ALPHA = isMobile ? 0.05 : 1.0;
-		let aW, aH;
+		let aW, aH, A_SCALE = 0.30;
 		function resizeAurora() {
+			const isLandscape = window.innerWidth > window.innerHeight;
+			A_SCALE = (isMobile && isLandscape) ? 0.55 : 0.30;
 			aW = aCanvas.width  = Math.floor(window.innerWidth * A_SCALE);
-			const hFrac = isMobile ? 0.14 : 0.20;
+			const hFrac = isMobile ? 0.18 : 0.20;
 			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * hFrac * A_SCALE));
 			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
