@@ -701,7 +701,7 @@
 	
 	.lbl {
 		fill: rgba(255,255,255,0.92);
-		font-size: 6.5px;
+		font-size: 9px;
 		pointer-events: none;
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
@@ -956,12 +956,15 @@
 	
 	#page-aurora {
 		position: fixed;
-		inset: 0;
-		width: 100vw;
-		height: 100dvh;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 14%;
 		pointer-events: none;
 		z-index: 9999;
 		will-change: transform;
+		filter: blur(16px) brightness(16.0) saturate(3.2);
+		image-rendering: pixelated;
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1059,9 +1062,12 @@
 		}
 		/* Map takes top portion */
 		.map-panel {
-			flex: 0 0 38% !important;
+			flex: 0 0 55% !important;
 			width: 100% !important;
 			height: auto !important;
+		}
+		.lbl {
+			font-size: 12px !important;
 		}
 		/* Data boxes stack underneath */
 		.right-panel {
@@ -1150,7 +1156,7 @@
 		}
 		/* Map — 50% width */
 		.map-panel {
-			flex: 0 0 50%;
+			flex: 0 0 60%;
 			height: auto !important;
 			max-height: 100%;
 			min-height: 0;
@@ -1165,7 +1171,7 @@
 		}
 		.lbl,
 		.lbl.on {
-			font-size: 16px !important;
+			font-size: 9px !important;
 		}
 		/* Right panel */
 		.right-panel {
@@ -1345,1994 +1351,12 @@
 		return html.replace(/([\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}]|[\u{FE00}-\u{FEFF}]|[\u{1F000}-\u{1F02F}]|[\u{1F0A0}-\u{1F0FF}]|[\u{1F100}-\u{1F1FF}]|[\u{1F200}-\u{1F2FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{2702}-\u{27B0}]|[\u{231A}-\u{231B}]|[\u{23E9}-\u{23F3}]|[\u{25AA}-\u{27BF}]|[\u{2B50}]|[\u{2B55}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|\u{1F525}|\u{1F3C6}|\u{1F44D})/gu, '<span class="emoji">$1</span>');
 	}
 	/* ═══════════════════════════════════════════════════════
-	   S2 — DATA
+	   S2 — DATA  (loaded from external file via script tag)
 	   ═══════════════════════════════════════════════════════ */
-	const DATA = {
-  "Barmer": {
-    "m": [
-      "<b>42 Allenites</b> nailed AIIMS Jodhpur ('24) 🏆",
-      "<b>5 Allenites</b> scored ≥550 in NEET ('22-'25)",
-      "<b>9 Allenites</b> aced GMC Barmer ('24) 🏆",
-      "<b>Manohar</b>: AIR 2,023, BJ MC Ahmedabad ('25)",
-      "<b>Garima Sisodiya</b>: SN MC Jodhpur ('25)",
-      "<b>Chetna Beniwal</b>: GMC Bhandara ('25)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'24) 🏆 (Jalore)",
-      "<b>Krinjal Agrawal</b>: 99.72%ile+ Main (AIR 4,283) ('25)",
-      "<b>Krinjal Agrawal</b>: IIT Delhi Civil ('25)",
-      "<b>Tanish Kumar</b>: 99.77%ile+ Main (AIR 3,646) [100%ile Phy] ('24)",
-      "<b>Tanish Kumar</b>: Adv AIR 3,897, IIT Ropar CS ('24) (Jalore)"
-    ]
-  },
-  "Jalore": {
-    "m": [
-      "<b>42 Allenites</b> nailed AIIMS Jodhpur ('24) 🏆",
-      "<b>5 Allenites</b> scored ≥550 in NEET ('22-'25)",
-      "<b>Bhagwati</b>: GMC Anantnag ('25)",
-      "<b>Naga Ram</b>: GMC Datia (665/720) ('24)",
-      "<b>42 Allenites</b> stormed AIIMS Jodhpur ('24) 🏆 (Barmer)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'24) 🏆",
-      "<b>Tanish Kumar</b>: 99.77%ile+ Main (AIR 3,646) [100%ile Phy] ('24)",
-      "<b>Tanish Kumar</b>: Adv AIR 3,897, IIT Ropar CS ('24)",
-      "<b>Sarvan Suthar</b>: Adv AIR 4,522, IIT Ropar CS ('23)",
-      "<b>Avaneet Singh</b>: 99.12%ile+ Main ('24)"
-    ]
-  },
-  "Pali": {
-    "m": [
-      "<b>42 Allenites</b> stormed AIIMS Jodhpur ('24) 🏆",
-      "<b>5 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>16 Allenites</b> led GMC Pali ('24) 🏆",
-      "<b>Kshitiz Agarwal</b>: AIR 3,941 (652/720) ('22)",
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆 (Jalore)"
-    ],
-    "e": [
-      "<b>3 Allenites</b> cracked IITs (Adv) ('23-'24) 🏆",
-      "<b>Prem Mali</b>: 99.37%ile+ Main ('24)",
-      "<b>Nehal Garg</b>: IIT Patna Civil ('24)",
-      "<b>Mayank Goyal</b>: IIT Dhanbad Mining ('24)",
-      "<b>Chandraveer Singh</b>: IIT BHU Civil ('23)"
-    ]
-  },
-  "Jaisalmer": {
-    "m": [
-      "<b>42 Allenites</b> led AIIMS Jodhpur ('24) 🏆",
-      "<b>3 Allenites</b> scored ≥550 in NEET ('22-'25)",
-      "<b>Lakshita</b>: AIR 2,037, SMS MC Jaipur (695/720) ('24)",
-      "<b>42 Allenites</b> cracked AIIMS Jodhpur ('24) 🏆 (Barmer)",
-      "<b>5 Allenites</b> scored ≥550 in NEET ('22-'25) (Barmer)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆",
-      "<b>Yash Choudhary</b>: 99.95%ile+ Main (AIR 792) [100%ile Phy] ('25)",
-      "<b>Yash Choudhary</b>: Adv AIR 2,326, IIT Guwahati DS & AI ('25)",
-      "<b>Deepak Soni</b>: 99.25%ile+ Main ('23)",
-      "<b>Deepak Soni</b>: IIT Goa M&C ('23)"
-    ]
-  },
-  "Bikaner": {
-    "m": [
-      "<b>42 Allenites</b> cracked AIIMS Jodhpur ('24) 🏆",
-      "<b>7 Allenites</b> scored ≥550 in NEET ('22-'25)",
-      "<b>50 Allenites</b> nailed SP MC Bikaner ('24) 🏆",
-      "<b>Ayush Shekhawat</b>: JMC Jhalawar (676/720) ('24)",
-      "<b>6 Allenites</b> scored ≥600 in NEET ('22-'25) (Churu)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>Anmol Bhargava</b>: 99.55%ile+ Main (AIR 4,104) ('22)",
-      "<b>Snehit Jain</b>: IIT Jodhpur Civil ('25)",
-      "<b>Anmol Bhargava</b>: IIT Gandhinagar Elec ('22)",
-      "<b>Khush Marodia</b>: IIT Jodhpur Chem ('24) (Churu)"
-    ]
-  },
-  "Sri Ganganagar": {
-    "m": [
-      "<b>6 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>7 Allenites</b> led GMC Sri Ganganagar ('24) 🏆",
-      "<b>5 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Anshul Kumar</b>: SN MC Jodhpur (682/720) ('24)",
-      "<b>Gouri</b>: GMC Suryapet (655/720) ('24)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('24) 🏆",
-      "<b>Maitri Surana</b>: 99.64%ile+ Main ('24)",
-      "<b>Tanish Booti</b>: 99.20%ile+ Main ('24)",
-      "<b>Sandesh Jangir</b>: 99.18%ile+ Main ('26)",
-      "<b>Tanish Booti</b>: IIT Dhanbad Petroleum ('24)",
-      "<b>Maitri Surana</b>: IIT Delhi Textile ('24)"
-    ]
-  },
-  "Nagaur": {
-    "m": [
-      "<b>42 Allenites</b> cracked AIIMS Jodhpur ('24) 🏆",
-      "<b>30 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>7 Allenites</b> nailed GMC Nagaur ('24) 🏆",
-      "<b>11 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Hitarth Vyas</b>: AIR 1,001, IMS BHU (701/720) ('24)",
-      "<b>Dhananjay Soni</b>: GMC Jangaon ('25)",
-      "<b>Rakesh Bhati</b>: GMC Nagaur ('24)"
-    ],
-    "e": [
-      "<b>5 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>Parth Agarwal</b>: Adv AIR 613, IIT Delhi Elec ('24)",
-      "<b>Parth Agarwal</b>: 99.98%ile+ Main (AIR 315) [100%ile Math] ('24)",
-      "<b>1 Allenite</b> in Top-1,000 Adv ('24)",
-      "<b>Tanishq Soni</b>: 99.17%ile+ Main ('23)",
-      "<b>Yash Buldak</b>: IIT Ropar Eng Physics ('25)",
-      "<b>Harshit Ghotiya</b>: IIT Roorkee Eng Physics ('25)",
-      "<b>Tanishq Soni</b>: IIT Kanpur Materials ('23)",
-      "<b>Akshat Kabra</b>: IIT Mandi Eng Physics ('22)"
-    ]
-  },
-  "Sirohi": {
-    "m": [
-      "<b>42 Allenites</b> led AIIMS Jodhpur ('24) 🏆",
-      "<b>4 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>7 Allenites</b> cracked GMC Sirohi ('24) 🏆",
-      "<b>Vidhi Rajpurohit</b>: PDU MC Rajkot ('25)",
-      "<b>42 Allenites</b> stormed AIIMS Jodhpur ('24) 🏆 (Jalore)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆",
-      "<b>Mehul Agarwal</b>: 99.91%ile+ Main (AIR 1,130) ('23)",
-      "<b>Siddharth Dangi</b>: IIT Gandhinagar AI ('25)",
-      "<b>Ayush Bairwa</b>: IIT Roorkee Elec ('23)",
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'24) 🏆 (Jalore)"
-    ]
-  },
-  "Churu": {
-    "m": [
-      "<b>6 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>11 Allenites</b> nailed GMC Churu ('24) 🏆",
-      "<b>12 Allenites</b> scored ≥500 in NEET ('22-'25) (Jhunjhunu)",
-      "<b>11 Allenites</b> aced GMC Jhunjhunu ('24) 🏆 (Jhunjhunu)",
-      "<b>5 Allenites</b> in GMCs pan-India ('22-'25) (Jhunjhunu)"
-    ],
-    "e": [
-      "<b>3 Allenites</b> cracked IITs (Adv) ('22-'24) 🏆 (Jhunjhunu)",
-      "<b>Khush Marodia</b>: IIT Jodhpur Chem ('24)",
-      "<b>Anirudh Jangid</b>: 99.88%ile+ Main (AIR 1,148) ('22) (Jhunjhunu)",
-      "<b>Neel Sumangesh</b>: 99.67%ile+ Main ('24) (Jhunjhunu)",
-      "<b>Anirudh K. Jangid</b>: Adv AIR 1,313, IIT Bombay ('22) (Jhunjhunu)"
-    ]
-  },
-  "Hanumangarh": {
-    "m": [
-      "<b>7 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>9 Allenites</b> stormed GMC Hanumangarh ('24) 🏆",
-      "<b>Prasoon Barayach</b>: AIR 1,697 (680/720) ('23)",
-      "<b>Bharti</b>: AIR 3,931 (664/720) ('23)",
-      "<b>6 Allenites</b> scored ≥600 in NEET ('22-'25) (Sri Ganganagar)"
-    ],
-    "e": [
-      "<b>3 Allenites</b> cracked IITs (Adv) ('22-'23) 🏆",
-      "<b>Manish</b>: Adv AIR 4,229, IIT Roorkee Elec ('22)",
-      "<b>Janvi</b>: 99.24%ile+ Main ('23)",
-      "<b>Janvi</b>: IIT Gandhinagar Chem ('23)",
-      "<b>Latika Dhingra</b>: IIT Roorkee Chem ('22)"
-    ]
-  },
-  "Jhunjhunu": {
-    "m": [
-      "<b>12 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>11 Allenites</b> stormed GMC Jhunjhunu ('24) 🏆",
-      "<b>5 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Yogesh Kumar</b>: ESIC MC Sanath Nagar (675/720) ('24)",
-      "<b>Lucky</b>: GMC Sindhudurg ('25)"
-    ],
-    "e": [
-      "<b>3 Allenites</b> cracked IITs (Adv) ('22-'24) 🏆",
-      "<b>Anirudh Jangid</b>: 99.88%ile+ Main (AIR 1,148) ('22)",
-      "<b>Neel Sumangesh</b>: 99.67%ile+ Main ('24)",
-      "<b>Anirudh K. Jangid</b>: Adv AIR 1,313, IIT Bombay Elec ('22)",
-      "<b>Aniruddh Kumar Sharma</b>: 99.44%ile+ Main ('23)",
-      "<b>Ujjawal Kishor Chirania</b>: 99.48%ile+ Main ('25)",
-      "<b>Neel Sumangesh</b>: IIT Guwahati CS ('24)",
-      "<b>Aniruddh Kumar Sharma</b>: IIT Bombay BS Math ('23)"
-    ]
-  },
-  "Sikar": {
-    "m": [
-      "<b>9 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>9 Allenites</b> aced Shri Kalyan GMC Sikar ('24) 🏆",
-      "<b>7 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Jatin Kumar Saini</b>: AIR 1,240 (675/720) ('22)",
-      "<b>Rakshit Kumar</b>: AIR 3,762 (654/720) ('22)",
-      "<b>Dholu Ram Swami</b>: GMC Pali ('25)",
-      "<b>Mohan L. Yadav</b>: Dr. Rajendar Prasad GMC, Tand ('24)",
-      "<b>Swati</b>: GMC Mahabubabad (601/720) ('25)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('24) 🏆",
-      "<b>Saksham Bansal</b>: 99.81%ile+ Main (AIR 3,132) ('24)",
-      "<b>Sneha Gupta</b>: 99.52%ile+ Main ('24)",
-      "<b>Ishant Agrawal</b>: 99.30%ile+ Main ('23)",
-      "<b>Ashwin Kumawat</b>: 99.07%ile+ Main ('24)",
-      "<b>Vedant Kulwal</b>: 99.27%ile+ Main ('25)",
-      "<b>Divyansh Temani</b>: 99.06%ile+ Main ('25)",
-      "<b>Sneha Gupta</b>: IIT Kanpur Elec ('24)",
-      "<b>Saksham Bansal</b>: IIT Roorkee Eng Physics ('24)"
-    ]
-  },
-  "Ajmer": {
-    "m": [
-      "<b>42 Allenites</b> cracked AIIMS Jodhpur ('24) 🏆",
-      "<b>12 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>51 Allenites</b> nailed JLN MC Ajmer ('24) 🏆",
-      "<b>7 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Vedant Pareek</b>: AIR 3,406 (666/720) ('23)",
-      "<b>Gauranshi Agarwal</b>: AIR 4,473, JLN MC Ajmer (686/720) ('24)",
-      "<b>Nausheen Gauri</b>: AIR 4,806 ('22)",
-      "<b>Himanshi Vaishnav</b>: GMC Dungarpur (666/720) ('24)",
-      "<b>Arin Jain</b>: GMC Miraj (662/720) ('24)",
-      "<b>Abhishek Sharma</b>: GMC Shastri (650/720) ('24)",
-      "<b>Nitika Tank</b>: GMC Bhilwara (616/720) ('24)",
-      "<b>Lakhan Jagrat</b>: GMC Dholpur ('24)",
-      "<b>Meenal Verma</b>: GMC Bundi ('24)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> aced Top-500 Adv ('23) 🎯",
-      "<b>Rishika Garg</b>: Adv AIR 419, IIT Delhi CS ('23)",
-      "<b>Rishika Garg</b>: 99.95%ile+ Main (AIR 643) ('23)",
-      "<b>Chayanika Mandal</b>: 99.98%ile+ Main ('26)",
-      "<b>9 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>Hridyansh Bhargava</b>: 99.78%ile+ Main (AIR 2,018) ('22)",
-      "<b>Aakash Jaisinghani</b>: 99.59%ile+ Main ('24)",
-      "<b>Mohit Somai</b>: 99.74%ile+ Main (AIR 3,983) ('25)",
-      "<b>Nehal Singh</b>: 99.69%ile+ Main ('26)",
-      "<b>Samyyak Jain</b>: 99.65%ile+ Main ('26)",
-      "<b>Mohit Somai</b>: Adv AIR 1,466, IIT Roorkee ECE ('25)",
-      "<b>Hridyansh Bhargava</b>: Adv AIR 1,931, IIT Bombay Chem ('22)",
-      "<b>Aakash Jaisinghani</b>: Adv AIR 2,262, IIT Ropar CS ('24)",
-      "<b>Rohit Khatri</b>: 99.14%ile+ Main ('23)",
-      "<b>Samarth Jain</b>: 99.33%ile+ Main ('24)",
-      "<b>Aman Jangid</b>: 99.28%ile+ Main [100%ile Phy] ('24)",
-      "<b>Lakshyjeet Bugaliya</b>: 99.29%ile+ Main ('25)",
-      "<b>Garvit Sharma</b>: 99.23%ile+ Main ('26)",
-      "<b>Trilok Choudharyy</b>: IIT BHU Materials ('24)",
-      "<b>Garvit B Nahta</b>: IIT Patna Civil ('23)",
-      "<b>Rohit Khatri</b>: IIT Jammu CS ('23)",
-      "<b>Naman Sharma</b>: IIT Guwahati Civil ('22)",
-      "<b>Raj Vijayvargiya</b>: IIT Jodhpur Materials ('22)"
-    ]
-  },
-  "Alwar": {
-    "m": [
-      "<b>3 Allenites</b> in Top-500 NEET ('23-'24) 🎯",
-      "<b>Prathvi R. Chouhan</b>: AIR 264, AIIMS Jodhpur (710/720) ('24) 🔥",
-      "<b>Dev Bansal</b>: AIR 393 (696/720) ('23) 🔥",
-      "<b>Pawan Kumar</b>: AIR 425, AIIMS Jodhpur (706/720) ('24) 🔥",
-      "<b>7 Allenites</b> in Top-1,000 NEET ('22-'25)",
-      "<b>86 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>15 Allenites</b> aced ESIC MC Alwar ('24) 🏆",
-      "<b>8 Allenites</b> stormed GMC Alwar ('24) 🏆",
-      "<b>70 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Priyanshu Soni</b>: AIR 807, SMS MC Jaipur ('25)",
-      "<b>Kirti Tailor</b>: AIR 818, LHMC Delhi (705/720) ('24)",
-      "<b>Chhavi Jain</b>: AIR 966, SMS MC Jaipur (701/720) ('24)",
-      "<b>Diya Gupta</b>: AIR 978 (677/720) ('22)",
-      "<b>Monika Yadav</b>: AIR 1,092 (675/720) ('22)",
-      "<b>Shorya Goyal</b>: AIR 2,079 (675/720) ('23)",
-      "<b>Praveer Kumar</b>: AIR 2,095 (665/720) ('22)",
-      "<b>Jahnvi Yadav</b>: AIR 2,181 (675/720) ('23)",
-      "<b>Sakshi Agrawal</b>: AIR 2,426 (673/720) ('23)",
-      "<b>Aryan Goyal</b>: AIR 2,507 (661/720) ('22)",
-      "<b>Jaivardhan Singh</b>: AIR 2,959 (660/720) ('22)",
-      "<b>Anant Kundnani</b>: AIR 3,074 (669/720) ('23)",
-      "<b>Arpit Khandelwal</b>: AIR 3,171 (657/720) ('22)",
-      "<b>Mayank Gupta</b>: AIR 3,760, SP MC Bikaner (690/720) ('24)",
-      "<b>Tanuj Yadav</b>: AIR 4,083, AIIMS Guwahati ('25)",
-      "<b>Garvita Gupta</b>: AIR 4,269 (650/720) ('22)",
-      "<b>Hardik Kundnani</b>: AIR 4,273, ESIC MC Faridabad ('25)",
-      "<b>Anshu</b>: AIR 4,524 (650/720) ('22)",
-      "<b>Nikhil Sahu</b>: SN MC Jodhpur (685/720) ('24)",
-      "<b>Nishika Yadav</b>: RNT MC Udaipur (681/720) ('24)",
-      "<b>Vivek Yadav</b>: GR MC Gwalior ('25)",
-      "<b>Naman Butolia</b>: RNT MC Udaipur (676/720) ('24)",
-      "<b>Aditya Sharma</b>: MP Shah MC Jamnagar (675/720) ('24)",
-      "<b>Mayank Jain</b>: GMC Kota (675/720) ('24)",
-      "<b>Krish Ratra</b>: GMC Bhilwara (675/720) ('24)",
-      "<b>Sayuri Rustagi</b>: GMC Surat (675/720) ('24)",
-      "<b>Anamika Sulaniya</b>: GMC Sen ('25)",
-      "<b>Kinmay Kumar</b>: GMC Hingoli ('25)",
-      "<b>Gagan Meena</b>: GMC Coimbatore ('25)",
-      "<b>Naman Choudhary</b>: VCSG GMC Srinagar ('25)",
-      "<b>Divya</b>: MC Sonebhadra ('25)",
-      "<b>Archana Yadav</b>: GMC Jalna (653/720) ('24)",
-      "<b>Janvi Kaushik</b>: GMC Vidisha (662/720) ('24)",
-      "<b>Aryan Naruka</b>: GMC Sakhlecha (662/720) ('24)",
-      "<b>Bharti Choudhary</b>: GMC Dholpur (666/720) ('24)",
-      "<b>Nidhi Arya</b>: GMC Alwar (670/720) ('24)",
-      "<b>Vishnu Sharma</b>: GMC Bharatpur (670/720) ('24)",
-      "<b>Himesh Singh Bagri</b>: GMC Alwar ('24)",
-      "<b>Divyanshi Meena</b>: JMC Jhalawar ('24)"
-    ],
-    "e": [
-      "<b>27 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>Yug Sharma</b>: Adv AIR 774, IIT BHU CS ('24)",
-      "<b>Piyush Sharma</b>: 99.90%ile+ Main (AIR 1,498) ('25)",
-      "<b>Piyush Sharma</b>: IIT Roorkee Mech ('25)",
-      "<b>Yug Sharma</b>: 99.91%ile+ Main (AIR 1,476) ('24)",
-      "<b>1 Allenite</b> in Top-1,000 Adv ('24)",
-      "<b>Gaurav Rao</b>: 99.89%ile+ Main (AIR 1,346) ('23)",
-      "<b>Vineet Nakra</b>: 99.77%ile+ Main (AIR 2,722) ('23)",
-      "<b>Daksh Pandey</b>: 99.60%ile+ Main (AIR 4,636) ('23)",
-      "<b>Gauri Aggarwal</b>: 99.53%ile+ Main ('23)",
-      "<b>Tanishq Singhal</b>: 99.55%ile+ Main ('24)",
-      "<b>Dhruv Sharma</b>: 99.85%ile+ Main (AIR 2,294) ('25)",
-      "<b>Palash Tekchandani</b>: 99.69%ile+ Main (AIR 4,740) ('25)",
-      "<b>Shubham Yadav</b>: 99.52%ile+ Main ('26)",
-      "<b>Jatin Gupta</b>: Adv AIR 1,380, IIT Roorkee ECE ('22)",
-      "<b>Jatin Gupta</b>: 99.16%ile+ Main ('22)",
-      "<b>Mehul Goyal</b>: Adv AIR 2,709, IIT BHU ('22)",
-      "<b>Mehul Goyal</b>: 99.36%ile+ Main ('22)",
-      "<b>Daksh Pandey</b>: Adv AIR 3,279, IIT Roorkee Eng Physics ('23)",
-      "<b>Palash Tekchandani</b>: Adv AIR 3,318, IIT Delhi Materials ('25)",
-      "<b>Divyansh Agarwal</b>: Adv AIR 4,135, IIT Patna ('24)",
-      "<b>Devansh K. Sharma</b>: Adv AIR 4,964, IIT Patna ECE ('24)",
-      "<b>Devansh Kumar Sharma</b>: 99.05%ile+ Main ('24)",
-      "<b>Antima</b>: 99.43%ile+ Main ('23)",
-      "<b>Yash Agarwal</b>: 99.09%ile+ Main ('23)",
-      "<b>Priyanshi Agrawal</b>: 99.46%ile+ Main ('24)",
-      "<b>Sanket Singhal</b>: 99.38%ile+ Main ('24)",
-      "<b>Arpit Choudhary</b>: 99.36%ile+ Main ('24)",
-      "<b>Lucky Soni</b>: 99.28%ile+ Main ('24)",
-      "<b>Madhav Kundnani</b>: 99.28%ile+ Main ('24)",
-      "<b>Aishyani Saini</b>: IIT Kharagpur Agri ('25)",
-      "<b>Kavya Gupta</b>: IIT Patna Chem ('25)",
-      "<b>Jay Khandelwal</b>: IIT Guwahati Chem ('25)",
-      "<b>Sanjeet Kumar</b>: IIT Madras Bio Sci ('24)"
-    ]
-  },
-  "Bharatpur": {
-    "m": [
-      "<b>1 Allenite</b> in Top-500 NEET ('22) 🎯",
-      "<b>Rohan Jindal</b>: AIR 198 (695/720) ('22) 🔥",
-      "<b>29 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>19 Allenites</b> cracked GMC Bharatpur ('24) 🏆",
-      "<b>7 Allenites</b> nailed SJP MC Bharatpur ('24) 🏆",
-      "<b>24 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Jay Shukla</b>: AIR 3,049 ('25)",
-      "<b>Shubham Kuntal</b>: AIR 3,261, RUHS CMS Jaipur (690/720) ('24)",
-      "<b>Krishn Kumar</b>: MLB MC Jhansi ('25)",
-      "<b>Prashansha Sethi</b>: GMC Bharatpur (682/720) ('24)",
-      "<b>Hardik Agrawal</b>: RNT MC Udaipur (682/720) ('24)",
-      "<b>Krish Jindal</b>: AIIMS Madurai (676/720) ('24)",
-      "<b>Mayank</b>: GMC Parbhani (616/720) ('25)",
-      "<b>Manju</b>: GMC Kanker ('25)",
-      "<b>Vishal Saini</b>: Nursing BHU ('25)",
-      "<b>Chainpal Singh</b>: SC Chattopadhyay GMC ('25)",
-      "<b>Piyush Choudhary</b>: SJP MC Bharatpur ('25)",
-      "<b>Lucky Chaudhary</b>: GMC Keonjhar ('25)",
-      "<b>Harsh Kumar Meena</b>: Yadgiri IMS ('25)",
-      "<b>Priya Kumari</b>: SMS MC Jaipur ('24)",
-      "<b>Sanchay Kumar Vinesh</b>: GMC Bharatpur (606/720) ('24)",
-      "<b>Sumit</b>: NSCB MC Jabalpur ('24)",
-      "<b>Ayush Agarwal</b>: GMC Korba (655/720) ('24)",
-      "<b>Abhishek Bansal</b>: GMC Sindhudurg (655/720) ('24)",
-      "<b>Gagan Dhakad</b>: GMC Bharatpur (675/720) ('24)",
-      "<b>Deepanshu Lawaniya</b>: GMC Dholpur (645/720) ('24)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> aced Top-500 Adv ('23) 🎯",
-      "<b>Harsh Goyal</b>: Adv AIR 397, IIT Roorkee CS ('23)",
-      "<b>Harsh Goyal</b>: 99.95%ile+ Main (AIR 621) [100%ile Chem] ('23)",
-      "<b>Aman Gupta</b>: 99.93%ile+ Main (AIR 1,202) ('24)",
-      "<b>Aman Gupta</b>: Adv AIR 2,381, IIT Mandi CS ('24)",
-      "<b>6 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>Yash Gupta</b>: 99.82%ile+ Main (AIR 1,704) ('22)",
-      "<b>Dev Narang</b>: 99.67%ile+ Main ('24)",
-      "<b>Tanmay Kumar Bansal</b>: 99.61%ile+ Main ('24)",
-      "<b>Shourya Mittal</b>: 99.62%ile+ Main ('25)",
-      "<b>Yash Gupta</b>: Adv AIR 1,242, IIT Bombay Mech ('22)",
-      "<b>Rohit Kaushik</b>: Adv AIR 2,911, IIT BHU ('22)",
-      "<b>Anuj Kuntal</b>: 99.19%ile+ Main ('22)",
-      "<b>Yogesh Tyagi</b>: 99.42%ile+ Main ('24)",
-      "<b>Yashmi Bhardwaj</b>: IIT BHU Chem ('25)",
-      "<b>Khushi Garg</b>: IIT Gandhinagar CS ('24)"
-    ]
-  },
-  "Jaipur": {
-    "m": [
-      "<b>7 Allenites</b> in Top-100 NEET ('22-'24) 🎯",
-      "<b>Parth Khandelwal</b>: AIR 10 (715/720) [RJ Topper] ('23) 🔥",
-      "<b>Tanishak Yadav</b>: AIR 37, AIIMS New Delhi (715/720) ('24) 🔥",
-      "<b>Shivam Gupta</b>: AIR 40 (705/720) ('22) 🔥",
-      "<b>Shashank Sharma</b>: AIR 45, AIIMS New Delhi (715/720) ('24) 🔥",
-      "<b>Puru Khandelwal</b>: AIR 58 (710/720) ('23) 🔥",
-      "<b>Priyanshi Garg</b>: AIR 66 (710/720) ('23) 🔥",
-      "<b>Vedika Gupta</b>: AIR 79 (706/720) ('23) 🔥",
-      "<b>Saurav Sharma</b>: AIR 101, AIIMS New Delhi ('25)",
-      "<b>Parth Upadhyay</b>: AIR 114, VMMC Delhi (715/720) ('24)",
-      "<b>Yashvi Garg</b>: AIR 128 (705/720) ('23)",
-      "<b>Abhay Mittal</b>: AIR 144 (705/720) ('23)",
-      "<b>Atishay Jain</b>: AIR 181, ABVIMS RML Delhi (710/720) ('24)",
-      "<b>Kanishk Kumar Sharma</b>: AIR 211 (700/720) ('23)",
-      "<b>Rudra Yadav</b>: AIR 225 (691/720) ('22)",
-      "<b>Vandini Singh</b>: AIR 231 (691/720) ('22)",
-      "<b>Krishna Agarwal</b>: AIR 258 (700/720) ('23)",
-      "<b>Rohan Janu</b>: AIR 276 (690/720) ('22)",
-      "<b>Krish Jain</b>: AIR 316, AIIMS Jodhpur (710/720) ('24)",
-      "<b>Prakhar Singh</b>: AIR 330 (690/720) ('22)",
-      "<b>Dishita</b>: AIR 331, SMS MC Jaipur ('25)",
-      "<b>Prakhar Jain</b>: AIR 338 (690/720) ('22)",
-      "<b>Somya Garg</b>: AIR 340, AIIMS Jodhpur (710/720) ('24)",
-      "<b>Abhinav Jain</b>: AIR 416 (687/720) ('22)",
-      "<b>Jaideep Rathore</b>: AIR 478, AIIMS Bhopal ('25)",
-      "<b>24 Allenites</b> in Top-500 NEET ('22-'25) 🎯",
-      "<b>853 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>73 Allenites</b> nailed SMS MC Jaipur ('24) 🏆",
-      "<b>22 Allenites</b> aced RUHS CMS Jaipur ('24) 🏆",
-      "<b>701 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Pinak Khoja</b>: AIR 508 (695/720) ('23)",
-      "<b>Prashan Choudhary</b>: AIR 515, SMS MC Jaipur (705/720) ('24)",
-      "<b>Yogita Gauttam</b>: AIR 519, ABVIMS RML Delhi ('25)",
-      "<b>Ashvin Sharma</b>: AIR 562, SMS MC Jaipur (705/720) ('24)",
-      "<b>Preksha Mishra</b>: AIR 579, AIIMS Rishikesh ('25)",
-      "<b>Sheetal Yadav</b>: AIR 598, SMS MC Jaipur ('25)",
-      "<b>Purvika Singh</b>: AIR 606, SMS MC Jaipur (705/720) ('24)",
-      "<b>Rishabh Godara</b>: AIR 627 (682/720) ('22)",
-      "<b>Tanmay Singhal</b>: AIR 681, SMS MC Jaipur (705/720) ('24)",
-      "<b>Anirudh Mathur</b>: AIR 688 (690/720) ('23)",
-      "<b>Kashika Vedwal</b>: AIR 736 (690/720) ('23)",
-      "<b>Aryan Singh</b>: AIR 758 (680/720) ('22)",
-      "<b>Bhumika Sharma</b>: AIR 761 (690/720) ('23)",
-      "<b>Jatin Gupta</b>: AIR 776 (690/720) ('23)",
-      "<b>Mahak Santani</b>: AIR 816 (690/720) ('23)",
-      "<b>Devank Agarwal</b>: AIR 864 (690/720) ('23)",
-      "<b>Tejasva Roshan Sharma</b>: AIR 907, SMS MC Jaipur ('25)",
-      "<b>Bhavika Sharma</b>: AIR 967 (677/720) ('22)",
-      "<b>Piyush Sharma</b>: AIR 968, SMS MC Jaipur ('25)",
-      "<b>Riddhima Singhal</b>: AIR 987 (686/720) ('23)",
-      "<b>Bhavya Jalewa</b>: AIR 1,090, SMS MC Jaipur ('25)",
-      "<b>Ronak Mangal</b>: AIR 1,092 ('25)",
-      "<b>Trisha Sharma</b>: AIR 1,107, SMS MC Jaipur ('25)",
-      "<b>Anushka Sharma</b>: AIR 1,137 (675/720) ('22)",
-      "<b>Abhay Khandelwal</b>: AIR 1,140 (675/720) ('22)",
-      "<b>Aryan Ghunawat</b>: AIR 1,150, AIIMS New Delhi (700/720) ('24)",
-      "<b>Anmol Malhotra</b>: AIR 1,166 (685/720) ('23)",
-      "<b>Saumya Gupta</b>: AIR 1,185, SMS MC Jaipur (700/720) ('24)",
-      "<b>Tanmay Gupta</b>: AIR 1,231, KGMU Lucknow ('25)",
-      "<b>Chelsi Goyal</b>: AIR 1,280 (685/720) ('23)",
-      "<b>Mudit Yadav</b>: AIR 1,285 (674/720) ('22)",
-      "<b>Purvi Sharma</b>: AIR 1,289 (674/720) ('22)",
-      "<b>Satviki Gupta</b>: AIR 1,303 (673/720) ('22)",
-      "<b>Hemakshi Bansal</b>: AIR 1,342 (672/720) ('22)",
-      "<b>Mahi Singh Choudhary</b>: AIR 1,388 (671/720) ('22)",
-      "<b>Anay Sharma</b>: AIR 1,412, SN MC Jodhpur ('25)",
-      "<b>Nikhil Kumawat</b>: AIR 1,427, SMS MC Jaipur (700/720) ('24)",
-      "<b>Nikhil Sharma</b>: AIR 1,427, AIIMS Rishikesh ('25)",
-      "<b>Nitesh Dewanda</b>: AIR 1,447 (681/720) ('23)",
-      "<b>Ananya Vyas</b>: AIR 1,500 (681/720) ('23)",
-      "<b>Naman Gupta</b>: AIR 1,567 (670/720) ('22)",
-      "<b>Ronak Sharma</b>: AIR 1,601, SMS MC Jaipur ('25)",
-      "<b>Utsav Gahlot</b>: AIR 1,662, SMS MC Jaipur (698/720) ('24)",
-      "<b>Manish Sharma</b>: AIR 1,721, SMS MC Jaipur (697/720) ('24)",
-      "<b>Navyansh Kaswan</b>: AIR 1,726 ('25)",
-      "<b>Romesh K. Dhayal</b>: AIR 1,735, SMS MC Jaipur (697/720) ('24)",
-      "<b>Anushka Meena</b>: AIR 1,763, AIIMS Jodhpur (696/720) ('24)",
-      "<b>Sneha Jain</b>: AIR 1,865 (667/720) ('22)",
-      "<b>Sarthak Bajaj</b>: AIR 1,875 (667/720) ('22)",
-      "<b>Koustubh Patel</b>: AIR 1,889 (666/720) ('22)",
-      "<b>Atul Garg</b>: AIR 1,896, SMS MC Jaipur (696/720) ('24)",
-      "<b>Devanshu Dharmawat</b>: AIR 1,915 (666/720) ('22)",
-      "<b>Kartik Raj Kuntal</b>: AIR 1,958 (676/720) ('23)",
-      "<b>Pushpendra Singh</b>: AIR 2,005, SMS MC Jaipur (695/720) ('24)",
-      "<b>Chahak Sharma</b>: AIR 2,089 (665/720) ('22)",
-      "<b>Ishant</b>: AIR 2,113 ('25)",
-      "<b>Shreya Sharma</b>: AIR 2,125, Grant MC Mumbai ('25)",
-      "<b>Aman Choudhary</b>: AIR 2,128 (665/720) ('22)",
-      "<b>Hardik Mittal</b>: AIR 2,134 (665/720) ('22)",
-      "<b>Aditri Bhardwaj</b>: AIR 2,173 (675/720) ('23)",
-      "<b>Peeyush Bangar</b>: AIR 2,178 (665/720) ('22)",
-      "<b>Yash Pratap Singh Bisht</b>: AIR 2,195 ('25)",
-      "<b>Suhani Sharma</b>: AIR 2,210 (665/720) ('22)",
-      "<b>Mudit Naruka</b>: AIR 2,228, SMS MC Jaipur (695/720) ('24)",
-      "<b>Saniya Choudhary</b>: AIR 2,263 (665/720) ('22)",
-      "<b>Srishti Agrawal</b>: AIR 2,267 (675/720) ('23)",
-      "<b>Khush Gupta</b>: AIR 2,271, AIIMS Gorakhpur (695/720) ('24)",
-      "<b>Prateek Pareek</b>: AIR 2,280 (675/720) ('23)",
-      "<b>Jyotsana Bansal</b>: AIR 2,320, SMS MC Jaipur (695/720) ('24)",
-      "<b>Harshit Agarwal</b>: AIR 2,375, RUHS CMS Jaipur (695/720) ('24)",
-      "<b>Nidhi Choudhary</b>: AIR 2,380 (663/720) ('22)",
-      "<b>Suhani Verma</b>: AIR 2,394 (674/720) ('23)",
-      "<b>Pranay Singhal</b>: AIR 2,450 ('25)",
-      "<b>Dhruv Gupta</b>: AIR 2,465 ('25)",
-      "<b>Arjun S. Rathore</b>: AIR 2,469, RUHS CMS Jaipur (695/720) ('24)",
-      "<b>Tanishka Jain</b>: AIR 2,485 (662/720) ('22)",
-      "<b>Khushhal Sharma</b>: AIR 2,485 (672/720) ('23)",
-      "<b>Vivek Sharma</b>: AIR 2,503 (661/720) ('22)",
-      "<b>Madhav Sharma</b>: AIR 2,508 (672/720) ('23)",
-      "<b>Ritika Agrawal</b>: AIR 2,531 (661/720) ('22)",
-      "<b>Prakhar Mishra</b>: AIR 2,566, AIIMS Rae Bareli (695/720) ('24)",
-      "<b>Archita Gupta</b>: AIR 2,577 (671/720) ('23)",
-      "<b>Siddhi Bhardwaj</b>: AIR 2,597 (661/720) ('22)",
-      "<b>Kaustubh Bansal</b>: AIR 2,605 (661/720) ('22)",
-      "<b>Ojaswi Mahawar</b>: AIR 2,616, ABVIMS RML Delhi (695/720) ('24)",
-      "<b>Purvi Goyal</b>: AIR 2,658 ('25)",
-      "<b>Madhur Jain</b>: AIR 2,673, SMS MC Jaipur (695/720) ('24)",
-      "<b>Priyanshu Saini</b>: AIR 2,701 (660/720) ('22)",
-      "<b>Himakshi Shekhawat</b>: AIR 2,736 ('25)",
-      "<b>Falguni Sharma</b>: AIR 2,793 (660/720) ('22)",
-      "<b>Aniruddh Agarwal</b>: AIR 2,869 (670/720) ('23)",
-      "<b>Deepanshu Saini</b>: AIR 2,873 (660/720) ('22)",
-      "<b>Raghav Soni</b>: AIR 2,887, SMS MC Jaipur (691/720) ('24)",
-      "<b>Nayan Sharma</b>: AIR 2,890 (660/720) ('22)",
-      "<b>Vatsal Tongya</b>: AIR 2,896 (660/720) ('22)",
-      "<b>Aniroodh Sharma</b>: AIR 2,917, SMS MC Jaipur (691/720) ('24)",
-      "<b>Lakshya Fauzdar</b>: AIR 2,981 (659/720) ('22)",
-      "<b>Aryan Singhal</b>: AIR 3,039, RUHS CMS Jaipur (691/720) ('24)",
-      "<b>Avika Koolwal</b>: AIR 3,048, SP MC Bikaner ('25)",
-      "<b>Aakarsh Kant Dubey</b>: AIR 3,090, AIIMS Rae Bareli ('25)",
-      "<b>Gourang Sharma</b>: AIR 3,099, RUHS CMS Jaipur (691/720) ('24)",
-      "<b>Palak Jain</b>: AIR 3,161 (668/720) ('23)",
-      "<b>Udit Mahawar</b>: AIR 3,189 (657/720) ('22)",
-      "<b>Surendra Choudhary</b>: AIR 3,219 (667/720) ('23)",
-      "<b>Riya Singhani</b>: AIR 3,281 (656/720) ('22)",
-      "<b>Aarush Mathur</b>: AIR 3,314 (656/720) ('22)",
-      "<b>Ravinder Kumar</b>: AIR 3,326, AIIMS Bilaspur (690/720) ('24)",
-      "<b>Archita Jain</b>: AIR 3,387, SMS MC Jaipur (690/720) ('24)",
-      "<b>Kumkum Sharma</b>: AIR 3,463 (666/720) ('23)",
-      "<b>Pari</b>: AIR 3,471, GMC Surat ('25)",
-      "<b>Samridhi Jain</b>: AIR 3,491 ('25)",
-      "<b>Gagan Sarolia</b>: AIR 3,504 (655/720) ('22)",
-      "<b>Abhinav Yadav</b>: AIR 3,545 (655/720) ('22)",
-      "<b>Nancy Yadav</b>: AIR 3,597 (665/720) ('23)",
-      "<b>Dinesh Kumawat</b>: AIR 3,605, RUHS CMS Jaipur (690/720) ('24)",
-      "<b>Dheeran Agarwal</b>: AIR 3,656 (665/720) ('23)",
-      "<b>Mridul Sharma</b>: AIR 3,714 (655/720) ('22)",
-      "<b>Harshita Jha</b>: AIR 3,784 (654/720) ('22)",
-      "<b>Chirayu Pareek</b>: AIR 3,807 (665/720) ('23)",
-      "<b>Mansi Parashar</b>: AIR 3,844 (665/720) ('23)",
-      "<b>Yash Jain</b>: AIR 3,873, RUHS CMS Jaipur ('25)",
-      "<b>Abhi Mittal</b>: AIR 3,900 (653/720) ('22)",
-      "<b>Himanshu Saharan</b>: AIR 3,927, SP MC Bikaner (690/720) ('24)",
-      "<b>Prabhjyot Singh</b>: AIR 3,956 (664/720) ('23)",
-      "<b>Niharika Dadheech</b>: AIR 3,978, Seth GS MC Mumbai ('25)",
-      "<b>Ayushi Sharma</b>: AIR 3,984 (652/720) ('22)",
-      "<b>Sudhanshu Sharma</b>: AIR 4,019, JLN MC Ajmer ('25)",
-      "<b>Harshit Sahu</b>: AIR 4,036, RUHS CMS Jaipur (689/720) ('24)",
-      "<b>Tanmay Biwal</b>: AIR 4,076, RUHS CMS Jaipur (688/720) ('24)",
-      "<b>Neha Saini</b>: AIR 4,087 (651/720) ('22)",
-      "<b>Tanu Sharma</b>: AIR 4,093 (662/720) ('23)",
-      "<b>Vipul Maan</b>: AIR 4,142, RUHS CMS Jaipur ('25)",
-      "<b>Manisha Chaudhary</b>: AIR 4,178 (662/720) ('23)",
-      "<b>Manasvi Kushwah</b>: AIR 4,186 (651/720) ('22)",
-      "<b>Rahul Vaishnav</b>: AIR 4,199, RNT MC Udaipur (687/720) ('24)",
-      "<b>Anvesha Dusad</b>: AIR 4,213, RUHS CMS Jaipur (687/720) ('24)",
-      "<b>Nisha Choudhary</b>: AIR 4,248, JLN MC Ajmer (687/720) ('24)",
-      "<b>Vansh Sharma</b>: AIR 4,265 (661/720) ('23)",
-      "<b>Divyanshi Saini</b>: AIR 4,273, SN MC Jodhpur (687/720) ('24)",
-      "<b>Aryanshi Fauzdar</b>: AIR 4,290 (650/720) ('22)",
-      "<b>Harshita Malawat</b>: AIR 4,303, SP MC Bikaner (687/720) ('24)",
-      "<b>Abhinav Agarwal</b>: AIR 4,362 (661/720) ('23)",
-      "<b>Sunita Sharma</b>: AIR 4,369 (661/720) ('23)",
-      "<b>Chinmay Gupta</b>: AIR 4,373 (661/720) ('23)",
-      "<b>Ishaan Sharma</b>: AIR 4,384 (650/720) ('22)",
-      "<b>Madhav Bharadia</b>: AIR 4,470 (660/720) ('23)",
-      "<b>Manan Yadav</b>: AIR 4,503, JLN MC Ajmer (686/720) ('24)",
-      "<b>Prachi Garssa</b>: AIR 4,590 (650/720) ('22)",
-      "<b>Ankit Agarwal</b>: AIR 4,654, SN MC Jodhpur (686/720) ('24)",
-      "<b>Sonal</b>: AIR 4,659, SN MC Jodhpur (686/720) ('24)",
-      "<b>Kanishka Gupta</b>: AIR 4,702 (660/720) ('23)",
-      "<b>Shubham</b>: AIR 4,841, SN MC Jodhpur (685/720) ('24)",
-      "<b>Priyanshi Godara</b>: AIR 4,896 (659/720) ('23)",
-      "<b>Nihar Mathur</b>: AIR 4,933 ('22)",
-      "<b>Ishita Saxena</b>: AIR 4,978 ('22)",
-      "<b>Jayant Kajla</b>: MAMC Delhi ('25)",
-      "<b>Prateek Saini</b>: SN MC Jodhpur (685/720) ('24)",
-      "<b>Shashwat Agarwal</b>: SN MC Jodhpur ('25)",
-      "<b>Tarun Raj Pareek</b>: RUHS CMS Jaipur ('25)",
-      "<b>Tamanna Yadav</b>: SN MC Jodhpur ('25)",
-      "<b>Anand Sharma</b>: GMC Surat ('25)",
-      "<b>Akmal Khan</b>: JLN MC Ajmer (685/720) ('24)",
-      "<b>Akhila Gupta</b>: RNT MC Udaipur ('25)",
-      "<b>Madhavi Chejara</b>: SN MC Jodhpur (684/720) ('24)",
-      "<b>Palak Sharma</b>: RUHS CMS Jaipur (683/720) ('24)",
-      "<b>Delisha Sahu</b>: GMC Nagpur (682/720) ('24)",
-      "<b>Rahul Jangir</b>: JLN MC Ajmer (682/720) ('24)",
-      "<b>Deepanshi Sehra</b>: SMS MC Jaipur (682/720) ('24)",
-      "<b>Lucky Gorsi</b>: RNT MC Udaipur (681/720) ('24)",
-      "<b>Tanisha Sharma</b>: GMC Kota ('25)",
-      "<b>Suhana Singh</b>: RNT MC Udaipur (681/720) ('24)",
-      "<b>Mohit Kumawat</b>: JLN MC Ajmer (681/720) ('24)",
-      "<b>Ujjwal Sharma</b>: SN MC Jodhpur (681/720) ('24)",
-      "<b>Riddhima Sharma</b>: GMC Kota (681/720) ('24)",
-      "<b>Parth Sharma</b>: JLN MC Ajmer (680/720) ('24)",
-      "<b>Mohitansh Sharma</b>: SJP MC Bharatpur ('25)",
-      "<b>Ayush Sharma</b>: ABV GMC Vidisha ('25)",
-      "<b>Pratyaksh Gupta</b>: JLN MC Ajmer (680/720) ('24)",
-      "<b>Rishabh Kumawat</b>: JLN MC Ajmer (680/720) ('24)",
-      "<b>Yashvardhan S. Naruka</b>: JLN MC Ajmer (680/720) ('24)",
-      "<b>Vedang</b>: JLN MC Ajmer (680/720) ('24)",
-      "<b>Naina Nandwani</b>: GMC Kalyan ('25)",
-      "<b>Parth Pratap Singh</b>: GMC Kota (680/720) ('24)",
-      "<b>Chesta Varshney</b>: GMC Kota (679/720) ('24)",
-      "<b>Tanishka Sharma</b>: GMC Kota (679/720) ('24)",
-      "<b>Saket Naraniya</b>: AIIMS Rishikesh (679/720) ('24)",
-      "<b>Sameer Yadav</b>: JLN MC Ajmer (678/720) ('24)",
-      "<b>Radhey Trivedi</b>: GMC Kota (678/720) ('24)",
-      "<b>Saksham Raj</b>: Calcutta NMC Kolkata ('25)",
-      "<b>Vanshika Bajaj</b>: GR MC Gwalior (677/720) ('24)",
-      "<b>Keshav Maharshi</b>: GMC Kota (676/720) ('24)",
-      "<b>Harshit Agrawal</b>: GMC Kota (676/720) ('24)",
-      "<b>Nitin Pareek</b>: GMC Amritsar ('25)",
-      "<b>Anjali Soni</b>: GMC Kalyan (676/720) ('24)",
-      "<b>Jayansh Sharma</b>: GMC Dungarpur ('25)",
-      "<b>Dhananjay Malakar</b>: Gandhi MC Bhopal (676/720) ('24)",
-      "<b>Shrestha Jangid</b>: MC Bhavnagar ('25)",
-      "<b>Arpit Tiwari</b>: MLN MC Allahabad (676/720) ('24)",
-      "<b>Kartik Kumar</b>: GMC Bhilwara (675/720) ('24)",
-      "<b>Titiksha Rajawat</b>: GMC Sirohi ('25)",
-      "<b>Chanchal</b>: GMC Bhilwara ('25)",
-      "<b>Hoonar Mittal</b>: JMC Jhalawar ('25)",
-      "<b>Nehal Sharma</b>: ESIC MC Alwar (675/720) ('24)",
-      "<b>Ritika Sharma</b>: GMC Kalyan (675/720) ('24)",
-      "<b>Divyanshi</b>: GMC Bhilwara ('25)",
-      "<b>Riya Choudhary</b>: GMC Phulbani ('25)",
-      "<b>Arni Agrawal</b>: SBH GMC Dhule (635/720) ('25)",
-      "<b>Gaurav Saini</b>: GMC Washim ('25)",
-      "<b>Madan Singh Takhar</b>: GMERS MC Rajpipla ('25)",
-      "<b>Manvendra Choudhary</b>: GMC Mumbai ('25)",
-      "<b>Sahil Khoda</b>: GMC Kalyan ('25)",
-      "<b>Khushi Jangid</b>: Govt Dental College Indore ('25)",
-      "<b>Pintu Dagar</b>: ESIC MC Faridabad (616/720) ('25)",
-      "<b>Shalini</b>: GMC Alwar ('25)",
-      "<b>Anisha Mandia</b>: GMC Anantnag ('25)",
-      "<b>Kalpana Sharma</b>: SV MC Tirupati ('25)",
-      "<b>Anju Yadav</b>: SRT MC Ambajogai (605/720) ('25)",
-      "<b>Nikhil Tailor</b>: GMC Patiala ('25)",
-      "<b>Aditya Gangwani</b>: GMC Durg ('25)",
-      "<b>Rohit Sharma</b>: GMC Mahata (641/720) ('25)",
-      "<b>Ritika Jangid</b>: Safdarjung Nursing Delhi ('25)",
-      "<b>Juhi Jain</b>: Manipal Dental (600/720) ('25)",
-      "<b>Sahil Nagal</b>: GMC Haridwar ('25)",
-      "<b>Mohit Swami</b>: GMC Machilipatnam (611/720) ('25)",
-      "<b>Mahak Jain</b>: GMC Sakhlecha (630/720) ('25)",
-      "<b>Maniisha Kanwadiya</b>: ESIC MC Alwar ('25)",
-      "<b>Suhrid Sood</b>: MM MC Mullana ('25)",
-      "<b>Anjani</b>: GMC Bahraich ('25)",
-      "<b>Sorabh Tamboli</b>: GMERS MC Navsari ('25)",
-      "<b>Yaman Jalendra</b>: GMC Nashik ('25)",
-      "<b>Ashutosh Ghasia</b>: MC Bhavnagar ('25)",
-      "<b>Nitya G. Saini</b>: ESIC PGIMSR Bangalore (627/720) ('25)",
-      "<b>Payal Kanwar</b>: GMC Sirohi (602/720) ('25)",
-      "<b>Lochan Sharma</b>: Zoram MC Falkawn (640/720) ('25)",
-      "<b>Amit Yadav</b>: GMC Sawai Madhopur ('25)",
-      "<b>Tathagat</b>: Midnapore MC ('25)",
-      "<b>Akshay Chaudhary</b>: GMC Bhandara ('25)",
-      "<b>Diksha Jhajhria</b>: GMC Nirmal (642/720) ('25)",
-      "<b>Diksha Saini</b>: GMC Bhilwara (619/720) ('25)",
-      "<b>Manish Meena</b>: GMC Jalna ('25)",
-      "<b>Anushka Shekhawat</b>: GMC Gondia (627/720) ('25)",
-      "<b>Nisha Meena</b>: GMC Tamralipto ('25)",
-      "<b>Ananya Goyal</b>: GMC Ratlam ('25)",
-      "<b>Kavya Juneja</b>: Manipal Dental ('25)",
-      "<b>Sandeep Choudhary</b>: JMC Jhalawar ('25)",
-      "<b>Aditya Kumar</b>: RUHS CMS Jaipur ('25)",
-      "<b>Megha Rajawat</b>: GMC Baran (607/720) ('25)",
-      "<b>Hemansh Sharma</b>: SJP MC Bharatpur (640/720) ('25)",
-      "<b>Akshita Nitharwal</b>: Tezpur MC ('25)",
-      "<b>Yash Verma</b>: SP MC Bikaner ('25)",
-      "<b>Lalita Kumawat</b>: Govt Dental College Indore ('25)",
-      "<b>Rekha</b>: Yadgiri IMS (642/720) ('25)",
-      "<b>Fareen Khan</b>: GMC Anantnag ('25)",
-      "<b>Tanu Meena</b>: GMC Sangareddy ('25)",
-      "<b>Vritika Mundotiya</b>: GMC Manjeri ('25)",
-      "<b>Kashvi Devgarha</b>: JSS MC Mysuru ('25)",
-      "<b>Ganesh Choudhary</b>: GMC Banswara ('25)",
-      "<b>Avi Jain</b>: GMC Ananthapuram (622/720) ('25)",
-      "<b>Tanishka Meena</b>: SN MC Jodhpur ('25)",
-      "<b>Palak Maharia</b>: SN MC Jodhpur ('25)",
-      "<b>Takshil Rajoria</b>: SMS MC Jaipur (675/720) ('24)",
-      "<b>Anuj Aggarwal</b>: ESIC MC Alwar (675/720) ('24)",
-      "<b>Saniya Khan</b>: GMC Bhilwara (674/720) ('24)",
-      "<b>Sheela Jat</b>: GMC Bhilwara (673/720) ('24)",
-      "<b>Riya Sharma</b>: GMC Bhilwara (675/720) ('24)",
-      "<b>Pooja Kumari</b>: GR MC Gwalior (673/720) ('24)",
-      "<b>Sunil Choudhary</b>: ESIC MC Bangalore (673/720) ('24)",
-      "<b>Aryan Swami</b>: GMC Churu (672/720) ('24)",
-      "<b>Shruti Sharma</b>: GMC Baramati (672/720) ('24)",
-      "<b>Mansi Vaishnave</b>: MG IMS Wardha (672/720) ('24)",
-      "<b>Rajat Singh</b>: GMC Mewati (672/720) ('24)",
-      "<b>Daksh Jhajhra</b>: GMC Dausa (672/720) ('24)",
-      "<b>Sanyam Jain</b>: GMC Dausa (673/720) ('24)",
-      "<b>Vinayak Mourya</b>: GMC Bharatpur (601/720) ('24)",
-      "<b>Keshav Nirmal</b>: GMC Bhilwara (605/720) ('24)",
-      "<b>Kavita Meena</b>: RNT MC Udaipur (606/720) ('24)",
-      "<b>Kapil Meena</b>: MGM MC Indore (607/720) ('24)",
-      "<b>Arsh Nareda</b>: JLN MC Ajmer (609/720) ('24)",
-      "<b>Rakshita</b>: JLN MC Ajmer (610/720) ('24)",
-      "<b>Siddhant Maurya</b>: GMC Kota (612/720) ('24)",
-      "<b>Manish Kumar Meena</b>: RNT MC Udaipur (612/720) ('24)",
-      "<b>Tanveer Atal</b>: JLN MC Ajmer (616/720) ('24)",
-      "<b>Abhijeet Sisodiya</b>: ESIC MC Alwar (617/720) ('24)",
-      "<b>Harsh Sakhuniya</b>: JLN MC Ajmer (619/720) ('24)",
-      "<b>Himanshu Sharma</b>: ESIC MC Patna (623/720) ('24)",
-      "<b>Annu Rathodiya</b>: JLN MC Ajmer (623/720) ('24)",
-      "<b>Pooja Sharma</b>: ESIC MC Joka (627/720) ('24)",
-      "<b>Kuldeep Brijwal</b>: JLN MC Ajmer (627/720) ('24)",
-      "<b>Deepak Yadav</b>: ESIC MC Joka (628/720) ('24)",
-      "<b>Kanishk Agarwal</b>: ESIC MC Sanath Nagar (631/720) ('24)",
-      "<b>Anjana</b>: ESIC MC Bangalore (633/720) ('24)",
-      "<b>Bhoomi Mourya</b>: SP MC Bikaner (634/720) ('24)",
-      "<b>Ashish Meena</b>: BJ MC Ahmedabad (635/720) ('24)",
-      "<b>Kanishk Malhotra</b>: RUHS CMS Jaipur (636/720) ('24)",
-      "<b>Akshat Verma</b>: Grant MC Mumbai (639/720) ('24)",
-      "<b>Diya Jangid</b>: ESIC MC Bangalore (639/720) ('24)",
-      "<b>Payal Meena</b>: SMS MC Jaipur (640/720) ('24)",
-      "<b>Anuj Sharma</b>: GMC Vidisha (642/720) ('24)",
-      "<b>Chandrashekhar Sharma</b>: GMC Shastri (644/720) ('24)",
-      "<b>Sarika Kasana</b>: GMC Karauli (646/720) ('24)",
-      "<b>Paras Sikhwal</b>: GMC Hanumangarh (647/720) ('24)",
-      "<b>Amit Sharma</b>: ESIC MC Bangalore (650/720) ('24)",
-      "<b>Aanya Verma</b>: SMS MC Jaipur (651/720) ('24)",
-      "<b>Ambesh Kumar</b>: GMC Jalpaiguri (652/720) ('24)",
-      "<b>Radhika S. Champawat</b>: GMC Jogulamba (653/720) ('24)",
-      "<b>Dhananjay Sain</b>: GMERS MC Rajpipla (653/720) ('24)",
-      "<b>Surabhi Gotharwal</b>: GMC Wanaparthy (653/720) ('24)",
-      "<b>Himanshu Chouhan</b>: GMC Mahabubabad (653/720) ('24)",
-      "<b>Sachin Chandela</b>: GMC Chittorgarh (655/720) ('24)",
-      "<b>Tushar Saini</b>: GMC Ambernath (655/720) ('24)",
-      "<b>Vaidehi Kumawat</b>: MC Lakhimpur (655/720) ('24)",
-      "<b>Ashish Tanwar</b>: GMC Jayashankar Bhupalpally (655/720) ('24)",
-      "<b>Nishu Yadav</b>: Tezpur MC (656/720) ('24)",
-      "<b>Meenal Jain</b>: GMERS MC Navsari (656/720) ('24)",
-      "<b>Nikhil Punjabi</b>: Grant MC Mumbai (657/720) ('24)",
-      "<b>Tanu Goyanka</b>: GMC Balasore (657/720) ('24)",
-      "<b>Sarika Choudhary</b>: GMC Durg (657/720) ('24)",
-      "<b>Raja Ram Agrawal</b>: ESIC MC Faridabad (657/720) ('24)",
-      "<b>Jaivikram Sharma</b>: GMC And District Hospital (658/720) ('24)",
-      "<b>Shaya</b>: ASMC Sultanpur (658/720) ('24)",
-      "<b>Mrinal Sharma</b>: GMC Sundargarh (658/720) ('24)",
-      "<b>Jahnvi Vashishtha</b>: GMC Gondia (658/720) ('24)",
-      "<b>Kiran Kumari</b>: GMC Banswara (659/720) ('24)",
-      "<b>Radhhika Shharma</b>: GMC Suryapet (660/720) ('24)",
-      "<b>Anish Gautam</b>: GMC Jhunjhunu (660/720) ('24)",
-      "<b>Resham Udhani</b>: GMC Gondia (660/720) ('24)",
-      "<b>Somya Prajapati</b>: GMC Sawai Madhopur (661/720) ('24)",
-      "<b>Shivansh Sharma</b>: GMC Datia (661/720) ('24)",
-      "<b>Krishna Kulchandani</b>: GMC Akola (662/720) ('24)",
-      "<b>Neha Singh</b>: GMC Nagaur (662/720) ('24)",
-      "<b>Gauri Meena</b>: SMS MC Jaipur (664/720) ('24)",
-      "<b>Riya Singh</b>: GMC Faizabad (665/720) ('24)",
-      "<b>Iti Dixit</b>: GMC Firozabad (665/720) ('24)",
-      "<b>Aman Sharma</b>: SS MC Rewa (665/720) ('24)",
-      "<b>Gaurang Goyal</b>: North Bengal MC (665/720) ('24)",
-      "<b>Muskan</b>: ESIC MC Sanath Nagar (666/720) ('24)",
-      "<b>Jeetika Lamba</b>: MG IMS Wardha (666/720) ('24)",
-      "<b>Navankur Motsara</b>: GMC Hanumangarh (666/720) ('24)",
-      "<b>Preksha Dadhich</b>: GMC Dausa (666/720) ('24)",
-      "<b>Suryansh Singh Shekhawat</b>: GMC Barmer (666/720) ('24)",
-      "<b>Nehal Jaswal</b>: GMC Dungarpur (666/720) ('24)",
-      "<b>Devansh Shukla</b>: GMC Faizabad (666/720) ('24)",
-      "<b>Akhil Sharma</b>: GMC Jhunjhunu (667/720) ('24)",
-      "<b>Aryan Choudhary</b>: GMC Dholpur (667/720) ('24)",
-      "<b>Tripti Singh Naruka</b>: GMC Dausa (667/720) ('24)",
-      "<b>Neeraj Sharma</b>: GMC Hanumangarh (667/720) ('24)",
-      "<b>Rohit Kumar</b>: GMC Bundi (668/720) ('24)",
-      "<b>Hemendra Kumar Kumawat</b>: GMC Dausa (668/720) ('24)",
-      "<b>Riddhima Jangid</b>: GMC Bundi (668/720) ('24)",
-      "<b>Keshav Somani</b>: GMC Ratlam (668/720) ('24)",
-      "<b>Anisha Singh Tomar</b>: GMC Dausa (669/720) ('24)",
-      "<b>Nehal Jangid</b>: GMC Dausa (669/720) ('24)",
-      "<b>Chitransh Kumawat</b>: GMC Chittorgarh (670/720) ('24)",
-      "<b>Jitendra Kumawat</b>: GMC Baramati (670/720) ('24)",
-      "<b>Vishwajeet Singh</b>: GMC Aurangabad (670/720) ('24)",
-      "<b>Ritesh Nitharwal</b>: GMC Chittorgarh (671/720) ('24)",
-      "<b>Abhishek Sharma</b>: GMC Kannauj (671/720) ('24)",
-      "<b>Kritika Jain</b>: GMC Baramati (671/720) ('24)",
-      "<b>Devanshu Agarwal</b>: GMC Churu (671/720) ('24)",
-      "<b>Dhruvita Agarwal</b>: GMC Alwar (671/720) ('24)",
-      "<b>Nikhil Ojha</b>: GMC Alwar (672/720) ('24)",
-      "<b>Sandeep Swami</b>: GMC Bhavnagar (672/720) ('24)",
-      "<b>Priyanka Gothwal</b>: GMC Bundi ('24)",
-      "<b>Sunil Verma</b>: GMC Churu ('24)",
-      "<b>Mitesh Arya</b>: GMC Firozabad ('24)",
-      "<b>Narendra Kumar</b>: GMC Banswara ('24)",
-      "<b>Kunal Boylla</b>: GMC Sri Ganganagar ('24)",
-      "<b>Ritu Mahariya</b>: GMC Hanumangarh ('24)",
-      "<b>Lucky Gahlot</b>: GMC Mahabubnagar ('24)",
-      "<b>Ayush Kanwat</b>: SP GMC Mandsaur ('24)",
-      "<b>Komal Dobwal</b>: BPS GMC Sonepat ('24)",
-      "<b>Ad Itya Thakkar</b>: GMC Vizianagaram ('24)",
-      "<b>Khushi</b>: GMC Mahabubabad ('24)",
-      "<b>Vidhi Solanki</b>: Nalbari MC ('24)",
-      "<b>Bhavika Mina</b>: JMC Jhalawar ('24)",
-      "<b>Mahendra Kumar Meena</b>: MG IMS Wardha ('24)",
-      "<b>Yatindra</b>: GMC Ambedkar Nagar ('24)",
-      "<b>Udit Meena</b>: ESIC MC Gulbarga ('24)",
-      "<b>Harshit Mourya</b>: GMC Ongole ('24)",
-      "<b>Keshav Lekhara</b>: GMC Krishnagiri ('24)",
-      "<b>Shreyansh Jarwal</b>: GMC Latur ('24)",
-      "<b>Bhavesh Jourwal</b>: GMC Sri Ganganagar ('24)",
-      "<b>Varen Khorwal</b>: GMC Karauli ('24)",
-      "<b>Sakshi Bohra</b>: GMC Nagpur ('24)",
-      "<b>Diyanshi Khunteta</b>: SMS MC Jaipur ('24)",
-      "<b>Harshita Kanwat</b>: GMC Barmer ('24)",
-      "<b>Ashish</b>: GMC Bhilwara ('24)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> stormed Top-100 Adv ('24-'25) 🎯",
-      "<b>Aryaman Dev Verma</b>: Adv AIR 93, IIT Delhi CS ('25) 🔥",
-      "<b>Saksham Khandelwal</b>: Adv AIR 60, IIT Bombay CS ('24) 🔥",
-      "<b>31 Allenites</b> stormed Top-500 Adv ('22-'25) 🎯",
-      "<b>Yashneil Rawat</b>: 100%ile Main [100%ile Phy] ('24) 🔥",
-      "<b>Shresth Jasoria</b>: 99.99%ile+ Main ('26) 🔥",
-      "<b>Prakhar Sharma</b>: 99.99%ile+ Main ('26) 🔥",
-      "<b>Lakshit Sinsinwar</b>: 99.99%ile+ Main ('26) 🔥",
-      "<b>Rachit Goyal</b>: Adv AIR 138, IIT Delhi CS ('25)",
-      "<b>Rachit Goyal</b>: 99.98%ile+ Main (AIR 213) [100%ile Phy] ('25)",
-      "<b>Lakshay Arya</b>: Adv AIR 186, IIT Delhi CS ('25)",
-      "<b>Lakshay Arya</b>: 99.98%ile+ Main (AIR 258) ('25)",
-      "<b>Krishiv Nijhawan</b>: Adv AIR 271, IIT Kanpur CS ('25)",
-      "<b>Krishiv Nijhawan</b>: 99.98%ile+ Main (AIR 331) [100%ile Phy] ('25)",
-      "<b>Chirantan B K</b>: Adv AIR 416, IIT Bombay Elec ('25)",
-      "<b>Chirantan B K</b>: 99.95%ile+ Main (AIR 803) ('25)",
-      "<b>Harit Mangal</b>: Adv AIR 128, IIT Delhi CS ('24)",
-      "<b>Harit Mangal</b>: 99.96%ile+ Main (AIR 655) [100%ile Math] ('24)",
-      "<b>Harsh Vijay</b>: Adv AIR 231, IIT Kanpur CS ('24)",
-      "<b>Harsh Vijay</b>: 99.97%ile+ Main (AIR 523) [100%ile Chem] ('24)",
-      "<b>Palaksh Goyal</b>: 99.99%ile+ Main (AIR 122) ('24) 🔥",
-      "<b>Palaksh Goyal</b>: Adv AIR 259, IIT Kharagpur CS ('24)",
-      "<b>Darsh Maheshwari</b>: Adv AIR 278, IIT Bombay Elec ('24)",
-      "<b>Darsh Maheshwari</b>: 99.97%ile+ Main (AIR 585) ('24)",
-      "<b>Sambhav Singh Aditya</b>: Adv AIR 391, IIT Delhi CS ('24)",
-      "<b>Sambhav Singh Aditya</b>: 99.97%ile+ Main (AIR 553) ('24)",
-      "<b>Parth Agrawal</b>: Adv AIR 113, IIT Delhi CS ('23)",
-      "<b>Parth Agrawal</b>: 99.98%ile+ Main (AIR 236) [100%ile Math] ('23)",
-      "<b>Suyash Kapoor</b>: 99.99%ile+ Main (AIR 91) [100%ile Math] ('23) 🔥",
-      "<b>Suyash Kapoor</b>: Adv AIR 149, IIT Kanpur CS ('23)",
-      "<b>Prakhar Gupta</b>: Adv AIR 154, IIT Delhi CS ('23)",
-      "<b>Prakhar Gupta</b>: 99.93%ile+ Main (AIR 865) [100%ile Math] ('23)",
-      "<b>Pratul Koolwal</b>: Adv AIR 174, IIT Kanpur CS ('23)",
-      "<b>Pratul Koolwal</b>: 99.96%ile+ Main (AIR 463) ('23)",
-      "<b>Yatharth Sharma</b>: Adv AIR 207, IIT Kanpur CS ('23)",
-      "<b>Yatharth Sharma</b>: 99.97%ile+ Main (AIR 416) [100%ile Phy] ('23)",
-      "<b>Saksham Saharia</b>: Adv AIR 227, IIT Bombay CS ('23)",
-      "<b>Saksham Saharia</b>: 99.94%ile+ Main (AIR 784) ('23)",
-      "<b>Devang Tibrewal</b>: Adv AIR 264, IIT Bombay CS ('23)",
-      "<b>Devang Tibrewal</b>: 99.96%ile+ Main (AIR 517) ('23)",
-      "<b>Nakshatra Mandowara</b>: Adv AIR 278, IIT Delhi M&C ('23)",
-      "<b>Nakshatra Mandowara</b>: 99.97%ile+ Main (AIR 395) ('23)",
-      "<b>Nitin Agiwal</b>: Adv AIR 298, IIT Roorkee CS ('23)",
-      "<b>Nitin Agiwal</b>: 99.94%ile+ Main (AIR 713) ('23)",
-      "<b>Kartik Sarda</b>: 99.99%ile+ Main (AIR 139) ('23) 🔥",
-      "<b>Kartik Sarda</b>: Adv AIR 312, IIT Roorkee CS ('23)",
-      "<b>Darsh Jain</b>: 99.98%ile+ Main (AIR 239) [100%ile Phy] ('23)",
-      "<b>Darsh Jain</b>: Adv AIR 393, IIT Roorkee CS ('23)",
-      "<b>Lovya Jain</b>: Adv AIR 495, IIT Delhi Elec ('23)",
-      "<b>Lovya Jain</b>: 99.83%ile+ Main (AIR 2,031) ('23)",
-      "<b>Devansh Agrawal</b>: Adv AIR 181, IIT Kanpur CS ('22)",
-      "<b>Devansh Agrawal</b>: 99.98%ile+ Main (AIR 206) [100%ile Phy] ('22)",
-      "<b>Saiyam Jain</b>: Adv AIR 324, IIT Delhi M&C ('22)",
-      "<b>Saiyam Jain</b>: 99.97%ile+ Main (AIR 325) ('22)",
-      "<b>Medhansh Sharma</b>: Adv AIR 351, IIT Bombay Elec ('22)",
-      "<b>Medhansh Sharma</b>: 99.93%ile+ Main (AIR 670) ('22)",
-      "<b>Mudit Mangal</b>: Adv AIR 379, IIT Roorkee CS ('22)",
-      "<b>Mudit Mangal</b>: 99.88%ile+ Main (AIR 1,092) ('22)",
-      "<b>Samarth Goyal</b>: Adv AIR 442, IIT Delhi Elec ('22)",
-      "<b>Arush Singhal</b>: 99.99%ile+ Main (AIR 131) [100%ile Phy] ('22) 🔥",
-      "<b>Arush Singhal</b>: Adv AIR 446, IIT Delhi Elec ('22)",
-      "<b>Vishakha Agarwal</b>: 99.99%ile+ Main (AIR 100) [100%ile Phy] ('22) 🔥",
-      "<b>Vishakha Agarwal</b>: Adv AIR 448, IIT Delhi CS ('22)",
-      "<b>Priyanshu Jindal</b>: Adv AIR 463, IIT Delhi Elec ('22)",
-      "<b>Priyanshu Jindal</b>: 99.79%ile+ Main (AIR 1,907) ('22)",
-      "<b>Bhavya Garg</b>: 99.99%ile+ Main ('26) 🔥",
-      "<b>Daksh Sehra</b>: 99.99%ile+ Main ('26) 🔥",
-      "<b>Luv Algar</b>: Adv AIR 570, IIT Madras CS ('25)",
-      "<b>Yash Ola</b>: Adv AIR 603, IIT Delhi CS ('25)",
-      "<b>Priyanshu</b>: Adv AIR 882, IIT Kanpur CS ('25)",
-      "<b>Ayush Mangal</b>: Adv AIR 539, IIT Kanpur CS ('24)",
-      "<b>Shreya Khandelwal</b>: Adv AIR 552, IIT Delhi CS ('24)",
-      "<b>Yashneil Rawat</b>: Adv AIR 686, IIT Bombay Elec ('24)",
-      "<b>Rishabh Parwal</b>: Adv AIR 874, IIT Bombay Elec ('24)",
-      "<b>Mridul Chhipa</b>: Adv AIR 974, IIT Delhi CS ('24)",
-      "<b>Anurag Agarwal</b>: Adv AIR 777, IIT Delhi M&C ('23)",
-      "<b>Sahil Pandey</b>: Adv AIR 883, IIT Kanpur Elec ('23)",
-      "<b>Vatsal Jain</b>: Adv AIR 503, IIT Delhi Elec ('22)",
-      "<b>Ayushya Joshi</b>: Adv AIR 562, IIT Delhi Elec ('22)",
-      "<b>Lovesh Mahar</b>: Adv AIR 644, IIT Bombay CS ('22)",
-      "<b>Chayan Kumawat</b>: Adv AIR 716, IIT Kanpur CS ('22)",
-      "<b>Shriya Garg</b>: Adv AIR 736, IIT Kanpur CS ('22)",
-      "<b>Cherish Jain</b>: Adv AIR 862, IIT Bombay Elec ('22)",
-      "<b>Divyam Agarwal</b>: Adv AIR 891, IIT Kanpur Elec ('22)",
-      "<b>Udbhav Agarwal</b>: Adv AIR 892, IIT Kanpur Elec ('22)",
-      "<b>Arin Dhariwal</b>: Adv AIR 904, IIT Kanpur Elec ('22)",
-      "<b>Anshul Chaubey</b>: Adv AIR 587, IIT Guwahati CS ('25)",
-      "<b>Vedant Saraf</b>: Adv AIR 722, IIT Delhi ('25)",
-      "<b>Abhinav Gupta</b>: Adv AIR 747, IIT BHU CS ('25)",
-      "<b>Naman Goyal</b>: Adv AIR 761, IIT Delhi ('25)",
-      "<b>Vishesh Garg</b>: Adv AIR 782, IIT Delhi ('25)",
-      "<b>Nirvan Maheshwari</b>: Adv AIR 867, IIT Bombay BS Math ('25)",
-      "<b>Dhruv Narwani</b>: Adv AIR 966, IIT Delhi ('25)",
-      "<b>Parv Dixit</b>: Adv AIR 663, IIT Delhi ('24)",
-      "<b>Pranay Shukla</b>: Adv AIR 697, IIT BHU CS ('24)",
-      "<b>Chatanya Maheshwari</b>: Adv AIR 768, IIT Delhi ('24)",
-      "<b>Devyansh Gupta</b>: Adv AIR 665, IIT Roorkee DS & AI ('23)",
-      "<b>Tattwa Shiwani</b>: Adv AIR 716, IIT Kanpur ('23)",
-      "<b>Pranav Goyal</b>: Adv AIR 738, IIT Delhi ('23)",
-      "<b>Prakhar Agrawal</b>: Adv AIR 748, IIT Guwahati M&C ('23)",
-      "<b>Aviral Gupta</b>: Adv AIR 862, IIT Kanpur ('23)",
-      "<b>Kanak Khandelwal</b>: Adv AIR 980, IIT Kanpur ('23)",
-      "<b>Pratyush Kant</b>: Adv AIR 528 ('22)",
-      "<b>Madhav Gupta</b>: Adv AIR 609, IIT Delhi ('22)",
-      "<b>Shorya Singhal</b>: Adv AIR 629, IIT Roorkee DS & AI ('22)",
-      "<b>Ojas Sharma</b>: Adv AIR 721, IIT Delhi ('22)",
-      "<b>Hitesh Jain</b>: Adv AIR 819, IIT Delhi ('22)",
-      "<b>Akshun Singh Rathore</b>: Adv AIR 853, IIT BHU CS ('22)",
-      "<b>Aniket Gupta</b>: Adv AIR 923, IIT Guwahati M&C ('22)",
-      "<b>Manas Jhawar</b>: Adv AIR 928, IIT Guwahati M&C ('22)",
-      "<b>Ishan Dandwani</b>: Adv AIR 986, IIT Kanpur ('22)",
-      "<b>Kovid Singhal</b>: 99.99%ile+ Main ('26) 🔥",
-      "<b>Darshil Dayma</b>: 99.99%ile+ Main (AIR 88) [100%ile Math] ('25) 🔥",
-      "<b>Saksham Khandelwal</b>: 99.99%ile+ Main (AIR 117) ('24) 🔥",
-      "<b>Parv Dixit</b>: 99.99%ile+ Main (AIR 226) ('24) 🔥",
-      "<b>Ruchit Agrawal</b>: 99.98%ile+ Main ('26)",
-      "<b>Mohit Maliwal</b>: 99.97%ile+ Main ('26)",
-      "<b>Daksh Khandelwal</b>: 99.96%ile+ Main ('26)",
-      "<b>Aryan Saxena</b>: 99.96%ile+ Main ('26)",
-      "<b>Harshit Khandelwal</b>: 99.95%ile+ Main ('26)",
-      "<b>Nehal Jain</b>: 99.94%ile+ Main ('26)",
-      "<b>Vivaan Singh</b>: 99.94%ile+ Main ('26)",
-      "<b>Divya Ranwka</b>: 99.93%ile+ Main ('26)",
-      "<b>Avnish Agrawal</b>: 99.93%ile+ Main ('26)",
-      "<b>Dhruv Sharma</b>: IIT Guwahati Biosciences ('22)",
-      "<b>Dhruv Sharma</b>: 99.93%ile+ Main ('26)",
-      "<b>Chirag Sisodia</b>: 99.92%ile+ Main ('26)",
-      "<b>Darsheel Gupta</b>: 99.92%ile+ Main ('26)",
-      "<b>Akshat Agarwal</b>: 99.92%ile+ Main ('26)",
-      "<b>Ishit Yadav</b>: 99.92%ile+ Main ('26)",
-      "<b>Priyam Bhattacharya</b>: 99.90%ile+ Main ('26)",
-      "<b>Aryaman Dev Verma</b>: 99.98%ile+ Main (AIR 208) ('25)",
-      "<b>Siddhi Gupta</b>: 99.98%ile+ Main (AIR 307) [100%ile Phy] ('25)",
-      "<b>Siddhi Gupta</b>: Adv AIR 2,013, IIT Roorkee CS ('25)",
-      "<b>Vishesh Garg</b>: 99.98%ile+ Main (AIR 353) ('25)",
-      "<b>Luv Algar</b>: 99.97%ile+ Main (AIR 473) [100%ile Math] ('25)",
-      "<b>Arjun Beniwal</b>: 99.96%ile+ Main (AIR 591) ('25)",
-      "<b>Arjun Beniwal</b>: Adv AIR 1,694, IIT Delhi Mech ('25)",
-      "<b>Avani Sharma</b>: 99.96%ile+ Main (AIR 632) ('25)",
-      "<b>Avani Sharma</b>: Adv AIR 2,486, IIT Guwahati CS ('25)",
-      "<b>Pradhuman Singh</b>: 99.96%ile+ Main (AIR 1,890) ('25)",
-      "<b>Prakhar Goyal</b>: 99.95%ile+ Main (AIR 781) ('25)",
-      "<b>Prakhar Goyal</b>: Adv AIR 1,173, IIT Kanpur ('25)",
-      "<b>Naman Goyal</b>: 99.95%ile+ Main (AIR 792) [100%ile Phy] ('25)",
-      "<b>Vedant Saraf</b>: 99.94%ile+ Main (AIR 859) ('25)",
-      "<b>Mehul Lakhwani</b>: Adv AIR 1,033, IIT BHU CS ('25)",
-      "<b>Mehul Lakhwani</b>: 99.93%ile+ Main (AIR 1,078) [100%ile Phy] ('25)",
-      "<b>Yash Ola</b>: 99.93%ile+ Main (AIR 1,145) ('25)",
-      "<b>Dev Tinker</b>: 99.93%ile+ Main (AIR 1,151) [100%ile Phy] ('25)",
-      "<b>Dev Tinker</b>: Adv AIR 1,597, IIT Bombay Elec ('25)",
-      "<b>Yash Mathur</b>: 99.92%ile+ Main (AIR 1,186) ('25)",
-      "<b>Yash Mathur</b>: Adv AIR 1,868, IIT Delhi ('25)",
-      "<b>Yash Jain</b>: 99.91%ile+ Main (AIR 1,227) ('25)",
-      "<b>Aditya Choudhary</b>: Adv AIR 1,271, IIT Kharagpur M&C ('25)",
-      "<b>Aditya Choudhary</b>: 99.90%ile+ Main (AIR 1,504) ('25)",
-      "<b>Pranjal Sharma</b>: Adv AIR 1,432, IIT Guwahati DS & AI ('25)",
-      "<b>Pranjal Sharma</b>: 99.90%ile+ Main ('25)",
-      "<b>Tanmay Bardia</b>: 99.90%ile+ Main (AIR 1,602) ('25)",
-      "<b>Tanmay Bardia</b>: Adv AIR 2,702, IIT Kanpur Mech ('25)",
-      "<b>Shikhar Singhania</b>: 99.98%ile+ Main (AIR 263) ('24)",
-      "<b>Shikhar Singhania</b>: Adv AIR 1,032 ('24)",
-      "<b>Ayush Mangal</b>: 99.96%ile+ Main (AIR 698) ('24)",
-      "<b>Nishant Goyal</b>: 99.95%ile+ Main (AIR 919) [100%ile Phy] ('24)",
-      "<b>Nishant Goyal</b>: Adv AIR 1,407, IIT Kharagpur ('24)",
-      "<b>Parth Bansal</b>: 99.95%ile+ Main (AIR 932) [100%ile Math] ('24)",
-      "<b>Parth Bansal</b>: Adv AIR 2,398, IIT Bombay Chem ('24)",
-      "<b>Kratin Gupta</b>: 99.94%ile+ Main (AIR 971) ('24)",
-      "<b>Kratin Gupta</b>: Adv AIR 1,450, IIT Bombay Mech ('24)",
-      "<b>Manit Bansal</b>: 99.93%ile+ Main (AIR 1,123) ('24)",
-      "<b>Manit Bansal</b>: Adv AIR 1,776, IIT Roorkee Elec ('24)",
-      "<b>Pranay Shukla</b>: 99.93%ile+ Main (AIR 1,130) ('24)",
-      "<b>Mridul Chhipa</b>: 99.93%ile+ Main (AIR 1,146) [100%ile Math] ('24)",
-      "<b>Dakshata Aggrawal</b>: 99.92%ile+ Main (AIR 1,346) ('24)",
-      "<b>Dakshata Aggrawal</b>: Adv AIR 1,652, IIT Roorkee CS ('24)",
-      "<b>Avni Jhalani</b>: 99.91%ile+ Main (AIR 1,474) ('24)",
-      "<b>Avni Jhalani</b>: Adv AIR 1,930, IIT Guwahati CS ('24)",
-      "<b>Soumil Patria</b>: 99.91%ile+ Main (AIR 1,498) ('24)",
-      "<b>Soumil Patria</b>: Adv AIR 1,965, IIT Roorkee Elec ('24)",
-      "<b>Anshika Jha</b>: 99.91%ile+ Main (AIR 1,504) ('24)",
-      "<b>Anshika Jha</b>: IIT Jodhpur CS ('24)",
-      "<b>Chatanya Maheshwari</b>: 99.91%ile+ Main (AIR 1,577) ('24)",
-      "<b>Shivam Khandelwal</b>: 99.90%ile+ Main (AIR 1,617) ('24)",
-      "<b>Shivam Khandelwal</b>: Adv AIR 1,825, IIT Delhi ('24)",
-      "<b>Shreya Khandelwal</b>: 99.90%ile+ Main (AIR 1,667) ('24)",
-      "<b>Tarun Gupta</b>: 99.90%ile+ Main (AIR 1,714) ('24)",
-      "<b>Tarun Gupta</b>: Adv AIR 3,887, IIT Guwahati ('24)",
-      "<b>Altamash Zahid</b>: 99.98%ile+ Main (AIR 277) [100%ile Phy] ('23)",
-      "<b>Altamash Zahid</b>: Adv AIR 1,101, IIT Roorkee ECE ('23)",
-      "<b>Devyansh Gupta</b>: 99.98%ile+ Main (AIR 288) ('23)",
-      "<b>Prakhar Agrawal</b>: 99.96%ile+ Main (AIR 440) [100%ile Phy] ('23)",
-      "<b>Kanak Khandelwal</b>: 99.94%ile+ Main (AIR 719) ('23)",
-      "<b>Ishaan Sharma</b>: 99.94%ile+ Main (AIR 805) ('23)",
-      "<b>Ishaan Sharma</b>: Adv AIR 2,001, IIT Roorkee Elec ('23)",
-      "<b>Anurag Agarwal</b>: 99.93%ile+ Main (AIR 877) ('23)",
-      "<b>Khush Maheshwari</b>: 99.92%ile+ Main (AIR 934) ('23)",
-      "<b>Sachin Yadav</b>: 99.91%ile+ Main (AIR 1,046) ('23)",
-      "<b>Sachin Yadav</b>: Adv AIR 3,826, IIT Delhi Mech ('23)",
-      "<b>Raunak Gupta</b>: 99.91%ile+ Main (AIR 1,052) ('23)",
-      "<b>Raunak Gupta</b>: Adv AIR 1,390, IIT Roorkee ECE ('23)",
-      "<b>Vatsal Jain</b>: 99.96%ile+ Main (AIR 378) [100%ile Math] ('22)",
-      "<b>Shivam Mittal</b>: 99.95%ile+ Main (AIR 455) ('22)",
-      "<b>Ayushya Joshi</b>: 99.94%ile+ Main (AIR 549) ('22)",
-      "<b>Arin Dhariwal</b>: 99.94%ile+ Main (AIR 571) ('22)",
-      "<b>Cherish Jain</b>: 99.93%ile+ Main (AIR 702) ('22)",
-      "<b>Chayan Kumawat</b>: 99.93%ile+ Main (AIR 645) ('22)",
-      "<b>Param Bansal</b>: 99.91%ile+ Main (AIR 884) ('22)",
-      "<b>Param Bansal</b>: Adv AIR 1,179, IIT Indore CS ('22)",
-      "<b>Shriya Garg</b>: 99.91%ile+ Main (AIR 845) ('22)",
-      "<b>Lovesh Mahar</b>: 99.90%ile+ Main (AIR 988) ('22)",
-      "<b>Priyansh Singh</b>: 99.90%ile+ Main (AIR 990) ('22)",
-      "<b>Priyansh Singh</b>: Adv AIR 1,765, IIT Bombay Eng Physics ('22)",
-      "<b>Ojas Sharma</b>: 99.90%ile+ Main (AIR 901) ('22)",
-      "<b>Purvi Agrawal</b>: 99.90%ile+ Main (AIR 913) ('22)",
-      "<b>Purvi Agrawal</b>: Adv AIR 2,084, IIT Madras Elec ('22)",
-      "<b>Aditya Garg</b>: 99.90%ile+ Main (AIR 924) ('22)",
-      "<b>613 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>75 Allenites</b> in Top-1,000 Adv ('22-'25)",
-      "<b>Rishita Agarwal</b>: 99.67%ile+ Main (AIR 2,991) ('22)",
-      "<b>Yash Natiya</b>: 99.60%ile+ Main (AIR 3,654) ('22)",
-      "<b>Geet Israni</b>: 99.76%ile+ Main (AIR 2,214) ('22)",
-      "<b>Pulkit Garg</b>: 99.51%ile+ Main (AIR 4,471) ('22)",
-      "<b>Rahul Gupta</b>: 99.80%ile+ Main (AIR 1,822) ('22)",
-      "<b>Rehan Choudhary</b>: 99.62%ile+ Main (AIR 3,452) [100%ile Phy] ('22)",
-      "<b>Raghav Govind</b>: 99.77%ile+ Main (AIR 2,158) ('22)",
-      "<b>Krishiv Geriani</b>: 99.85%ile+ Main (AIR 1,441) ('22)",
-      "<b>Manas Jhawar</b>: 99.85%ile+ Main (AIR 1,379) ('22)",
-      "<b>Pratham Seervi</b>: 99.66%ile+ Main (AIR 3,078) ('22)",
-      "<b>Divyam Agarwal</b>: 99.89%ile+ Main (AIR 1,004) ('22)",
-      "<b>Garvit Gupta</b>: 99.86%ile+ Main (AIR 1,275) ('22)",
-      "<b>Ronit Arora</b>: 99.68%ile+ Main (AIR 2,975) ('22)",
-      "<b>Udbhav Agarwal</b>: 99.68%ile+ Main (AIR 2,962) ('22)",
-      "<b>Ansh Gujral</b>: 99.74%ile+ Main (AIR 2,391) ('22)",
-      "<b>Megha Agarwal</b>: 99.73%ile+ Main (AIR 2,480) ('22)",
-      "<b>Priyansh Gupta</b>: 99.69%ile+ Main (AIR 2,854) ('22)",
-      "<b>Aditya Raj Mishra</b>: 99.78%ile+ Main (AIR 2,002) ('22)",
-      "<b>Manya Gupta</b>: 99.88%ile+ Main (AIR 1,097) ('22)",
-      "<b>Ishan Gupta</b>: 99.81%ile+ Main (AIR 1,777) ('22)",
-      "<b>Khushajh Verma</b>: 99.85%ile+ Main (AIR 1,411) ('22)",
-      "<b>Madhav Gupta</b>: 99.81%ile+ Main (AIR 1,753) ('22)",
-      "<b>Saksham Jain</b>: 99.81%ile+ Main (AIR 1,779) ('22)",
-      "<b>Mahek Choudhary</b>: 99.88%ile+ Main (AIR 1,169) ('22)",
-      "<b>Arya Jha</b>: 99.63%ile+ Main (AIR 3,366) [100%ile Phy] ('22)",
-      "<b>Himanshu Gangwal</b>: 99.57%ile+ Main (AIR 3,911) ('22)",
-      "<b>Devansh Jain</b>: 99.67%ile+ Main (AIR 3,013) ('22)",
-      "<b>Anmol Tambi</b>: 99.62%ile+ Main (AIR 3,524) ('22)",
-      "<b>Gaurav Gupta</b>: 99.80%ile+ Main (AIR 1,824) [100%ile Phy] ('22)",
-      "<b>Dhruv Khandelwal</b>: 99.79%ile+ Main (AIR 1,908) ('22)",
-      "<b>Parul Khicha</b>: 99.70%ile+ Main (AIR 2,746) ('22)",
-      "<b>Yash Purswani</b>: 99.68%ile+ Main (AIR 2,951) ('22)",
-      "<b>Soumya Sharma</b>: 99.65%ile+ Main (AIR 3,243) ('22)",
-      "<b>Rishika Gupta</b>: 99.70%ile+ Main (AIR 2,757) ('22)",
-      "<b>Aniket Gupta</b>: 99.69%ile+ Main (AIR 2,802) ('22)",
-      "<b>Ishan Dandwani</b>: 99.85%ile+ Main (AIR 1,369) [100%ile Phy] ('22)",
-      "<b>Chetan Vijay</b>: 99.70%ile+ Main (AIR 2,735) ('22)",
-      "<b>Govind Anand</b>: 99.55%ile+ Main (AIR 4,109) ('22)",
-      "<b>Disha</b>: 99.83%ile+ Main (AIR 1,556) ('22)",
-      "<b>Madhav Agrawal</b>: 99.76%ile+ Main (AIR 2,227) ('22)",
-      "<b>Akshun S. Rathore</b>: 99.70%ile+ Main (AIR 2,750) ('22)",
-      "<b>Riya Agarwal</b>: 99.67%ile+ Main (AIR 3,036) ('22)",
-      "<b>Parth Batwara</b>: 99.82%ile+ Main (AIR 1,674) ('22)",
-      "<b>Debashish Das</b>: 99.66%ile+ Main (AIR 3,150) ('22)",
-      "<b>Shorya Singhal</b>: 99.85%ile+ Main (AIR 1,381) ('22)",
-      "<b>Hitesh Jain</b>: 99.79%ile+ Main (AIR 1,931) ('22)",
-      "<b>Radhika Goyal</b>: 99.87%ile+ Main (AIR 1,237) ('22)",
-      "<b>Praveen</b>: 99.74%ile+ Main (AIR 2,412) ('22)",
-      "<b>Vastu Agarwal</b>: 99.57%ile+ Main (AIR 3,945) ('22)",
-      "<b>Yuvraj Khandelwal</b>: 99.76%ile+ Main (AIR 2,160) ('22)",
-      "<b>Arunim Garg</b>: 99.77%ile+ Main (AIR 2,065) ('22)",
-      "<b>Ronak Sonkiya</b>: 99.83%ile+ Main (AIR 1,595) ('22)",
-      "<b>Ashnidh Khandelwal</b>: 99.68%ile+ Main (AIR 2,931) ('22)",
-      "<b>Ujjwal Choudhary</b>: 99.58%ile+ Main (AIR 3,855) ('22)",
-      "<b>Luv Mathur</b>: 99.55%ile+ Main (AIR 4,099) ('22)",
-      "<b>Priyanshu Nareda</b>: 99.72%ile+ Main (AIR 2,573) ('22)",
-      "<b>Lekhansh Bhatnagar</b>: 99.79%ile+ Main (AIR 1,982) ('22)",
-      "<b>Aaditya Vaid</b>: 99.53%ile+ Main (AIR 4,259) ('22)",
-      "<b>Yash Sharma</b>: 99.56%ile+ Main (AIR 4,022) ('22)",
-      "<b>Pragya Bhanot</b>: 99.68%ile+ Main (AIR 2,905) ('22)",
-      "<b>Dhruv Lila</b>: 99.59%ile+ Main (AIR 3,734) ('22)",
-      "<b>Sanyam Kumar Jain</b>: 99.86%ile+ Main (AIR 1,344) ('22)",
-      "<b>Tanish Goyal</b>: 99.81%ile+ Main (AIR 1,722) ('22)",
-      "<b>Khushi Yadav</b>: 99.56%ile+ Main (AIR 4,020) ('22)",
-      "<b>Yash Ganeriwal</b>: 99.52%ile+ Main (AIR 4,451) ('22)",
-      "<b>Tattwa Shiwani</b>: 99.89%ile+ Main (AIR 1,293) ('23)",
-      "<b>Jay Upadhyay</b>: 99.88%ile+ Main (AIR 1,387) ('23)",
-      "<b>Pranav Goyal</b>: 99.86%ile+ Main (AIR 1,675) ('23)",
-      "<b>Manan Jiwnani</b>: 99.85%ile+ Main (AIR 1,800) ('23)",
-      "<b>Girish Sharma</b>: 99.84%ile+ Main (AIR 1,883) ('23)",
-      "<b>Kaustubh Sharma</b>: 99.84%ile+ Main (AIR 1,898) ('23)",
-      "<b>Deep Sarda</b>: 99.83%ile+ Main (AIR 1,974) ('23)",
-      "<b>Divyansh Garg</b>: 99.83%ile+ Main (AIR 1,981) ('23)",
-      "<b>Abhishek Gupta</b>: 99.83%ile+ Main (AIR 2,060) ('23)",
-      "<b>Rachit Agarwal</b>: 99.82%ile+ Main (AIR 2,145) ('23)",
-      "<b>Arjun Bhardwaj</b>: 99.81%ile+ Main (AIR 2,295) ('23)",
-      "<b>Purvi Rathore</b>: 99.81%ile+ Main (AIR 2,315) ('23)",
-      "<b>Prateek Agarwal</b>: 99.80%ile+ Main (AIR 2,328) ('23)",
-      "<b>Harshit Joshi</b>: 99.80%ile+ Main (AIR 2,330) ('23)",
-      "<b>Sankalp Saharia</b>: 99.79%ile+ Main (AIR 2,482) ('23)",
-      "<b>Aviral Gupta</b>: 99.78%ile+ Main (AIR 2,570) ('23)",
-      "<b>Harsh Chopra</b>: 99.78%ile+ Main (AIR 2,584) ('23)",
-      "<b>Khushi Khandelwal</b>: 99.76%ile+ Main (AIR 2,768) ('23)",
-      "<b>Vanshika Bansal</b>: 99.76%ile+ Main (AIR 2,824) ('23)",
-      "<b>Aniruddh Yadav</b>: 99.75%ile+ Main (AIR 2,868) ('23)",
-      "<b>Ayush Garg</b>: 99.75%ile+ Main (AIR 2,902) ('23)",
-      "<b>Archit Jain</b>: 99.73%ile+ Main (AIR 3,195) ('23)",
-      "<b>Meghav Singhal</b>: 99.72%ile+ Main (AIR 3,235) ('23)",
-      "<b>Parv Khandelwal</b>: 99.72%ile+ Main (AIR 3,237) ('23)",
-      "<b>Anushka Gupta</b>: 99.70%ile+ Main (AIR 3,467) [100%ile Phy] ('23)",
-      "<b>Ribhu Hooja</b>: 99.70%ile+ Main (AIR 3,549) ('23)",
-      "<b>Kavya Agarwal</b>: 99.68%ile+ Main (AIR 3,714) ('23)",
-      "<b>Aryan Chaudhary</b>: 99.68%ile+ Main (AIR 3,724) ('23)",
-      "<b>Saksham Kankaria</b>: 99.68%ile+ Main (AIR 3,752) [100%ile Phy] ('23)",
-      "<b>Shreyansh Garg</b>: 99.66%ile+ Main (AIR 3,902) ('23)",
-      "<b>Rishit Mathur</b>: 99.66%ile+ Main (AIR 3,950) ('23)",
-      "<b>Vishwajeet Gupta</b>: 99.66%ile+ Main (AIR 4,023) ('23)",
-      "<b>Kartavya Agarwal</b>: 99.65%ile+ Main (AIR 4,059) ('23)",
-      "<b>Aman Agrawal</b>: 99.63%ile+ Main (AIR 4,308) ('23)",
-      "<b>Darshan Jain</b>: 99.63%ile+ Main (AIR 4,344) ('23)",
-      "<b>Arsh</b>: 99.62%ile+ Main (AIR 4,403) ('23)",
-      "<b>Manish Choudhary</b>: 99.62%ile+ Main (AIR 4,414) ('23)",
-      "<b>Abhinav Garg</b>: 99.61%ile+ Main (AIR 4,585) ('23)",
-      "<b>Anshul Ranka</b>: 99.58%ile+ Main (AIR 4,918) ('23)",
-      "<b>Siddhi Tanwar</b>: 99.57%ile+ Main (AIR 4,990) ('23)",
-      "<b>Akshat Goyal</b>: 99.89%ile+ Main (AIR 1,810) ('24)",
-      "<b>Divya Khandelwal</b>: 99.89%ile+ Main (AIR 1,819) ('24)",
-      "<b>Priyanka Agarwal</b>: 99.88%ile+ Main (AIR 2,032) ('24)",
-      "<b>Vansh Toshniwal</b>: 99.87%ile+ Main (AIR 2,130) ('24)",
-      "<b>Darsheel Sharma</b>: 99.87%ile+ Main (AIR 2,135) ('24)",
-      "<b>Arsh Mathur</b>: 99.87%ile+ Main (AIR 2,169) ('24)",
-      "<b>Saksham Keswani</b>: 99.87%ile+ Main (AIR 2,170) ('24)",
-      "<b>Kushagra Singhal</b>: 99.86%ile+ Main (AIR 2,205) ('24)",
-      "<b>Piyush Agarwal</b>: 99.86%ile+ Main (AIR 2,224) ('24)",
-      "<b>Garvit Bansal</b>: 99.86%ile+ Main (AIR 2,256) ('24)",
-      "<b>Saransh Bansal</b>: 99.86%ile+ Main (AIR 2,257) ('24)",
-      "<b>Nishchal Gupta</b>: 99.86%ile+ Main (AIR 2,281) ('24)",
-      "<b>Naitik Singhal</b>: 99.86%ile+ Main (AIR 2,284) [100%ile Phy] ('24)",
-      "<b>Priyanshu Garg</b>: 99.86%ile+ Main (AIR 2,296) ('24)",
-      "<b>Raghav Dangayach</b>: 99.86%ile+ Main (AIR 2,309) ('24)",
-      "<b>Rishabh Parwal</b>: 99.86%ile+ Main (AIR 2,325) ('24)",
-      "<b>Lav Khator</b>: 99.86%ile+ Main (AIR 2,381) ('24)",
-      "<b>Yash Mishra</b>: 99.85%ile+ Main (AIR 2,403) ('24)",
-      "<b>Paaras Kataria</b>: 99.83%ile+ Main (AIR 2,686) ('24)",
-      "<b>Harshil Soni</b>: 99.81%ile+ Main (AIR 3,145) ('24)",
-      "<b>Daksh Chauhan</b>: 99.80%ile+ Main (AIR 3,219) ('24)",
-      "<b>Shubh Mohta</b>: 99.80%ile+ Main (AIR 3,290) ('24)",
-      "<b>Shreyas Dangi</b>: 99.79%ile+ Main (AIR 3,378) ('24)",
-      "<b>Monisha Bangar</b>: 99.79%ile+ Main (AIR 3,454) ('24)",
-      "<b>Husain Mohd Ali</b>: 99.78%ile+ Main (AIR 3,479) ('24)",
-      "<b>Tanmay Jain</b>: 99.77%ile+ Main (AIR 3,721) ('24)",
-      "<b>Utkarsh Bansal</b>: 99.76%ile+ Main (AIR 3,849) ('24)",
-      "<b>Chaitanya Pant</b>: 99.76%ile+ Main (AIR 3,922) ('24)",
-      "<b>Piyush Soni</b>: 99.75%ile+ Main (AIR 4,011) ('24)",
-      "<b>Kushagra Kinra</b>: 99.75%ile+ Main (AIR 4,084) ('24)",
-      "<b>Vidit Agarwal</b>: 99.74%ile+ Main (AIR 4,199) ('24)",
-      "<b>Dikshant Goyal</b>: 99.73%ile+ Main (AIR 4,254) ('24)",
-      "<b>Dhruv Agarwal</b>: 99.71%ile+ Main (AIR 4,615) ('24)",
-      "<b>Vansh Ajmera</b>: 99.71%ile+ Main (AIR 4,705) ('24)",
-      "<b>Radhika Gupta</b>: 99.69%ile+ Main (AIR 4,982) ('24)",
-      "<b>Bhavishya K. Agarwal</b>: 99.89%ile+ Main (AIR 1,672) ('25)",
-      "<b>Nirvan Maheshwari</b>: 99.88%ile+ Main (AIR 1,880) ('25)",
-      "<b>Parth Agarwal</b>: 99.88%ile+ Main (AIR 1,914) ('25)",
-      "<b>Shivam Gupta</b>: 99.87%ile+ Main (AIR 2,017) ('25)",
-      "<b>Harshal Goyal</b>: 99.87%ile+ Main (AIR 2,041) ('25)",
-      "<b>Sarthak Agarwal</b>: 99.85%ile+ Main (AIR 2,297) ('25)",
-      "<b>Naveen Bhatia</b>: 99.85%ile+ Main (AIR 2,330) ('25)",
-      "<b>Bhavy Saini</b>: 99.85%ile+ Main (AIR 2,333) ('25)",
-      "<b>Anubhav Gupta</b>: 99.85%ile+ Main (AIR 2,382) ('25)",
-      "<b>Harsh Sharma</b>: 99.85%ile+ Main (AIR 2,403) ('25)",
-      "<b>Ekansh Jain</b>: 99.85%ile+ Main (AIR 2,418) ('25)",
-      "<b>Garvit Goyal</b>: 99.84%ile+ Main (AIR 2,554) ('25)",
-      "<b>Aaryan Agrawal</b>: 99.83%ile+ Main (AIR 2,579) ('25)",
-      "<b>Ruchirr Lodha</b>: 99.83%ile+ Main (AIR 2,591) ('25)",
-      "<b>Abhay S. Rathore</b>: 99.82%ile+ Main (AIR 2,777) ('25)",
-      "<b>Akshita Sharma</b>: 99.82%ile+ Main (AIR 2,791) ('25)",
-      "<b>Priyanshu</b>: 99.82%ile+ Main (AIR 2,805) ('25)",
-      "<b>Anshul Chaubey</b>: 99.81%ile+ Main (AIR 2,940) ('25)",
-      "<b>Siddharth Tiwari</b>: 99.81%ile+ Main (AIR 3,014) ('25)",
-      "<b>Kartik Bunas</b>: 99.80%ile+ Main (AIR 3,103) ('25)",
-      "<b>Manav Sancheti</b>: 99.80%ile+ Main (AIR 3,118) ('25)",
-      "<b>Dhruv Vashishth</b>: 99.79%ile+ Main (AIR 3,214) ('25)",
-      "<b>Abhinav Gupta</b>: 99.79%ile+ Main (AIR 3,237) ('25)",
-      "<b>Charvi Garg</b>: 99.78%ile+ Main (AIR 3,474) ('25)",
-      "<b>Bhavya Mudgal</b>: 99.77%ile+ Main (AIR 3,510) ('25)",
-      "<b>Pranav Malik</b>: 99.77%ile+ Main (AIR 3,528) ('25)",
-      "<b>Rajveer S. Choudhary</b>: 99.77%ile+ Main (AIR 3,568) ('25)",
-      "<b>Harshita Jain</b>: 99.76%ile+ Main (AIR 3,705) ('25)",
-      "<b>Jaisingh Saini</b>: 99.75%ile+ Main (AIR 3,926) ('25)",
-      "<b>Kanak Agarwal</b>: 99.73%ile+ Main (AIR 4,183) ('25)",
-      "<b>Saksham Gupta</b>: 99.71%ile+ Main (AIR 4,447) ('25)",
-      "<b>Rananjay K. Mishra</b>: 99.71%ile+ Main (AIR 4,567) ('25)",
-      "<b>Pulkit Indoriya</b>: 99.70%ile+ Main (AIR 4,628) ('25)",
-      "<b>Lalit Kumar</b>: 99.70%ile+ Main (AIR 4,648) ('25)",
-      "<b>Chetan Chaudhary</b>: 99.70%ile+ Main (AIR 4,656) ('25)",
-      "<b>Ativeer Godha</b>: 99.70%ile+ Main (AIR 4,707) ('25)",
-      "<b>Kritika Sharma</b>: 99.69%ile+ Main (AIR 4,885) ('25)",
-      "<b>Disha</b>: Adv AIR 1,036, IIT Delhi CS ('22)",
-      "<b>Parth Batwara</b>: Adv AIR 1,045, IIT Bombay Mech ('22)",
-      "<b>Aniruddh Yadav</b>: Adv AIR 1,047, IIT Roorkee Elec ('23)",
-      "<b>Piyush Agarwal</b>: Adv AIR 1,071, IIT BHU CS ('24)",
-      "<b>Khushajh Verma</b>: Adv AIR 1,073, IIT Bombay Mech ('22)",
-      "<b>Himanshu Gangwal</b>: Adv AIR 1,088, IIT Bombay CS ('22)",
-      "<b>Vedansh Bansal</b>: Adv AIR 1,162, IIT Bombay Mech ('22)",
-      "<b>Vedansh Bansal</b>: 99.31%ile+ Main ('22)",
-      "<b>Aishan Bhagat</b>: Adv AIR 1,174, IIT Kharagpur M&C ('24)",
-      "<b>Aishan Bhagat</b>: 99.61%ile+ Main ('24)",
-      "<b>Harsh Sharma</b>: Adv AIR 1,194, IIT Delhi M&C ('25)",
-      "<b>Yash Sharma</b>: Adv AIR 1,209, IIT BHU CS ('22)",
-      "<b>Parth Agarwal</b>: Adv AIR 1,213, IIT Roorkee ECE ('25)",
-      "<b>Raghav Govind</b>: Adv AIR 1,218, IIT Kanpur Elec ('22)",
-      "<b>Radhika Gupta</b>: Adv AIR 1,220, IIT Delhi M&C ('24)",
-      "<b>Rishika Gupta</b>: Adv AIR 1,283 ('22)",
-      "<b>Gaurav Gupta</b>: Adv AIR 1,336, IIT Delhi Elec ('22)",
-      "<b>Krishiv Geriani</b>: Adv AIR 1,349, IIT Kanpur Elec ('22)",
-      "<b>Ronak Sonkiya</b>: Adv AIR 1,477, IIT Bombay Aerospace ('22)",
-      "<b>Monisha Bangar</b>: Adv AIR 1,483, IIT Delhi Elec ('24)",
-      "<b>Kushagra Singhal</b>: Adv AIR 1,494, IIT Guwahati ECE ('24)",
-      "<b>Anubhav Gupta</b>: Adv AIR 1,498, IIT Gandhinagar CS ('25)",
-      "<b>Priyanshu Garg</b>: Adv AIR 1,534, IIT Delhi Elec ('24)",
-      "<b>Ronit Arora</b>: Adv AIR 1,536, IIT Bombay Chem ('22)",
-      "<b>Mahek Choudhary</b>: Adv AIR 1,586, IIT Guwahati CS ('22)",
-      "<b>Rajveer S. Choudhary</b>: Adv AIR 1,588, IIT Bombay Elec ('25)",
-      "<b>Kaustubh Sharma</b>: Adv AIR 1,624, IIT Roorkee Elec ('23)",
-      "<b>Tanish Goyal</b>: Adv AIR 1,629, IIT Roorkee M&C ('22)",
-      "<b>Madhav Agrawal</b>: Adv AIR 1,636, IIT Bombay Chem ('22)",
-      "<b>Ripu D. S. Bankawat</b>: Adv AIR 1,648, IIT Jodhpur CS ('23)",
-      "<b>Ripu Daman Singh Bankawat</b>: 99.08%ile+ Main ('23)",
-      "<b>Vihaan S. Kumar</b>: Adv AIR 1,663, IIT Kharagpur Elec ('22)",
-      "<b>Rahul Gupta</b>: Adv AIR 1,710, IIT Bombay Chem ('22)",
-      "<b>Arunim Garg</b>: Adv AIR 1,720, IIT Delhi Mech ('22)",
-      "<b>Naveen Bhatia</b>: Adv AIR 1,769, IIT Delhi Mech ('25)",
-      "<b>Aryan Arya</b>: Adv AIR 1,775, IIT Indore CS ('25)",
-      "<b>Lokik Agarwal</b>: Adv AIR 1,780, IIT Kanpur Elec ('25)",
-      "<b>Lokik Agarwal</b>: 99.53%ile+ Main ('25)",
-      "<b>Rehan Choudhary</b>: Adv AIR 1,787, IIT Ropar CS ('22)",
-      "<b>Pulkit Garg</b>: Adv AIR 1,790, IIT BHU M&C ('22)",
-      "<b>Jayant Kumar</b>: Adv AIR 1,792, IIT Bombay Elec ('24)",
-      "<b>Jayant Kumar</b>: 99.33%ile+ Main ('24)",
-      "<b>Priyanshu Mangawa</b>: Adv AIR 1,802, IIT Delhi Elec ('22)",
-      "<b>Arsh Mathur</b>: Adv AIR 1,807, IIT Madras Eng Physics ('24)",
-      "<b>Aryan Chaudhary</b>: Adv AIR 1,837 ('23)",
-      "<b>Garvit Goyal</b>: Adv AIR 1,851, IIT Kharagpur Elec ('25)",
-      "<b>Pratham Seervi</b>: Adv AIR 1,859, IIT Bombay Chem ('22)",
-      "<b>Shubh Mohta</b>: Adv AIR 1,866, IIT Roorkee Elec ('24)",
-      "<b>Anirudh Yadav</b>: Adv AIR 1,886, IIT Delhi Elec ('22)",
-      "<b>Anirudh Yadav</b>: 99.05%ile+ Main ('22)",
-      "<b>Abhinav S. Naruka</b>: Adv AIR 1,899, IIT Roorkee Elec ('23)",
-      "<b>Abhinav Singh Naruka</b>: 99.54%ile+ Main ('23)",
-      "<b>Yash Natiya</b>: Adv AIR 1,926, IIT Bombay ('22)",
-      "<b>Vastu Agarwal</b>: Adv AIR 1,937, IIT Roorkee Elec ('22)",
-      "<b>Geet Israni</b>: Adv AIR 1,998, IIT Bombay Chem ('22)",
-      "<b>Atharva Gupta</b>: Adv AIR 2,027, IIT Roorkee Elec ('22)",
-      "<b>Aditya Jain</b>: Adv AIR 2,060, IIT Guwahati ('23)",
-      "<b>Aditya Jain</b>: 99.56%ile+ Main ('23)",
-      "<b>Harshil Mishra</b>: Adv AIR 2,077, IIT Kharagpur ('25)",
-      "<b>Harshil Mishra</b>: 99.57%ile+ Main ('25)",
-      "<b>Aditya R. Mishra</b>: Adv AIR 2,095, IIT Kanpur Elec ('22)",
-      "<b>Ishan Gupta</b>: Adv AIR 2,104 ('22)",
-      "<b>Krish Garg</b>: Adv AIR 2,125 ('24)",
-      "<b>Krish Garg</b>: 99.65%ile+ Main ('24)",
-      "<b>Rishita Agarwal</b>: Adv AIR 2,168, IIT Guwahati DS & AI ('22)",
-      "<b>Aman Agrawal</b>: Adv AIR 2,228, IIT Roorkee ECE ('23)",
-      "<b>Sanyam K. Jain</b>: Adv AIR 2,240, IIT Guwahati ECE ('22)",
-      "<b>Riya Agarwal</b>: Adv AIR 2,250, IIT Kanpur Elec ('22)",
-      "<b>Pragya Bhanot</b>: Adv AIR 2,289, IIT Roorkee ECE ('22)",
-      "<b>Bhavishya Kumar Agarwal</b>: Adv AIR 2,311, IIT BHU ('25)",
-      "<b>Gauri Joshi</b>: Adv AIR 2,326, IIT Guwahati M&C ('22)",
-      "<b>Gauri Joshi</b>: 99.46%ile+ Main (AIR 4,901) ('22)",
-      "<b>Garvit Bansal</b>: Adv AIR 2,337, IIT Roorkee ECE ('24)",
-      "<b>Priyansh Gupta</b>: Adv AIR 2,369, IIT BHU M&C ('22)",
-      "<b>Chetan Vijay</b>: Adv AIR 2,383, IIT Bombay Mech ('22)",
-      "<b>Utkarsh Bansal</b>: Adv AIR 2,385, IIT Bombay Aerospace ('24)",
-      "<b>Kunal Goyal</b>: Adv AIR 2,397, IIT Madras Mech ('23)",
-      "<b>Kunal Goyal</b>: 99.37%ile+ Main ('23)",
-      "<b>Devansh Jain</b>: Adv AIR 2,466, IIT Hyderabad Elec ('22)",
-      "<b>Vassu Sharma</b>: Adv AIR 2,479, IIT Bombay Chem ('23)",
-      "<b>Vassu Sharma</b>: 99.18%ile+ Main ('23)",
-      "<b>Daksh Chauhan</b>: Adv AIR 2,502, IIT Delhi CS ('24)",
-      "<b>Garvit Gupta</b>: Adv AIR 2,536 ('22)",
-      "<b>Lekhansh Bhatnagar</b>: Adv AIR 2,541, IIT Kanpur Mech ('22)",
-      "<b>Naitik Singhal</b>: Adv AIR 2,561, IIT Kanpur Chem ('24)",
-      "<b>Praveen</b>: Adv AIR 2,565, IIT Bombay Elec ('22)",
-      "<b>Prateek Sharma</b>: Adv AIR 2,607, IIT Bombay ('22)",
-      "<b>Prateek Sharma</b>: 99.09%ile+ Main ('22)",
-      "<b>Ruchirr Lodha</b>: Adv AIR 2,609, IIT Delhi ('25)",
-      "<b>Khushi Ranawat</b>: Adv AIR 2,653, IIT Kanpur ('23)",
-      "<b>Khushi Ranawat</b>: 99.11%ile+ Main ('23)",
-      "<b>Raghav Dangayach</b>: Adv AIR 2,675, IIT Kanpur Elec ('24)",
-      "<b>Shivam Gupta</b>: Adv AIR 2,679, IIT Kanpur ('25)",
-      "<b>Arsh</b>: Adv AIR 2,682, IIT BHU ('23)",
-      "<b>Vansh Ajmera</b>: Adv AIR 2,743, IIT Kanpur ('24)",
-      "<b>Trisha Shekhawat</b>: Adv AIR 2,761, IIT Kanpur Elec ('24)",
-      "<b>Trisha Shekhawat</b>: 99.41%ile+ Main ('24)",
-      "<b>Yash Purswani</b>: Adv AIR 2,768, IIT Madras Mech ('22)",
-      "<b>Kritika Sharma</b>: Adv AIR 2,789, IIT Delhi ('25)",
-      "<b>Manya Gupta</b>: Adv AIR 2,829, IIT BHU CS ('22)",
-      "<b>Harshal Goyal</b>: Adv AIR 2,863, IIT Delhi ('25)",
-      "<b>Saksham Keswani</b>: Adv AIR 2,867, IIT Delhi Production ('24)",
-      "<b>Siddharth Tiwari</b>: Adv AIR 2,879, IIT Kanpur Aerospace ('25)",
-      "<b>Garvit Khandelwal</b>: Adv AIR 2,895, IIT Mandi CS ('24)",
-      "<b>Garvit Khandelwal</b>: 99.05%ile+ Main ('24)",
-      "<b>Divya Khandelwal</b>: Adv AIR 2,903, IIT BHU Elec ('24)",
-      "<b>Bhavy Saini</b>: Adv AIR 2,916 ('25)",
-      "<b>Pulkit Indoriya</b>: Adv AIR 2,922, IIT Guwahati ECE ('25)",
-      "<b>Chhavi Mittal</b>: Adv AIR 2,933, IIT Guwahati DS & AI ('25)",
-      "<b>Angad Bhalothia</b>: Adv AIR 2,933, IIT Guwahati M&C ('24)",
-      "<b>Angad Bhalothia</b>: 99.38%ile+ Main ('24)",
-      "<b>Aaditya Vaid</b>: Adv AIR 2,962, IIT Kanpur Mech ('22)",
-      "<b>Saksham Gupta</b>: Adv AIR 2,998, IIT Roorkee M&C ('25)",
-      "<b>Yuvraj Khandelwal</b>: Adv AIR 3,016, IIT Bombay Civil ('22)",
-      "<b>Kartik Bunas</b>: Adv AIR 3,062, IIT Bombay CS ('25)",
-      "<b>Nishchal Gupta</b>: Adv AIR 3,088, IIT Roorkee Mech ('24)",
-      "<b>Soham Vijay</b>: Adv AIR 3,098, IIT Roorkee Mech ('24)",
-      "<b>Soham Vijay</b>: 99.13%ile+ Main ('24)",
-      "<b>Lakshay Bansal</b>: Adv AIR 3,120 ('24)",
-      "<b>Lakshay Bansal</b>: 99.62%ile+ Main ('24)",
-      "<b>Nakshtra Goyal</b>: Adv AIR 3,121, IIT Patna CS ('24)",
-      "<b>Nakshtra Goyal</b>: 99.66%ile+ Main ('24)",
-      "<b>Kanak Agarwal</b>: Adv AIR 3,122, IIT Mandi CS ('25)",
-      "<b>Ekansh Jain</b>: Adv AIR 3,140, IIT Kanpur ('25)",
-      "<b>Vanshika Bansal</b>: Adv AIR 3,144, IIT Bombay Mech ('23)",
-      "<b>Ujjawal</b>: Adv AIR 3,156, IIT Kanpur Elec ('22)",
-      "<b>Husain M. Ali</b>: Adv AIR 3,178, IIT Jodhpur DS & AI ('24)",
-      "<b>Dhruv Lila</b>: Adv AIR 3,198, IIT Delhi Chem ('22)",
-      "<b>Nikhil Gupta</b>: Adv AIR 3,199, IIT Ropar M&C ('22)",
-      "<b>Nikhil Gupta</b>: 99.28%ile+ Main ('22)",
-      "<b>Soumya Sharma</b>: Adv AIR 3,244, IIT BHU Elec ('22)",
-      "<b>Vedant Jain</b>: Adv AIR 3,245, IIT BHU Elec ('24)",
-      "<b>Vedant Jain</b>: 99.37%ile+ Main ('24)",
-      "<b>Pranjal</b>: Adv AIR 3,248, IIT Bombay ('24)",
-      "<b>Pranjal</b>: 99.62%ile+ Main ('24)",
-      "<b>Nitesh Gahlot</b>: Adv AIR 3,282, IIT Roorkee ECE ('22)",
-      "<b>Nitesh Gahlot</b>: 99.47%ile+ Main (AIR 4,858) ('22)",
-      "<b>Aaryan Agrawal</b>: Adv AIR 3,307, IIT Bombay Civil ('25)",
-      "<b>Akshat Goyal</b>: Adv AIR 3,320, IIT Roorkee Mech ('24)",
-      "<b>Shreyansh Garg</b>: Adv AIR 3,347, IIT BHU Elec ('23)",
-      "<b>Arya Jha</b>: Adv AIR 3,349, IIT Bombay Eng Physics ('22)",
-      "<b>Arsh Goyal</b>: Adv AIR 3,353, IIT Kharagpur Mech ('24)",
-      "<b>Arsh Goyal</b>: 99.58%ile+ Main ('24)",
-      "<b>Archit Jain</b>: Adv AIR 3,392, IIT Guwahati ('23)",
-      "<b>Khushi Singhal</b>: Adv AIR 3,406, IIT Roorkee Elec ('22)",
-      "<b>Khushi Singhal</b>: 99.18%ile+ Main [100%ile Phy] ('22)",
-      "<b>Bhavya Mudgal</b>: Adv AIR 3,428, IIT Roorkee Chem ('25)",
-      "<b>Vidit Agarwal</b>: Adv AIR 3,440, IIT BHU Elec ('24)",
-      "<b>Radhika Goyal</b>: Adv AIR 3,448, IIT Bombay Chem ('22)",
-      "<b>Arnav Jain</b>: Adv AIR 3,461, IIT Delhi Materials ('23)",
-      "<b>Arnav Jain</b>: 99.57%ile+ Main ('23)",
-      "<b>Priyanshu Nareda</b>: Adv AIR 3,508, IIT Roorkee CS ('22)",
-      "<b>Samiya Singhal</b>: Adv AIR 3,514, IIT Kharagpur M&C ('24)",
-      "<b>Samiya Singhal</b>: 99.67%ile+ Main ('24)",
-      "<b>Manav Sancheti</b>: Adv AIR 3,515, IIT Delhi Civil ('25)",
-      "<b>Tanuj Agrawal</b>: Adv AIR 3,570, IIT Bombay ('22)",
-      "<b>Oshine Agarwal</b>: Adv AIR 3,572, IIT Delhi Civil ('25)",
-      "<b>Oshine Agarwal</b>: 99.81%ile+ Main ('25)",
-      "<b>Abhay P. Choudhary</b>: Adv AIR 3,616, IIT Roorkee M&C ('23)",
-      "<b>Abhay Pratap Choudhary</b>: 99.46%ile+ Main ('23)",
-      "<b>Arjun Bhardwaj</b>: Adv AIR 3,626, IIT Bombay Civil ('23)",
-      "<b>Mitravinda</b>: Adv AIR 3,639, IIT BHU CS ('25)",
-      "<b>Mitravinda</b>: 99.61%ile+ Main ('25)",
-      "<b>Yojit Saini</b>: Adv AIR 3,668, IIT Bombay Mech ('25)",
-      "<b>Yojit Saini</b>: 99.51%ile+ Main ('25)",
-      "<b>Anshul Ranka</b>: Adv AIR 3,699, IIT Kanpur Aerospace ('23)",
-      "<b>Sambhav Jain</b>: Adv AIR 3,709, IIT Delhi Civil ('24)",
-      "<b>Sambhav Jain</b>: 99.64%ile+ Main ('24)",
-      "<b>Mahima Sharma</b>: Adv AIR 3,744, IIT Bombay ('25)",
-      "<b>Mahima Sharma</b>: 99.60%ile+ Main ('25)",
-      "<b>Ridhima</b>: Adv AIR 3,754, IIT Kharagpur M&C ('25)",
-      "<b>Ridhima</b>: 99.63%ile+ Main ('25)",
-      "<b>Debashish Das</b>: Adv AIR 3,760, IIT Bombay ('22)",
-      "<b>Paaras Kataria</b>: Adv AIR 3,790, IIT Jodhpur DS & AI ('24)",
-      "<b>Anveshan Khanna</b>: Adv AIR 3,816 ('23)",
-      "<b>Anveshan Khanna</b>: 99.49%ile+ Main ('23)",
-      "<b>Aarna Sharma</b>: Adv AIR 3,849, IIT Guwahati M&C ('25)",
-      "<b>Aarna Sharma</b>: 99.52%ile+ Main ('25)",
-      "<b>Divesh Kandoi</b>: Adv AIR 3,853, IIT Delhi Civil ('24)",
-      "<b>Divesh Kandoi</b>: 99.00%ile+ Main ('24)",
-      "<b>Ashmil Saxena</b>: Adv AIR 3,906, IIT Kanpur Chem ('24)",
-      "<b>Ashmil Saxena</b>: 99.67%ile+ Main ('24)",
-      "<b>Lav Khator</b>: Adv AIR 3,918, IIT Mandi ('24)",
-      "<b>Shubhang Bagaria</b>: Adv AIR 3,938, IIT Delhi Civil ('22)",
-      "<b>Saksham Jain</b>: Adv AIR 3,965 ('22)",
-      "<b>Samay Jain</b>: Adv AIR 4,016, IIT Roorkee Mech ('22)",
-      "<b>Samay Jain</b>: 99.41%ile+ Main ('22)",
-      "<b>Pranav Malik</b>: Adv AIR 4,163, IIT Bombay Civil ('25)",
-      "<b>Savyasachi Deval</b>: Adv AIR 4,199 ('22)",
-      "<b>Savyasachi Deval</b>: 99.44%ile+ Main ('22)",
-      "<b>Yugadhya Sharma</b>: Adv AIR 4,209, IIT Roorkee ECE ('25)",
-      "<b>Yugadhya Sharma</b>: 99.65%ile+ Main ('25)",
-      "<b>Kavya Bansal</b>: Adv AIR 4,213, IIT Delhi Civil ('25)",
-      "<b>Kavya Bansal</b>: 99.44%ile+ Main ('25)",
-      "<b>Parthupman</b>: Adv AIR 4,226, IIT Kharagpur Industrial ('25)",
-      "<b>Parthupman</b>: 99.31%ile+ Main ('25)",
-      "<b>Kartavya Agarwal</b>: Adv AIR 4,242, IIT Kharagpur Chem ('23)",
-      "<b>Saransh Bansal</b>: Adv AIR 4,254, IIT Delhi Chem ('24)",
-      "<b>Divyansh Garg</b>: Adv AIR 4,270, IIT Dhanbad M&C ('23)",
-      "<b>Kushagra Kakkar</b>: Adv AIR 4,295, IIT Delhi Civil ('23)",
-      "<b>Harsh Chopra</b>: Adv AIR 4,316, IIT Bombay ('23)",
-      "<b>Rahul</b>: Adv AIR 4,343, IIT Kanpur CS ('23)",
-      "<b>Amogh Chatterjee</b>: Adv AIR 4,366 ('23)",
-      "<b>Amogh Chatterjee</b>: 99.06%ile+ Main ('23)",
-      "<b>Aneek Biswas</b>: Adv AIR 4,407, IIT Kharagpur CS ('25)",
-      "<b>Aneek Biswas</b>: 99.48%ile+ Main ('25)",
-      "<b>Yash Mishra</b>: Adv AIR 4,425, IIT Delhi Biotech ('24)",
-      "<b>Amaan A. Khan</b>: Adv AIR 4,444, IIT Bombay Mech ('25)",
-      "<b>Amaan Anjum Khan</b>: 99.63%ile+ Main ('25)",
-      "<b>Utkarsh Tiwari</b>: Adv AIR 4,459, IIT Guwahati Mech ('22)",
-      "<b>Utkarsh Tiwari</b>: 99.43%ile+ Main ('26)",
-      "<b>Sparsh Goyal</b>: Adv AIR 4,494, IIT Kanpur Chem ('22)",
-      "<b>Harshil Soni</b>: Adv AIR 4,527 ('24)",
-      "<b>Poorvi Bansal</b>: Adv AIR 4,530, IIT Bombay Chem ('23)",
-      "<b>Poorvi Bansal</b>: 99.51%ile+ Main ('23)",
-      "<b>Harshit Joshi</b>: Adv AIR 4,535, IIT Roorkee Eng Physics ('23)",
-      "<b>Anmol Tambi</b>: Adv AIR 4,556, IIT Roorkee Chem ('22)",
-      "<b>Swyam Vatwani</b>: Adv AIR 4,576 ('24)",
-      "<b>Swyam Vatwani</b>: 99.64%ile+ Main ('24)",
-      "<b>Vansh Goyal</b>: Adv AIR 4,612, IIT Patna M&C ('23)",
-      "<b>Anshuman Yadav</b>: Adv AIR 4,630, IIT Roorkee Chem ('24)",
-      "<b>Anshuman Yadav</b>: 99.53%ile+ Main ('24)",
-      "<b>Tanmay Singhal</b>: Adv AIR 4,639, IIT Dhanbad M&C ('22)",
-      "<b>Tanmay Singhal</b>: 99.15%ile+ Main ('22)",
-      "<b>Ansh Dev Singh</b>: Adv AIR 4,642, IIT Goa CS ('25)",
-      "<b>Lalit Kumar</b>: Adv AIR 4,649, IIT Guwahati ('25)",
-      "<b>Pratham Gupta</b>: Adv AIR 4,662, IIT BHU ('23)",
-      "<b>Pratham Gupta</b>: 99.20%ile+ Main ('23)",
-      "<b>Aniket Kanwar</b>: Adv AIR 4,666, IIT Kharagpur ('23)",
-      "<b>Aniket Kanwar</b>: 99.36%ile+ Main ('23)",
-      "<b>Shourya Singhal</b>: Adv AIR 4,674, IIT Roorkee Chem ('22)",
-      "<b>Aaryav Bansal</b>: Adv AIR 4,718, IIT Bombay ('24)",
-      "<b>Aaryav Bansal</b>: 99.65%ile+ Main ('24)",
-      "<b>Chetan Chaudhary</b>: Adv AIR 4,727, IIT Roorkee ('25)",
-      "<b>Dishank Tongaria</b>: Adv AIR 4,746, IIT Roorkee Elec ('25)",
-      "<b>Shriya Kothari</b>: Adv AIR 4,812, IIT Bombay Aerospace ('25)",
-      "<b>Shriya Kothari</b>: 99.31%ile+ Main ('25)",
-      "<b>Prabhav Vaishnav</b>: Adv AIR 4,820, IIT Kharagpur Chem ('25)",
-      "<b>Prabhav Vaishnav</b>: 99.52%ile+ Main ('25)",
-      "<b>Ayush Garg</b>: Adv AIR 4,828, IIT Kanpur Civil ('23)",
-      "<b>Rishit Mathur</b>: Adv AIR 4,844, IIT Roorkee Chem ('23)",
-      "<b>Nachiketa Yadav</b>: Adv AIR 4,846, IIT Delhi Biotech ('24)",
-      "<b>Nachiketa Yadav</b>: 99.29%ile+ Main ('24)",
-      "<b>Megha Agarwal</b>: Adv AIR 4,865, IIT Kanpur Chem ('22)",
-      "<b>Dhruv Vashishth</b>: Adv AIR 4,876, IIT Tirupati CS ('25)",
-      "<b>Mridul Gopalia</b>: Adv AIR 4,893, IIT Bombay Mech ('23)",
-      "<b>Mohit Jhunjhunwala</b>: Adv AIR 4,924, IIT Roorkee Chem ('23)",
-      "<b>Mohit Jhunjhunwala</b>: 99.52%ile+ Main ('23)",
-      "<b>Vansh Toshniwal</b>: Adv AIR 4,938, IIT Patna M&C ('24)",
-      "<b>Dhananjay Sharma</b>: Adv AIR 4,947, IIT Kanpur Civil ('25)",
-      "<b>Dhananjay Sharma</b>: 99.57%ile+ Main ('25)",
-      "<b>Dhawal Khatri</b>: Adv AIR 4,986, IIT Madras Civil ('23)",
-      "<b>Dhawal Khatri</b>: 99.55%ile+ Main ('23)",
-      "<b>Harsh Agrawal</b>: 99.48%ile+ Main (AIR 4,714) ('22)",
-      "<b>Dhruv Singh</b>: 99.46%ile+ Main (AIR 4,884) ('22)",
-      "<b>Yash Chhawal</b>: IIT Roorkee Mech ('25)",
-      "<b>Armaan Verma</b>: IIT Kharagpur Mech ('25)",
-      "<b>Yatin Verma</b>: IIT Jodhpur DS & AI ('25)",
-      "<b>Nandita Chandrawat</b>: IIT Bombay Civil ('25)",
-      "<b>Shreya Sharma</b>: IIT Jodhpur Chem ('25)"
-    ]
-  },
-  "Dausa": {
-    "m": [
-      "<b>4 Allenites</b> in Top-500 NEET ('22-'25) 🎯",
-      "<b>Vipin Chhawri</b>: AIR 200 (695/720) ('22) 🔥",
-      "<b>Daksh Kumar</b>: AIR 220 ('25) 🔥",
-      "<b>Mayank Kholwad</b>: AIR 380, AIIMS New Delhi ('25) 🔥",
-      "<b>Mayank Sharma</b>: AIR 389 (696/720) ('23)",
-      "<b>53 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>7 Allenites</b> nailed GMC Dausa ('24) 🏆",
-      "<b>44 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Kapil Tanwar</b>: AIR 666 ('25)",
-      "<b>Raghav Gahlot</b>: AIR 728, AIIMS Jodhpur (705/720) ('24)",
-      "<b>Akshat Bamor</b>: AIR 1,048, MAMC Delhi ('25)",
-      "<b>Sanyam Jain</b>: AIR 1,169 (675/720) ('22)",
-      "<b>Deepak Singh Gurjar</b>: AIR 1,259 ('25)",
-      "<b>Daksh Kumar Gurjar</b>: AIR 1,442, SMS MC Jaipur ('25)",
-      "<b>Nitin Yogi</b>: AIR 1,813, SMS MC Jaipur (696/720) ('24)",
-      "<b>Vatsala Sharma</b>: AIR 1,992 (676/720) ('23)",
-      "<b>Aarav Kumar</b>: AIR 2,549, AIIMS Rae Bareli ('25)",
-      "<b>Raj Kumar Sehra</b>: AIR 2,776, SMS MC Jaipur ('25)",
-      "<b>Ronil Awasthi</b>: AIR 3,353 (666/720) ('23)",
-      "<b>Mayur Meena</b>: AIIMS Jodhpur ('25)",
-      "<b>Ayush Meena</b>: AIIMS Jodhpur ('25)",
-      "<b>Chandraprakash Saini</b>: GMC Durg (612/720) ('25)",
-      "<b>Niru Meena</b>: GMC Barmer ('25)",
-      "<b>Kashvi Sharma</b>: Amrita School of Medicine Faridabad ('25)",
-      "<b>Raghav Khandelwal</b>: GMC Rajanna Sircilla ('25)",
-      "<b>Kartik Samriya</b>: GMC Alwar ('25)",
-      "<b>Sarita Meena</b>: RIMS Ongole ('25)",
-      "<b>Kaushal Meena</b>: GMC Churachandpur ('25)",
-      "<b>Ramesh Meena</b>: RCSMGMC Kolhapur ('25)",
-      "<b>Deependra Singh Gahlot</b>: GMC Kalyan (675/720) ('24)",
-      "<b>Priya Sharma</b>: Govt Allopathic MC Banda (666/720) ('24)",
-      "<b>Keshav Pratap Singh</b>: GMC Dholpur (665/720) ('24)",
-      "<b>Shivam Meena</b>: SMS MC Jaipur (660/720) ('24)",
-      "<b>Shailendra Kumar Meena</b>: GMC Coimbatore ('24)",
-      "<b>Jayesh Meena</b>: RKS GMC Surguja ('24)",
-      "<b>Bhavana Meena</b>: GMC Haldwani ('24)",
-      "<b>Sanskriti Meena</b>: GMC Jhunjhunu ('24)",
-      "<b>Rahul Bairwa</b>: GMC Shahdol ('24)",
-      "<b>Tapish</b>: GMC Bharatpur ('24)",
-      "<b>Himanshu Pingoliya</b>: GMC Sawai Madhopur ('24)",
-      "<b>Sourabh Meena</b>: RNT MC Udaipur (612/720) ('24)",
-      "<b>Bhawana Kumari</b>: ESIC MC Alwar (612/720) ('24)",
-      "<b>Vedansh Kumar Amat</b>: RUHS CMS Jaipur (624/720) ('24)",
-      "<b>Ajay Kumar Meena</b>: KGMU Lucknow (627/720) ('24)",
-      "<b>Mayank Godra</b>: IGMC Shimla (640/720) ('24)",
-      "<b>Rishabh Devatwal</b>: SMS MC Jaipur (655/720) ('24)",
-      "<b>Rohan Rajalwal</b>: GMC Krishnagiri ('24)",
-      "<b>Anjali Meena</b>: Tinsukia MC ('24)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> stormed Top-500 Adv ('23) 🎯",
-      "<b>Ishan Khandelwal</b>: 100%ile Main [100%ile Phy/100%ile Math] ('23) 🔥",
-      "<b>Ishan Khandelwal</b>: Adv AIR 226, IIT Delhi M&C ('23)",
-      "<b>Jayansh Khandelwal</b>: Adv AIR 805, IIT Guwahati M&C ('24)",
-      "<b>Krish Jangid</b>: 99.95%ile+ Main ('26)",
-      "<b>Jayansh Khandelwal</b>: 99.91%ile+ Main (AIR 1,508) ('24)",
-      "<b>23 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>2 Allenites</b> in Top-1,000 Adv ('23-'24)",
-      "<b>Mohit Soni</b>: 99.73%ile+ Main (AIR 2,457) ('22)",
-      "<b>Harshit Sharma</b>: 99.52%ile+ Main ('23)",
-      "<b>Kushal Jain</b>: 99.88%ile+ Main (AIR 2,041) ('24)",
-      "<b>Harshit Agarwal</b>: 99.82%ile+ Main (AIR 2,929) ('24)",
-      "<b>Naman Awana</b>: 99.55%ile+ Main ('25)",
-      "<b>Harshit Agarwal</b>: Adv AIR 2,030, IIT Roorkee Elec ('24)",
-      "<b>Kushal Jain</b>: Adv AIR 2,267, IIT Kanpur Elec ('24)",
-      "<b>Yadvendra Gurjar</b>: Adv AIR 2,408, IIT Delhi ('22)",
-      "<b>Abhivansh Gupta</b>: Adv AIR 4,840, IIT Roorkee Chem ('23)",
-      "<b>Parth Jhalani</b>: 99.41%ile+ Main ('23)",
-      "<b>Indra Dev Singh Mal</b>: 99.01%ile+ Main ('23)",
-      "<b>Yogesh Mahar</b>: 99.46%ile+ Main ('24)",
-      "<b>Daksh Katta</b>: 99.15%ile+ Main ('24)",
-      "<b>Bhavya Bansal</b>: 99.07%ile+ Main ('24)",
-      "<b>Parth Katta</b>: 99.49%ile+ Main ('26)",
-      "<b>Drishti Agrawal</b>: 99.34%ile+ Main ('26)",
-      "<b>Amit Saini</b>: IIT Guwahati Civil ('25)",
-      "<b>Naman Awana</b>: IIT Roorkee Chem ('25)",
-      "<b>Nayasha Goyal</b>: IIT Jodhpur Mech ('25)",
-      "<b>Paramshiv Jharwal</b>: IIT Roorkee ECE ('25)",
-      "<b>Tejsingh Meena</b>: IIT Kanpur Civil ('25)"
-    ]
-  },
-  "Dhaulpur": {
-    "m": [
-      "<b>22 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>12 Allenites</b> nailed GMC Dholpur ('24) 🏆",
-      "<b>6 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Chirag Shandilya</b>: Zoram MC Falkawn ('25)",
-      "<b>Dhruv Bansal</b>: GMC Miraj ('25)",
-      "<b>Priyanshi Kumari Meena</b>: SP MC Bikaner (609/720) ('24)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> led Top-500 Adv ('23) 🎯 (Karauli)",
-      "<b>Hemakshi Tomar</b>: 99.78%ile+ Main ('26)",
-      "<b>Raghav Rastogi</b>: 99.36%ile+ Main ('23)",
-      "<b>Mayank Goyal</b>: Adv AIR 230, IIT Kharagpur CS ('23) (Karauli)",
-      "<b>Mayank Goyal</b>: 99.98%ile+ Main (AIR 287) ('23) (Karauli)"
-    ]
-  },
-  "Karauli": {
-    "m": [
-      "<b>1 Allenite</b> in Top-1,000 NEET ('23)",
-      "<b>24 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>11 Allenites</b> aced GMC Karauli ('24) 🏆",
-      "<b>17 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Ansh Gupta</b>: AIR 836 (690/720) ('23)",
-      "<b>Amogh Pareek</b>: AIR 1,282, AIIMS Patna (700/720) ('24)",
-      "<b>Priyanshu Bansal</b>: AIR 3,095, AIIMS Rae Bareli ('25)",
-      "<b>Pranav Soni</b>: SP MC Bikaner (685/720) ('24)",
-      "<b>Abhishek Kumar</b>: GMC Sundargarh ('25)",
-      "<b>Palak Gupta</b>: GMC Siddipet ('25)",
-      "<b>Rajnikant</b>: MG IMS Wardha ('25)",
-      "<b>Ritesh Kumar Sharma</b>: GMC Durg ('25)",
-      "<b>Piyush Gupta</b>: GMC Dholpur (660/720) ('24)",
-      "<b>Shailja</b>: GMC Handwara (652/720) ('24)",
-      "<b>Shubhi Garg</b>: Tirunelveli MC (650/720) ('24)",
-      "<b>Aadil Khan</b>: GMC Bundi (651/720) ('24)",
-      "<b>Shivani Meena</b>: SS MC Rewa ('24)",
-      "<b>Shivani Bairwa</b>: GMC Ratlam ('24)",
-      "<b>Yash Kumar Meena</b>: GSVM MC Kanpur ('24)",
-      "<b>Madhu Meena</b>: SMS MC Jaipur (642/720) ('24)",
-      "<b>Abhinav Meena</b>: ESIC MC Bangalore ('24)",
-      "<b>Palak Ghunawat</b>: GMC Thiruvarur ('24)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> cracked Top-500 Adv ('23) 🎯",
-      "<b>Mayank Goyal</b>: Adv AIR 230, IIT Kharagpur CS ('23)",
-      "<b>Mayank Goyal</b>: 99.98%ile+ Main (AIR 287) ('23)",
-      "<b>Bhavesh Gupta</b>: Adv AIR 871, IIT Delhi M&C ('25)",
-      "<b>Bhavesh Gupta</b>: 99.98%ile+ Main (AIR 333) [100%ile Phy] ('25)",
-      "<b>7 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆",
-      "<b>2 Allenites</b> in Top-1,000 Adv ('23-'25)",
-      "<b>Yash Kumar Agrawal</b>: Adv AIR 3,194, IIT BHU Elec ('22)",
-      "<b>Yash Kumar Agrawal</b>: 99.12%ile+ Main ('22)",
-      "<b>Raghav Agrawal</b>: 99.34%ile+ Main ('25)",
-      "<b>Ankit Kumar Sahu</b>: IIT Kanpur Civil ('24)",
-      "<b>Harshit Singh</b>: IIT Patna Eng Physics ('24)",
-      "<b>Raunak Garg</b>: IIT Kanpur Materials ('22)"
-    ]
-  },
-  "Sawai Madhopur": {
-    "m": [
-      "<b>2 Allenites</b> in Top-500 NEET ('23-'24) 🎯",
-      "<b>Satyendra Kumar</b>: AIR 189 (701/720) ('23) 🔥",
-      "<b>Anushka Doi</b>: AIR 469, AIIMS Jodhpur (705/720) ('24) 🔥",
-      "<b>16 Allenites</b> scored ≥550 in NEET ('22-'25)",
-      "<b>5 Allenites</b> nailed GMC Sawai Madhopur ('24) 🏆",
-      "<b>9 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Tanay Gupta</b>: AIR 2,828 (670/720) ('23)",
-      "<b>Palak Agrawal</b>: AIR 4,847, MGM MC Indore (685/720) ('24)",
-      "<b>Kavya Jain</b>: SN MC Jodhpur (683/720) ('24)",
-      "<b>Rajshri Meena</b>: GMC Karauli ('25)",
-      "<b>Aarushi Garg</b>: GMC Dausa (670/720) ('24)",
-      "<b>Sanjana Mina</b>: GMC Churu ('24)",
-      "<b>Pankaj Kumar</b>: SMS MC Jaipur (651/720) ('24)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('22) 🏆",
-      "<b>Vipul Kumar Jain</b>: 99.65%ile+ Main (AIR 3,254) ('22)",
-      "<b>Hemant Singh Pipchanot</b>: 99.03%ile+ Main ('22)",
-      "<b>Sameer Sattavan</b>: 99.27%ile+ Main ('26)",
-      "<b>Ayush Gupta</b>: IIT Guwahati Mech ('22)",
-      "<b>Vipul Kumar Jain</b>: IIT Roorkee Civil ('22)"
-    ]
-  },
-  "Tonk": {
-    "m": [
-      "<b>13 Allenites</b> scored ≥600 in NEET ('22-'25)",
-      "<b>12 Allenites</b> in GMCs pan-India ('22-'25)",
-      "<b>Rachit Jain</b>: AIR 4,317, SP MC Bikaner (687/720) ('24)",
-      "<b>Manish Kumar Choudhary</b>: AIR 4,604 (650/720) ('22)",
-      "<b>Khushi Jain</b>: SN MC Jodhpur (681/720) ('24)",
-      "<b>Ankita Meena</b>: GMC Satara ('25)",
-      "<b>Harit Mangal Gupta</b>: GMC Bhilwara (674/720) ('24)",
-      "<b>Devendra S. Meharada</b>: RNT MC Udaipur (629/720) ('24)",
-      "<b>Naveen Choudhary</b>: GMC Banswara (661/720) ('24)",
-      "<b>Deependar Meena</b>: GMC Mulugu ('24)",
-      "<b>Rahul Kumar Regar</b>: GMC Baran ('24)"
-    ],
-    "e": [
-      "<b>7 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆",
-      "<b>Parth Jain</b>: 99.77%ile+ Main (AIR 3,574) ('25)",
-      "<b>Kuldeep Choudhary</b>: 99.65%ile+ Main ('25)",
-      "<b>Parth Jain</b>: Adv AIR 2,723, IIT Roorkee Elec ('25)",
-      "<b>Anvi Jain</b>: 99.22%ile+ Main ('24)",
-      "<b>Krish Vijayvergiya</b>: 99.21%ile+ Main ('24)",
-      "<b>Rahul Lamba</b>: 99.13%ile+ Main ('24)",
-      "<b>Ankit Puri</b>: 99.06%ile+ Main ('25)",
-      "<b>Aadish Jain</b>: 99.18%ile+ Main ('26)",
-      "<b>Arjav Bansal</b>: 99.17%ile+ Main ('26)",
-      "<b>Mahima Jain</b>: IIT Roorkee Chem ('25)",
-      "<b>Kuldeep Choudhary</b>: IIT Patna M&C ('25)",
-      "<b>Navya Jain</b>: IIT Mandi Elec ('25)",
-      "<b>Aadi Jain</b>: IIT Kharagpur Geology ('24)",
-      "<b>Anvi Jain</b>: IIT Delhi Materials ('24)"
-    ]
-  },
-  "Baran": {
-    "m": [
-      "<b>14 Allenites</b> led GMC Baran ('24) 🏆",
-      "<b>1 Allenite</b> in Top-1,000 NEET ('22) (Kota)",
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'23) (Kota)",
-      "<b>68 Allenites</b> aced GMC Kota ('24) 🏆 (Kota)",
-      "<b>Srishti Rajput</b>: AIR 521 (685/720) ('22) (Kota)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> led Top-500 Adv ('25) 🎯 (Kota)",
-      "<b>Somya Agrawal</b>: 99.92%ile+ Main (AIR 1,314) ('24)",
-      "<b>Somya Agrawal</b>: Adv AIR 2,033, IIT Roorkee Elec ('24)",
-      "<b>Harshit Rana</b>: Adv AIR 428, IIT Kharagpur CS ('25) (Kota)",
-      "<b>Harshit Rana</b>: 99.93%ile+ Main (AIR 1,027) ('25) (Kota)"
-    ]
-  },
-  "Jhalawar": {
-    "m": [
-      "<b>24 Allenites</b> aced JMC Jhalawar ('24) 🏆",
-      "<b>1 Allenite</b> in Top-1,000 NEET ('22) (Kota)",
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'23) (Kota)",
-      "<b>68 Allenites</b> stormed GMC Kota ('24) 🏆 (Kota)",
-      "<b>Srishti Rajput</b>: AIR 521 (685/720) ('22) (Kota)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> cracked Top-500 Adv ('25) 🎯 (Kota)",
-      "<b>Yuvraj Jain</b>: 99.64%ile+ Main ('24)",
-      "<b>Yuvraj Jain</b>: IIT BHU Chem ('24)",
-      "<b>Harshit Rana</b>: Adv AIR 428, IIT Kharagpur CS ('25) (Kota)",
-      "<b>Harshit Rana</b>: 99.93%ile+ Main (AIR 1,027) ('25) (Kota)"
-    ]
-  },
-  "Kota": {
-    "m": [
-      "<b>1 Allenite</b> in Top-1,000 NEET ('22)",
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'23)",
-      "<b>68 Allenites</b> led GMC Kota ('24) 🏆",
-      "<b>Srishti Rajput</b>: AIR 521 (685/720) ('22)",
-      "<b>3 Allenites</b> scored ≥500 in NEET ('22-'25) (Bundi)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> nailed Top-500 Adv ('25) 🎯",
-      "<b>Harshit Rana</b>: Adv AIR 428, IIT Kharagpur CS ('25)",
-      "<b>Harshit Rana</b>: 99.93%ile+ Main (AIR 1,027) ('25)",
-      "<b>Niharika Aggarwal</b>: 99.06%ile+ Main ('26)",
-      "<b>Somya Agrawal</b>: 99.92%ile+ Main (AIR 1,314) ('24) (Baran)"
-    ]
-  },
-  "Banswara": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥600 in NEET ('22-'25)",
-      "<b>9 Allenites</b> aced GMC Banswara ('24) 🏆",
-      "<b>1 Allenite</b> scored ≥500 in NEET ('22-'25) (Dungarpur)",
-      "<b>13 Allenites</b> cracked GMC Dungarpur ('24) 🏆 (Dungarpur)",
-      "<b>Manasth Bharti</b>: RNT MC Udaipur ('25) (Dungarpur)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆 (Sirohi)",
-      "<b>Tanush Mandawara</b>: Adv AIR 1,022, IIT Delhi ('25) (Udaipur)",
-      "<b>Tanush Mandawara</b>: 99.92%ile+ Main (AIR 1,240) ('25) (Udaipur)",
-      "<b>Mehul Agarwal</b>: 99.91%ile+ Main (AIR 1,130) ('23) (Sirohi)",
-      "<b>Siddharth Dangi</b>: IIT Gandhinagar AI ('25) (Sirohi)"
-    ]
-  },
-  "Bhilwara": {
-    "m": [
-      "<b>7 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>17 Allenites</b> aced GMC Bhilwara ('24) 🏆",
-      "<b>Saloni Jain</b>: GMC Mahabubnagar (654/720) ('24)",
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆 (Ajmer)",
-      "<b>12 Allenites</b> scored ≥600 in NEET ('22-'25) (Ajmer)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆",
-      "<b>Navdeep Singh Chhabra</b>: 99.43%ile+ Main ('23)",
-      "<b>Atharva Toshniwal</b>: 99.48%ile+ Main ('25)",
-      "<b>Lakshya Saraf</b>: 99.41%ile+ Main ('26)",
-      "<b>Atharva Toshniwal</b>: IIT Roorkee Chem Sci ('25)",
-      "<b>Navdeep Singh Chhabra</b>: IIT Kharagpur Naval Arch ('23)"
-    ]
-  },
-  "Bundi": {
-    "m": [
-      "<b>3 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>19 Allenites</b> aced GMC Bundi ('24) 🏆",
-      "<b>1 Allenite</b> in Top-1,000 NEET ('22) (Kota)",
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'23) (Kota)",
-      "<b>68 Allenites</b> cracked GMC Kota ('24) 🏆 (Kota)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> aced Top-500 Adv ('25) 🎯 (Kota)",
-      "<b>Harshit Rana</b>: Adv AIR 428, IIT Kharagpur CS ('25) (Kota)",
-      "<b>Harshit Rana</b>: 99.93%ile+ Main (AIR 1,027) ('25) (Kota)",
-      "<b>Niharika Aggarwal</b>: 99.06%ile+ Main ('26) (Kota)",
-      "<b>7 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆 (Tonk)"
-    ]
-  },
-  "Dungarpur": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥500 in NEET ('22-'25)",
-      "<b>13 Allenites</b> nailed GMC Dungarpur ('24) 🏆",
-      "<b>Manasth Bharti</b>: RNT MC Udaipur ('25)",
-      "<b>1 Allenite</b> scored ≥600 in NEET ('22-'25) (Banswara)",
-      "<b>9 Allenites</b> stormed GMC Banswara ('24) 🏆 (Banswara)"
-    ],
-    "e": [
-      "<b>Tanush Mandawara</b>: Adv AIR 1,022, IIT Delhi ('25) (Udaipur)",
-      "<b>Tanush Mandawara</b>: 99.92%ile+ Main (AIR 1,240) ('25) (Udaipur)"
-    ]
-  },
-  "Rajsamand": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥500 in NEET ('22-'25)",
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'24) (Udaipur)",
-      "<b>62 Allenites</b> nailed RNT MC Udaipur ('24) 🏆 (Udaipur)",
-      "<b>Yashaswi Jain</b>: AIR 2,852, AIIMS Rae Bareli ('24) (Udaipur)",
-      "<b>7 Allenites</b> scored ≥500 in NEET ('22-'25) (Bhilwara)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆 (Bhilwara)",
-      "<b>Tanush Mandawara</b>: Adv AIR 1,022, IIT Delhi ('25) (Udaipur)",
-      "<b>Tanush Mandawara</b>: 99.92%ile+ Main (AIR 1,240) ('25) (Udaipur)",
-      "<b>Navdeep S. Chhabra</b>: 99.43%ile+ Main ('23) (Bhilwara)",
-      "<b>Atharva Toshniwal</b>: 99.48%ile+ Main ('25) (Bhilwara)"
-    ]
-  },
-  "Udaipur": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'24)",
-      "<b>62 Allenites</b> aced RNT MC Udaipur ('24) 🏆",
-      "<b>Yashaswi Jain</b>: AIR 2,852, AIIMS Rae Bareli (692/720) ('24)",
-      "<b>1 Allenite</b> scored ≥500 in NEET ('22-'25) (Rajsamand)",
-      "<b>6 Allenites</b> scored ≥500 in NEET ('22-'24) (Chittorgarh)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆 (Bhilwara)",
-      "<b>Tanush Mandawara</b>: Adv AIR 1,022, IIT Delhi ('25)",
-      "<b>Tanush Mandawara</b>: 99.92%ile+ Main (AIR 1,240) ('25)",
-      "<b>Navdeep S. Chhabra</b>: 99.43%ile+ Main ('23) (Bhilwara)",
-      "<b>Atharva Toshniwal</b>: 99.48%ile+ Main ('25) (Bhilwara)"
-    ]
-  },
-  "Pratapgarh": {
-    "m": [
-      "<b>6 Allenites</b> scored ≥500 in NEET ('22-'24) (Chittorgarh)",
-      "<b>14 Allenites</b> cracked GMC Chittorgarh ('24) 🏆 (Chittorgarh)",
-      "<b>Priyank Taneja</b>: GMC Osmanabad (657/720) ('24) (Chittorgarh)",
-      "<b>1 Allenite</b> scored ≥600 in NEET ('22-'25) (Banswara)",
-      "<b>9 Allenites</b> led GMC Banswara ('24) 🏆 (Banswara)"
-    ],
-    "e": [
-      "<b>Tanush Mandawara</b>: Adv AIR 1,022, IIT Delhi ('25) (Udaipur)",
-      "<b>Tanush Mandawara</b>: 99.92%ile+ Main (AIR 1,240) ('25) (Udaipur)"
-    ]
-  },
-  "Chittorgarh": {
-    "m": [
-      "<b>6 Allenites</b> scored ≥500 in NEET ('22-'24)",
-      "<b>14 Allenites</b> nailed GMC Chittorgarh ('24) 🏆",
-      "<b>Priyank Taneja</b>: GMC Osmanabad (657/720) ('24)",
-      "<b>7 Allenites</b> scored ≥500 in NEET ('22-'25) (Bhilwara)",
-      "<b>17 Allenites</b> led GMC Bhilwara ('24) 🏆 (Bhilwara)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆 (Bhilwara)",
-      "<b>Navdeep S. Chhabra</b>: 99.43%ile+ Main ('23) (Bhilwara)",
-      "<b>Atharva Toshniwal</b>: 99.48%ile+ Main ('25) (Bhilwara)",
-      "<b>Lakshya Saraf</b>: 99.41%ile+ Main ('26) (Bhilwara)",
-      "<b>Atharva Toshniwal</b>: IIT Roorkee Chem Sci ('25) (Bhilwara)"
-    ]
-  },
-  "Didwana-Kuchaman": {
-    "m": [
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆",
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆 (Nagaur)",
-      "<b>30 Allenites</b> scored ≥500 in NEET ('22-'25) (Nagaur)",
-      "<b>7 Allenites</b> stormed GMC Nagaur ('24) 🏆 (Nagaur)",
-      "<b>11 Allenites</b> in GMCs pan-India ('22-'25) (Nagaur)"
-    ],
-    "e": [
-      "<b>5 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆 (Nagaur)",
-      "<b>Parth Agarwal</b>: Adv AIR 613, IIT Delhi Elec ('24) (Nagaur)",
-      "<b>Parth Agarwal</b>: 99.98%ile+ Main (AIR 315) [100%ile Math] ('24)",
-      "<b>1 Allenite</b> in Top-1,000 Adv ('24) (Nagaur)",
-      "<b>Tanishq Soni</b>: 99.17%ile+ Main ('23) (Nagaur)"
-    ]
-  },
-  "Deeg": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥500 in NEET ('23-'25)",
-      "<b>Chahit Khandelwal</b>: GMC Osmanabad ('25)",
-      "<b>Rohan Jindal</b>: AIR 198 (695/720) ('22) 🔥 (Bharatpur)",
-      "<b>1 Allenite</b> in Top-500 NEET ('22) 🎯 (Bharatpur)",
-      "<b>29 Allenites</b> scored ≥600 in NEET ('22-'25) (Bharatpur)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> stormed Top-500 Adv ('23) 🎯 (Bharatpur)",
-      "<b>Harsh Goyal</b>: Adv AIR 397, IIT Roorkee CS ('23) (Bharatpur)",
-      "<b>Harsh Goyal</b>: 99.95%ile+ Main (AIR 621) [100%ile Chem] ('23)",
-      "<b>Aman Gupta</b>: 99.93%ile+ Main (AIR 1,202) ('24) (Bharatpur)",
-      "<b>Aman Gupta</b>: Adv AIR 2,381, IIT Mandi CS ('24) (Bharatpur)"
-    ]
-  },
-  "Phalodi": {
-    "m": [
-      "<b>42 Allenites</b> stormed AIIMS Jodhpur ('24) 🏆",
-      "<b>42 Allenites</b> cracked AIIMS Jodhpur ('24) 🏆 (Jodhpur)",
-      "<b>13 Allenites</b> scored ≥500 in NEET ('22-'25) (Jodhpur)",
-      "<b>61 Allenites</b> nailed SN MC Jodhpur ('24) 🏆 (Jodhpur)",
-      "<b>Jayvardhan S. Chouhan</b>: AIR 3,061 (669/720) ('23) (Jodhpur)"
-    ],
-    "e": [
-      "<b>7 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆 (Jodhpur)",
-      "<b>Shivansh Agarwal</b>: 99.95%ile+ Main (AIR 790) ('25) (Jodhpur)",
-      "<b>Shivansh Agarwal</b>: Adv AIR 1,032, IIT Delhi ('25) (Jodhpur)",
-      "<b>Soham Kejriwal</b>: 99.73%ile+ Main (AIR 3,112) ('23) (Jodhpur)",
-      "<b>Sahvendra</b>: 99.82%ile+ Main (AIR 2,894) ('24) (Jodhpur)"
-    ]
-  },
-  "Jodhpur": {
-    "m": [
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆",
-      "<b>13 Allenites</b> scored ≥500 in NEET ('22-'25)",
-      "<b>61 Allenites</b> stormed SN MC Jodhpur ('24) 🏆",
-      "<b>Jayvardhan Singh Chouhan</b>: AIR 3,061 (669/720) ('23)",
-      "<b>42 Allenites</b> cracked AIIMS Jodhpur ('24) 🏆 (Pali)"
-    ],
-    "e": [
-      "<b>7 Allenites</b> cracked IITs (Adv) ('23-'25) 🏆",
-      "<b>Shivansh Agarwal</b>: 99.95%ile+ Main (AIR 790) ('25)",
-      "<b>Shivansh Agarwal</b>: Adv AIR 1,032, IIT Delhi ('25)",
-      "<b>Soham Kejriwal</b>: 99.73%ile+ Main (AIR 3,112) ('23)",
-      "<b>Sahvendra</b>: 99.82%ile+ Main (AIR 2,894) ('24)",
-      "<b>Rounak Sambhwani</b>: 99.71%ile+ Main (AIR 4,636) ('24)",
-      "<b>Dhruv Nigam</b>: 99.68%ile+ Main ('26)",
-      "<b>Soham Kejriwal</b>: Adv AIR 1,378, IIT Kharagpur ('23)",
-      "<b>Kartik Sharma</b>: 99.18%ile+ Main ('26)",
-      "<b>Shashwat Gogoi</b>: IIT Kharagpur Arch ('24)",
-      "<b>Kavyansh Raj Singh</b>: IIT Indore Chem ('24)",
-      "<b>Rounak Sambhwani</b>: IIT Roorkee Metallurgy ('24)",
-      "<b>Sahvendra</b>: IIT Kharagpur Mining ('24)",
-      "<b>Vishrut</b>: IIT Jodhpur Civil ('23)"
-    ]
-  },
-  "Kotputli-Behror": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥550 in NEET ('24-'25)",
-      "<b>Ravi Payala</b>: AIR 1,752, GMC Chandigarh ('25)",
-      "<b>Prathvi R. Chouhan</b>: AIR 264, AIIMS Jodhpur ('24) (Alwar)",
-      "<b>Dev Bansal</b>: AIR 393 (696/720) ('23) 🔥 (Alwar)",
-      "<b>Pawan Kumar</b>: AIR 425, AIIMS Jodhpur (706/720) ('24) (Alwar)"
-    ],
-    "e": [
-      "<b>27 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆 (Alwar)",
-      "<b>Yug Sharma</b>: Adv AIR 774, IIT BHU CS ('24) (Alwar)",
-      "<b>Piyush Sharma</b>: 99.90%ile+ Main (AIR 1,498) ('25) (Alwar)",
-      "<b>Piyush Sharma</b>: IIT Roorkee Mech ('25) (Alwar)",
-      "<b>Yug Sharma</b>: 99.91%ile+ Main (AIR 1,476) ('24) (Alwar)"
-    ]
-  },
-  "Khairthal-Tijara": {
-    "m": [
-      "<b>3 Allenites</b> in Top-500 NEET ('23-'24) 🎯 (Alwar)",
-      "<b>Prathvi R. Chouhan</b>: AIR 264, AIIMS Jodhpur ('24) (Alwar)",
-      "<b>Dev Bansal</b>: AIR 393 (696/720) ('23) 🔥 (Alwar)",
-      "<b>Pawan Kumar</b>: AIR 425, AIIMS Jodhpur (706/720) ('24) (Alwar)",
-      "<b>7 Allenites</b> in Top-1,000 NEET ('22-'25) (Alwar)"
-    ],
-    "e": [
-      "<b>27 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆 (Alwar)",
-      "<b>Yug Sharma</b>: Adv AIR 774, IIT BHU CS ('24) (Alwar)",
-      "<b>Piyush Sharma</b>: 99.90%ile+ Main (AIR 1,498) ('25) (Alwar)",
-      "<b>Piyush Sharma</b>: IIT Roorkee Mech ('25) (Alwar)",
-      "<b>Yug Sharma</b>: 99.91%ile+ Main (AIR 1,476) ('24) (Alwar)"
-    ]
-  },
-  "Beawar": {
-    "m": [
-      "<b>42 Allenites</b> stormed AIIMS Jodhpur ('24) 🏆",
-      "<b>42 Allenites</b> led AIIMS Jodhpur ('24) 🏆 (Ajmer)",
-      "<b>12 Allenites</b> scored ≥600 in NEET ('22-'25) (Ajmer)",
-      "<b>51 Allenites</b> cracked JLN MC Ajmer ('24) 🏆 (Ajmer)",
-      "<b>7 Allenites</b> in GMCs pan-India ('22-'25) (Ajmer)"
-    ],
-    "e": [
-      "<b>1 Allenite</b> stormed Top-500 Adv ('23) 🎯 (Ajmer)",
-      "<b>Rishika Garg</b>: Adv AIR 419, IIT Delhi CS ('23) (Ajmer)",
-      "<b>Rishika Garg</b>: 99.95%ile+ Main (AIR 643) ('23) (Ajmer)",
-      "<b>Chayanika Mandal</b>: 99.98%ile+ Main ('26) (Ajmer)",
-      "<b>9 Allenites</b> cracked IITs (Adv) ('22-'25) 🏆 (Ajmer)"
-    ]
-  },
-  "Salumbar": {
-    "m": [
-      "<b>1 Allenite</b> scored ≥650 in NEET ('22-'24) (Udaipur)",
-      "<b>62 Allenites</b> stormed RNT MC Udaipur ('24) 🏆 (Udaipur)",
-      "<b>Yashaswi Jain</b>: AIR 2,852, AIIMS Rae Bareli ('24) (Udaipur)",
-      "<b>1 Allenite</b> scored ≥500 in NEET ('22-'25) (Dungarpur)",
-      "<b>13 Allenites</b> aced GMC Dungarpur ('24) 🏆 (Dungarpur)"
-    ],
-    "e": [
-      "<b>Tanush Mandawara</b>: Adv AIR 1,022, IIT Delhi ('25) (Udaipur)",
-      "<b>Tanush Mandawara</b>: 99.92%ile+ Main (AIR 1,240) ('25) (Udaipur)"
-    ]
-  },
-  "Balotra": {
-    "m": [
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆",
-      "<b>42 Allenites</b> aced AIIMS Jodhpur ('24) 🏆 (Barmer)",
-      "<b>5 Allenites</b> scored ≥550 in NEET ('22-'25) (Barmer)",
-      "<b>9 Allenites</b> stormed GMC Barmer ('24) 🏆 (Barmer)",
-      "<b>Manohar</b>: AIR 2,023, BJ MC Ahmedabad ('25) (Barmer)"
-    ],
-    "e": [
-      "<b>2 Allenites</b> cracked IITs (Adv) ('23-'24) 🏆 (Jalore)",
-      "<b>Krinjal Agrawal</b>: 99.72%ile+ Main (AIR 4,283) ('25) (Barmer)",
-      "<b>Krinjal Agrawal</b>: IIT Delhi Civil ('25) (Barmer)",
-      "<b>Tanish Kumar</b>: 99.77%ile+ Main (AIR 3,646) [100%ile Phy] ('24)",
-      "<b>Tanish Kumar</b>: Adv AIR 3,897, IIT Ropar CS ('24) (Jalore)"
-    ]
-  }
-};
+	let DATA = {};
+	const s = document.createElement('script');
+	s.src = BRAND.replace('Allen ', '') + '_Results.js';
+	document.head.appendChild(s);
 	/* ═══════════════════════════════════════════════════════
 	   S3 — AUDIO
 	   ═══════════════════════════════════════════════════════ */
@@ -3712,7 +1736,7 @@
 			}));
 		});
 
-		const padding = 60;
+		const padding = 0;
 		const dx = x1 - x0, dy = y1 - y0;
 		const sc = Math.min((500 - padding) / dx, (520 - padding) / dy);
 		const ox = (500 - dx * sc) / 2;
@@ -3881,149 +1905,237 @@
 		}
 		(document.fonts ? document.fonts.ready : Promise.resolve()).then(initTicker);
 		/* ═══════════════════════════════════════════════════════
-		   S14 — AURORA (mobile-optimised)
+		   S14 — AURORA (lean: tiny canvas + CSS blur/brightness)
+		   ~20× cheaper than old S14: no shadowBlur, no lighter,
+		   SCALE=0.30 canvas, one GPU blur pass via CSS filter.
 		   ═══════════════════════════════════════════════════════ */
 		const aCanvas = document.getElementById('page-aurora'),
 			ax = aCanvas.getContext('2d');
-		let aW, aH;
 
+		/* tiny canvas — CSS filter does the heavy lifting */
+		const A_SCALE = 0.30;
+		let aW, aH;
 		function resizeAurora() {
-			aW = aCanvas.width = window.innerWidth;
-			aH = aCanvas.height = window.innerHeight;
+			aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
+			aH = aCanvas.height = Math.floor(window.innerHeight * 0.14 * A_SCALE);
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
-		let aEnergy = 0,
-			aT = 0,
-			aRaf = null,
-			aFrame = 0;
-		const waveSeeds = [
-			[2.31, 5.17, 1.83, 4.42, 0.91, 3.67],
-			[1.14, 3.89, 6.02, 2.55, 5.33, 0.77],
-			[4.66, 1.22, 3.14, 5.88, 2.09, 4.31],
-			[0.55, 4.73, 2.61, 1.39, 5.94, 3.02],
-			[3.21, 0.88, 4.55, 2.17, 6.11, 1.44],
-			[5.77, 2.43, 0.66, 4.88, 1.55, 3.99],
-			[1.89, 3.44, 5.21, 0.73, 4.17, 2.88],
-			[4.02, 1.67, 3.55, 5.43, 0.29, 2.14],
-			[0.91, 4.12, 2.88, 5.67, 1.33, 3.77],
-			[3.54, 0.22, 4.91, 2.05, 5.78, 1.62]
-		];
-		const waves = [{
-			speed: 0.025,
-			amp: 40,
-			color: '77,232,184',
-			alpha: 0.52,
-			width: 85,
-			fr: [1.00, 1.67, 0.53, 2.09, 1.43, 0.89]
-		}, {
-			speed: 0.022,
-			amp: 45,
-			color: '66,133,244',
-			alpha: 0.45,
-			width: 85,
-			fr: [1.00, 1.73, 0.61, 2.41, 0.37, 1.19]
-		}, {
-			speed: 0.018,
-			amp: 55,
-			color: '185,43,227',
-			alpha: 0.45,
-			width: 95,
-			fr: [1.00, 1.41, 2.23, 0.67, 1.89, 0.53]
-		}, {
-			speed: 0.045,
-			amp: 25,
-			color: '180,240,220',
-			alpha: 0.22,
-			width: 60,
-			fr: [1.00, 2.13, 0.79, 1.57, 0.43, 2.87]
-		}];
 
-		function getAuroraTier() {
-			const w = window.innerWidth,
-				h = window.innerHeight;
-			if(h <= 440 || (w <= 600)) return 'phone';
-			if(w <= 1024) return 'tablet';
-			return 'desktop';
-		}
-		/* Quadratic bezier smoothing — eliminates sharp angles at any step size */
-		function drawSmoothWave(e, w, ph, fr, ampR, step) {
-			const pts = [];
+		/* CSS filter on the aurora canvas — applied once, covers all waves */
+		aCanvas.style.filter = 'blur(16px) brightness(16.0) saturate(3.2)';
+		aCanvas.style.imageRendering = 'pixelated';
+
+		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false;
+
+		/*
+		  4 waves — teal, white, purple, blue-violet.
+		  Speed formula kept identical to original S14: aT * w.speed * 60 * fr[n]
+		  Amp: original used ampR = w.amp * rScale (40–55px on 900px canvas).
+		  Here canvas is A_SCALE wide so we scale amp proportionally:
+		  ampPx = w.amp * (aW / 900) — same physical size on screen.
+		  baseY = aH (waves push UP from bottom, same as original pts [x, aH+wobble]).
+		  3 terms only (vs 6 in original) — removes flutter, keeps wave shape.
+		  flutter term weight scales down faster than main wave during decay.
+		*/
+		const aWaves = [
+			{ speed:0.055, offset:0.0, col:[77,232,184],  ampMult:1.00, baseOff:0.00,
+			  terms:[ [1.6,0.50], [4.2,0.32], [9.5,0.18] ] },
+			{ speed:0.048, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
+			  terms:[ [1.4,0.50], [3.8,0.32], [8.7,0.18] ] },
+			{ speed:0.040, offset:3.1, col:[185,43,227],  ampMult:0.88, baseOff:0.05,
+			  terms:[ [1.9,0.50], [4.7,0.32], [10.3,0.18] ] },
+			{ speed:0.080, offset:1.8, col:[80,160,255],  ampMult:0.78, baseOff:0.02,
+			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
+		];
+
+		/* hotspots — live glow bursts riding wave crests */
+		const aHotspots = [
+			{ nx:0.15, spd:0.0011, col:[255,255,255], sz:0.22, ph:0.0,  pSpd:0.08, wi:0 },
+			{ nx:0.42, spd:0.0008, col:[77,232,184],  sz:0.18, ph:1.4,  pSpd:0.11, wi:0 },
+			{ nx:0.68, spd:0.0014, col:[185,43,227],  sz:0.20, ph:2.8,  pSpd:0.09, wi:2 },
+			{ nx:0.30, spd:0.0010, col:[80,160,255],  sz:0.16, ph:4.2,  pSpd:0.13, wi:3 },
+			{ nx:0.82, spd:0.0007, col:[255,255,255], sz:0.19, ph:0.7,  pSpd:0.07, wi:1 },
+			{ nx:0.55, spd:0.0013, col:[77,232,184],  sz:0.15, ph:3.5,  pSpd:0.12, wi:0 },
+		];
+		const aSpikes = aHotspots.map(() => ({ active:false, age:0, dur:0, inten:0 }));
+
+			function aGetCrestY(wi, nx) {
+				const w = aWaves[wi];
+				const rScale = Math.min(1, aW / (900 * A_SCALE));
+				const amp   = aEnergy * w.ampMult * w.terms[0][1] * 40 * rScale;
+				const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - aEnergy));
+				const rollScale2 = Math.pow(aEnergy, 1.8);
+				const ph0 =  aT * w.speed * 8       + w.offset;
+				const ph1 = -aT * w.speed * 8 * 0.7 + w.offset * 1.5;
+				let y = 0;
+				y += Math.sin(nx * w.terms[0][0] * Math.PI + ph0) * w.terms[0][1];
+				y += Math.sin(nx * w.terms[1][0] * Math.PI + ph1) * w.terms[1][1] * rollScale2;
+				return baseY + y * amp;
+			}
+
+		function aDrawWave(w) {
+			const e = aEnergy;
+			if(e < 0.003) return;
+			const rScale = Math.min(1, aW / (900 * A_SCALE));
+			const ampPx = e * w.ampMult * 40 * rScale;
+			const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - e));
+			/* pre-compute all per-wave scalars OUTSIDE the loop */
+			const rollScale = Math.pow(e, 1.8);
+			/* FIX 1: remove *60 multiplier — was causing 1.5 rad/frame phase jump = jitter */
+			const ph0 =  aT * w.speed * 8        + w.offset;
+			const ph1 = -aT * w.speed * 8 * 0.7  + w.offset * 1.5;
+			/* FIX 2: step=1 on tiny canvas for smooth bezier curves, no angular jitter */
+			const step = 2;
+			const pts  = [];
+			let minY = aH;
 			for(let x = 0; x <= aW; x += step) {
 				const nx = x / aW;
-				const wobble = e * (Math.sin(nx * 3.7 + aT * w.speed * 60 * fr[0] + ph[0]) * ampR * 0.40 + Math.sin(nx * 7.3 + aT * w.speed * 60 * fr[1] + ph[1]) * ampR * 0.30 + Math.sin(nx * 13.1 + aT * w.speed * 60 * fr[2] + ph[2]) * ampR * 0.22 + Math.sin(nx * 19.7 + aT * w.speed * 60 * fr[3] + ph[3]) * ampR * 0.16 + Math.sin(nx * 31.4 + aT * w.speed * 60 * fr[4] + ph[4]) * ampR * 0.12 + Math.sin(nx * 47.3 + aT * w.speed * 60 * fr[5] + ph[5]) * ampR * 0.08);
-				pts.push([x, aH + wobble]);
+				let y = 0;
+				y += Math.sin(nx * w.terms[0][0] * Math.PI + ph0) * w.terms[0][1];
+				y += Math.sin(nx * w.terms[1][0] * Math.PI + ph1) * w.terms[1][1] * rollScale;
+				const py = baseY + y * ampPx;
+				if(py < minY) minY = py; /* FIX 3: track minY inline, no spread operator */
+				pts.push([x, py]);
 			}
+			/* closed filled shape — zero hollow */
 			ax.beginPath();
-			ax.moveTo(pts[0][0], pts[0][1]);
+			ax.moveTo(0, aH);
+			ax.lineTo(0, pts[0][1]);
 			for(let i = 1; i < pts.length - 1; i++) {
-				const cpx = (pts[i][0] + pts[i + 1][0]) / 2;
-				const cpy = (pts[i][1] + pts[i + 1][1]) / 2;
-				ax.quadraticCurveTo(pts[i][0], pts[i][1], cpx, cpy);
+				const mx = (pts[i][0] + pts[i+1][0]) * 0.5;
+				const my = (pts[i][1] + pts[i+1][1]) * 0.5;
+				ax.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
 			}
-			if(pts.length > 1) ax.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]);
+			ax.lineTo(aW, pts[pts.length-1][1]);
+			ax.lineTo(aW, aH);
+			ax.closePath();
+			const [r,g,b] = w.col;
+			const peak = Math.min(0.80, e * w.ampMult * 0.90);
+			/* gradient starts ABOVE canvas (negative Y) so opacity is already
+			   fading to zero before it reaches the canvas top edge —
+			   blends seamlessly into the black background above */
+			const gradTop = -aH * 0.4; /* start 40% of canvas height above top */
+			const grad = ax.createLinearGradient(0, gradTop, 0, aH);
+			/* map stops relative to gradTop→aH span */
+			const span = aH - gradTop;
+			const s0 = (0      - gradTop) / span; /* canvas top edge */
+			const s1 = (minY   - gradTop) / span; /* wave crest */
+			const clamp01 = v => Math.max(0, Math.min(1, v));
+			grad.addColorStop(0.00,                         `rgba(${r},${g},${b},0)`);
+			grad.addColorStop(clamp01(Math.min(s0, 0.35)),  `rgba(${r},${g},${b},0)`);
+			grad.addColorStop(clamp01(Math.min(s1, 0.60)),  `rgba(${r},${g},${b},${(peak*0.45).toFixed(3)})`);
+			grad.addColorStop(clamp01(Math.min(s1+0.15, 0.80)), `rgba(${r},${g},${b},${(peak*0.85).toFixed(3)})`);
+			grad.addColorStop(1.00,                         `rgba(${r},${g},${b},${peak.toFixed(3)})`);
+			ax.fillStyle = grad;
+			ax.fill();
+			/* mist halo — also fades to zero above */
+			const mist = ax.createLinearGradient(0, minY - aH*0.08, 0, minY + aH*0.15);
+			mist.addColorStop(0.0, `rgba(${r},${g},${b},0)`);
+			mist.addColorStop(0.4, `rgba(${r},${g},${b},${(e * w.ampMult * 0.12).toFixed(3)})`);
+			mist.addColorStop(1.0, `rgba(${r},${g},${b},0)`);
+			ax.fillStyle = mist;
+			ax.beginPath();
+			ax.moveTo(0, aH);
+			ax.lineTo(0, pts[0][1]);
+			for(let i = 1; i < pts.length - 1; i++) {
+				const mx = (pts[i][0] + pts[i+1][0]) * 0.5;
+				const my = (pts[i][1] + pts[i+1][1]) * 0.5;
+				ax.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
+			}
+			ax.lineTo(aW, pts[pts.length-1][1]);
+			ax.lineTo(aW, aH);
+			ax.closePath();
+			ax.fill();
+		}
+
+		function aDrawHotspots() {
+			const e = aEnergy;
+			if(e < 0.01) return;
+			aHotspots.forEach((h, i) => {
+				h.nx = (h.nx + h.spd + 1) % 1;
+				const pulse = 0.5 + 0.5 * Math.sin(aT * h.pSpd + h.ph);
+				const spk = aSpikes[i];
+				if(!spk.active && Math.random() < 0.004) {
+					spk.active = true; spk.age = 0;
+					spk.dur = 8 + Math.floor(Math.random() * 12);
+					spk.inten = 0.8 + Math.random() * 0.2;
+				}
+				let spikeB = 0;
+				if(spk.active) {
+					spk.age++;
+					const prog = spk.age / spk.dur;
+					spikeB = spk.inten * Math.exp(-prog * 4) * Math.sin(prog * Math.PI);
+					if(spk.age >= spk.dur) spk.active = false;
+				}
+				const inten = e * (pulse * 0.6 + 0.4 + spikeB);
+				const cx = h.nx * aW;
+				const cy = aGetCrestY(h.wi, h.nx);
+				const rx = aW * h.sz;
+				const [r,g,b] = h.col;
+				/* outer glow */
+				const og = ax.createRadialGradient(cx, cy, 0, cx, cy, rx * 1.8);
+				og.addColorStop(0,   `rgba(${r},${g},${b},${(inten*0.25).toFixed(3)})`);
+				og.addColorStop(0.5, `rgba(${r},${g},${b},${(inten*0.10).toFixed(3)})`);
+				og.addColorStop(1.0, `rgba(${r},${g},${b},0)`);
+				ax.fillStyle = og;
+				ax.beginPath();
+				ax.ellipse(cx, cy, rx*1.8, rx*0.9, 0, 0, Math.PI*2);
+				ax.fill();
+				/* inner core */
+				const ig = ax.createRadialGradient(cx, cy, 0, cx, cy, rx*0.5);
+				ig.addColorStop(0,   `rgba(255,255,255,${(inten*0.70).toFixed(3)})`);
+				ig.addColorStop(0.4, `rgba(${r},${g},${b},${(inten*0.45).toFixed(3)})`);
+				ig.addColorStop(1.0, `rgba(${r},${g},${b},0)`);
+				ax.fillStyle = ig;
+				ax.beginPath();
+				ax.ellipse(cx, cy, rx*0.5, rx*0.25, 0, 0, Math.PI*2);
+				ax.fill();
+				/* spike flash */
+				if(spikeB > 0.05) {
+					const fg = ax.createRadialGradient(cx, cy, 0, cx, cy, rx*0.8);
+					fg.addColorStop(0,   `rgba(255,255,255,${(spikeB*0.9).toFixed(3)})`);
+					fg.addColorStop(0.3, `rgba(255,255,255,${(spikeB*0.4).toFixed(3)})`);
+					fg.addColorStop(1.0, 'rgba(255,255,255,0)');
+					ax.fillStyle = fg;
+					ax.beginPath();
+					ax.ellipse(cx, cy, rx*0.8, rx*0.4, 0, 0, Math.PI*2);
+					ax.fill();
+				}
+			});
 		}
 
 		function drawAurora() {
-			aFrame++;
-			const tier = getAuroraTier();
-			if(tier === 'phone' && aFrame % 2 !== 0) {
-				aEnergy *= 0.94;
-				aT++;
-				aRaf = requestAnimationFrame(drawAurora);
-				return;
+			/* grow */
+			if(aGrowing) {
+				aEnergy = Math.min(1.0, aEnergy + 0.09);
+				if(aEnergy >= 1.0) aGrowing = false;
+			} else {
+				/* smooth 4-stage decay — waves settle, never snap */
+				aEnergy *= 0.978; // was: aEnergy > 0.70 ? 0.975
+				         
+				         
+				         
 			}
-			if(tier === 'tablet' && aFrame % 3 !== 0) {
-				aEnergy *= 0.957;
-				aT++;
-				aRaf = requestAnimationFrame(drawAurora);
-				return;
-			}
-			ax.globalCompositeOperation = 'source-over';
-			ax.clearRect(0, 0, aW, aH);
-			if(aEnergy < 0.01) {
+			if(aEnergy < 0.004) {
 				aEnergy = 0;
+				ax.clearRect(0, 0, aW, aH);
 				aRaf = null;
 				return;
 			}
-			const e = aEnergy,
-				rScale = Math.min(1, aW / 900);
-			const waveCount = tier === 'phone' ? 2 : tier === 'tablet' ? 3 : 4;
-			/* bezier smoothing means we can use fewer points and still get silky curves */
-			const step = tier === 'phone' ? 18 : tier === 'tablet' ? 14 : 10;
-			const decayRate = tier === 'phone' ? 0.94 : tier === 'tablet' ? 0.92 : 0.94;
-			const shadowMult = tier === 'desktop' ? 1.0 : tier === 'tablet' ? 0.45 : 0.25;
-			const whiteAlpha = tier === 'desktop' ? 0.9 : tier === 'tablet' ? 0.55 : 0.35;
-			ax.globalCompositeOperation = 'lighter';
-			for(let wi = 0; wi < waveCount; wi++) {
-				const w = waves[wi],
-					ph = waveSeeds[wi],
-					fr = w.fr;
-				const ampR = w.amp * rScale,
-					widR = w.width * rScale;
-				/* coloured wave */
-				drawSmoothWave(e, w, ph, fr, ampR, step);
-				ax.strokeStyle = `rgba(${w.color},${w.alpha*e})`;
-				ax.lineWidth = widR * e;
-				ax.lineCap = 'round';
-				ax.lineJoin = 'round';
-				ax.shadowBlur = widR * 4.5 * e * shadowMult;
-				ax.shadowColor = `rgba(${w.color},${w.alpha*e*0.95})`;
-				ax.stroke();
-				/* white highlight on all devices — dimmer on mobile/tablet */
-				drawSmoothWave(e, w, ph, fr, ampR, step);
-				ax.strokeStyle = `rgba(255,255,255,${w.alpha*e*whiteAlpha})`;
-				ax.lineWidth = widR * 0.20 * e;
-				ax.shadowBlur = widR * 1.0 * e * shadowMult;
-				ax.shadowColor = 'rgba(255,255,255,1)';
-				ax.stroke();
-			}
-			aEnergy *= decayRate;
+			ax.clearRect(0, 0, aW, aH);
+			ax.globalCompositeOperation = 'source-over';
+			aWaves.forEach(w => aDrawWave(w));
+			ax.globalCompositeOperation = 'screen';
+			aDrawHotspots();
+			ax.globalCompositeOperation = 'source-over';
 			aT++;
 			aRaf = requestAnimationFrame(drawAurora);
 		}
+
 		window.triggerAurora = () => {
-			aEnergy = 1.0;
+			aGrowing = true;
+			aEnergy = Math.max(aEnergy, 0.35);
 			if(!aRaf) drawAurora();
 		};
 	});
