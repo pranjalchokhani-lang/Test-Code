@@ -1034,11 +1034,12 @@
 			height: auto !important;
 			width: 100% !important;
 		}
-		/* Map takes top portion — reduced by 20% */
+		/* Map takes top portion */
 		.map-panel {
 			flex: 0 0 50% !important;
 			width: 100% !important;
 			height: auto !important;
+			padding: 6px 6px 4px !important;
 		}
 		.lbl {
 			font-size: 12px !important;
@@ -1412,14 +1413,11 @@
 	function doReset() {
 		const mover = document.getElementById('map-mover');
 		mover.style.transition = '';
-		/* Call _mapReset first — it sets the correct transform.
-		   Clearing transform here would wipe the mobile fit. */
+		mover.style.transform = '';
 		if(typeof window._mapReset === 'function') window._mapReset();
 		setTimeout(() => {
 			mover.style.transition = '';
-			select(INITIAL_DISTRICT, {
-				silent: true
-			});
+			select(INITIAL_DISTRICT, { silent: true });
 			setTimeout(() => {
 				if(typeof triggerAurora === 'function') triggerAurora();
 			}, 120);
@@ -1660,33 +1658,7 @@
 		}, { passive: false });
 		viewport.addEventListener('touchend', () => { drag = false; lastDist = null; });
 		window.mapApply = apply;
-
-		const isMobileMap = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
-
-		function fitMobile() {
-			if(!isMobileMap) return;
-			const vp = document.getElementById('map-viewport');
-			const r  = vp.getBoundingClientRect();
-			const vw = r.width, vh = r.height;
-			if(vw < 10 || vh < 10) return;
-			/* fit SVG viewBox 500×520 into viewport with 5% padding */
-			scale = Math.min(vw / 500, vh / 520) * 0.95;
-			tx = (vw - 500 * scale) / 2;
-			ty = (vh - 520 * scale) / 2;
-			apply();
-		}
-
-		window._mapReset = () => {
-			if(isMobileMap) {
-				fitMobile();
-			} else {
-				scale = 1; tx = 0; ty = 0;
-				mover.style.transform = '';
-				apply();
-			}
-		};
-
-		window.addEventListener('resize', () => { if(isMobileMap) fitMobile(); });
+		window._mapReset = () => { scale = 1; tx = 0; ty = 0; mover.style.transform = ''; apply(); };
 	})();
 	/* ═══════════════════════════════════════════════════════
 	   S12 — GeoJSON RENDERER
@@ -1850,10 +1822,9 @@
 			svg.appendChild(sp);
 		});
 		select(INITIAL_DISTRICT, { silent: true });
-		/* Size labels + fit map after paint */
+		/* Size labels after paint — double rAF ensures SVG has real dimensions */
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			if(typeof window.mapApply === 'function') window.mapApply();
-			if(typeof window._mapReset === 'function') window._mapReset();
 		}));
 	})();
 	</script>
@@ -1888,18 +1859,17 @@
 			ax = aCanvas.getContext('2d');
 
 		/* tiny canvas — CSS filter does the heavy lifting.
-		 * A_SCALE=0.30 on all devices. Mobile gets blur(8px) not blur(16px):
-		 * phone canvas aW=117px — blur(16px)=14% of width destroys gradients.
-		 * blur(8px)=7% matches laptop blur(16px)/384px=4%. Same brightness. */
+		 * blur(16px) is CSS pixels — same physical size on all devices.
+		 * The wave must NOT fill the full canvas height or brightness(22)
+		 * turns everything solid white. ampMult kept at ~0.70 so crest
+		 * sits at 30% from canvas top, leaving room for the blur to feather. */
 		const isMobile = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
 		const A_SCALE = 0.30;
 		let aW, aH;
 		function resizeAurora() {
 			aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
 			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
-			aCanvas.style.filter = isMobile
-				? 'blur(8px) grayscale(1) brightness(22.0) saturate(0)'
-				: 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
+			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
@@ -1907,25 +1877,15 @@
 
 		let aEnergy = 0, aT = 0, aRaf = null, aGrowing = false, aLastTs = 0;
 
-		/*
-		  4 waves — teal, white, purple, blue-violet.
-		  Speed formula kept identical to original S14: aT * w.speed * 60 * fr[n]
-		  Amp: original used ampR = w.amp * rScale (40–55px on 900px canvas).
-		  Here canvas is A_SCALE wide so we scale amp proportionally:
-		  ampPx = w.amp * (aW / 900) — same physical size on screen.
-		  baseY = aH (waves push UP from bottom, same as original pts [x, aH+wobble]).
-		  3 terms only (vs 6 in original) — removes flutter, keeps wave shape.
-		  flutter term weight scales down faster than main wave during decay.
-		*/
 		const aWaves = [
-			{ speed:0.025, offset:0.0, col:[255,255,255], ampMult:1.00, baseOff:0.00,
-			  terms:[ [1.6,0.50], [4.2,0.32], [9.5,0.18] ] },
-			{ speed:0.022, offset:4.5, col:[255,255,255], ampMult:0.90, baseOff:0.03,
-			  terms:[ [1.4,0.50], [3.8,0.32], [8.7,0.18] ] },
-			{ speed:0.018, offset:3.1, col:[255,255,255], ampMult:0.88, baseOff:0.05,
-			  terms:[ [1.9,0.50], [4.7,0.32], [10.3,0.18] ] },
-			{ speed:0.030, offset:1.8, col:[255,255,255], ampMult:0.78, baseOff:0.02,
-			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
+			{ speed:0.034, offset:0.0, col:[255,255,255], ampMult:0.70, baseOff:0.00,
+			  terms:[ [1.6,0.55], [4.2,0.42], [9.5,0.22] ] },
+			{ speed:0.030, offset:4.5, col:[255,255,255], ampMult:0.63, baseOff:0.03,
+			  terms:[ [1.4,0.55], [3.8,0.42], [8.7,0.22] ] },
+			{ speed:0.025, offset:3.1, col:[255,255,255], ampMult:0.60, baseOff:0.05,
+			  terms:[ [1.9,0.55], [4.7,0.42], [10.3,0.22] ] },
+			{ speed:0.040, offset:1.8, col:[255,255,255], ampMult:0.55, baseOff:0.02,
+			  terms:[ [2.2,0.55], [5.1,0.42], [11.5,0.22] ] },
 		];
 
 		/* hotspots — live glow bursts riding wave crests */
