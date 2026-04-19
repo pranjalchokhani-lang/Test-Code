@@ -932,10 +932,7 @@
 		bottom: 0;
 		left: 0;
 		width: 100%;
-		/* Extra height so blur(16px) has room to fade above the visible portion.
-		   Negative bottom pushes canvas down so only the bottom 14%/8% shows. */
-		height: 20%;
-		bottom: -6%;
+		height: 14%;
 		pointer-events: none;
 		z-index: 9999;
 		will-change: transform;
@@ -943,11 +940,9 @@
 		transform: translateZ(0);
 		-webkit-transform: translateZ(0);
 	}
-	@media screen and (max-width: 850px) {
-		#page-aurora { height: 14%; bottom: -6%; }
-	}
-	@media (min-width:601px) and (min-height:441px) and (max-width:1180px) and (max-height:899px) {
-		#page-aurora { height: 12%; bottom: -4%; }
+	/* Mobile: taller with negative bottom so blur fades above visible area */
+	@media screen and (max-width: 1024px) and (pointer: coarse) {
+		#page-aurora { height: 18%; bottom: -4%; }
 	}
 	/* ══════════════════════════════════════════════════════
    REVISED BP2 — iPad PORTRAIT ONLY 
@@ -1867,14 +1862,30 @@
 		const aCanvas = document.getElementById('page-aurora'),
 			ax = aCanvas.getContext('2d');
 
-		const isMobile = (navigator.maxTouchPoints || 0) > 0 || window.innerWidth < 850;
+		/* Touch-only detection — width-based would break narrow laptop windows */
+		const isMobile = (navigator.maxTouchPoints || 0) > 0;
 		const PAINT_ALPHA = isMobile ? 0.05 : 1.0;
-		let aW, aH, A_SCALE = 1.0;
+		let aW, aH, A_SCALE = 0.30;
 		function resizeAurora() {
-			A_SCALE = 1.0; /* full resolution — no downscale, no stretch, no pixelation */
-			aW = aCanvas.width  = Math.floor(window.innerWidth * A_SCALE);
-			const hFrac = isMobile ? 0.18 : 0.20;
-			aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * hFrac * A_SCALE));
+			if(isMobile) {
+				/* Mobile: use devicePixelRatio (capped at 2) so canvas matches physical
+				   pixels — eliminates pixelation on high-DPR iPhone/iPad screens. */
+				const dpr = Math.min(window.devicePixelRatio || 1, 2);
+				A_SCALE = dpr;
+				const cssW = window.innerWidth;
+				const cssH = Math.floor(window.innerHeight * 0.18);
+				aW = aCanvas.width  = Math.floor(cssW * dpr);
+				aH = aCanvas.height = Math.max(20, Math.floor(cssH * dpr));
+				aCanvas.style.width  = cssW + 'px';
+				aCanvas.style.height = cssH + 'px';
+			} else {
+				/* Laptop: exact original logic — untouched */
+				A_SCALE = 0.30;
+				aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
+				aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
+				aCanvas.style.width  = '';
+				aCanvas.style.height = '';
+			}
 			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
 		resizeAurora();
