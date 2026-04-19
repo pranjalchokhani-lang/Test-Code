@@ -1872,9 +1872,7 @@
 		let aW, aH, A_SCALE = 0.30;
 		function resizeAurora() {
 			if(isMobile) {
-				/* Mobile: use devicePixelRatio (capped at 2) so canvas matches physical
-				   pixels — eliminates pixelation on high-DPR iPhone/iPad screens. */
-				const dpr = Math.min(window.devicePixelRatio || 1, 2);
+				const dpr = window.devicePixelRatio || 1;
 				A_SCALE = dpr;
 				const cssW = window.innerWidth;
 				const isLandscape = window.innerWidth > window.innerHeight;
@@ -1883,6 +1881,10 @@
 				aH = aCanvas.height = Math.max(20, Math.floor(cssH * dpr));
 				aCanvas.style.width  = cssW + 'px';
 				aCanvas.style.height = cssH + 'px';
+				/* Scale blur proportionally so it's ~13% of element height (matches laptop).
+				   Landscape: 11%*vh is short, so blur must be smaller to avoid banding. */
+				const blurPx = Math.max(4, Math.round(cssH * 0.13));
+				aCanvas.style.filter = `blur(${blurPx}px) grayscale(1) brightness(22.0) saturate(0)`;
 			} else {
 				/* Laptop: exact original logic — untouched */
 				A_SCALE = 0.30;
@@ -1890,8 +1892,8 @@
 				aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
 				aCanvas.style.width  = '';
 				aCanvas.style.height = '';
+				aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 			}
-			aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 		}
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
