@@ -1838,18 +1838,18 @@
 		const aCanvas = document.getElementById('page-aurora'),
 			ax = aCanvas.getContext('2d');
 
-		/* ── FIXED: maxTouchPoints is unreliable on Windows (reports 1 even on non-touch laptops).
-		      Use matchMedia pointer:coarse which correctly identifies true touch-only devices. ── */
-		const isMobile = window.matchMedia('(pointer: coarse)').matches;
-		const PAINT_ALPHA = 1.0; /* Always 1.0 — CSS filter brightness(22) handles the intensity.
-		                            0.05 was making aurora invisible on Windows. */
+		const isMobile = (navigator.maxTouchPoints || 0) > 0;
+		/* Windows laptops report maxTouchPoints>0 so isMobile=true there too.
+		   isLaptop = touch-capable BUT has a large screen + fine pointer (mouse/trackpad). */
+		const isLaptop = isMobile && window.innerWidth >= 1024 && window.matchMedia('(pointer: fine)').matches;
+		const PAINT_ALPHA = isMobile && !isLaptop ? 0.05 : 1.0;
 		let aW, aH, A_SCALE = 0.30;
 
 		function resizeAurora() {
-			const dpr = window.devicePixelRatio || 1;
-			const cssW = window.innerWidth;
-			if(isMobile) {
+			if(isMobile && !isLaptop) {
+				const dpr = window.devicePixelRatio || 1;
 				A_SCALE = 0.30;
+				const cssW = window.innerWidth;
 				const isLandscape = window.innerWidth > window.innerHeight;
 				const cssH = Math.floor(window.innerHeight * (isLandscape ? 0.11 : 0.18));
 				aW = Math.floor(cssW * A_SCALE);
@@ -1862,8 +1862,8 @@
 				const blurPx = Math.max(4, Math.round(cssH * 0.13));
 				aCanvas.style.filter = `blur(${blurPx}px) grayscale(1) brightness(22.0) saturate(0)`;
 			} else {
-				/* Desktop (including Windows laptops) */
 				A_SCALE = 0.30;
+				const cssW = window.innerWidth;
 				const cssH = Math.floor(window.innerHeight * 0.14);
 				aW = Math.floor(cssW * A_SCALE);
 				aH = Math.max(40, Math.floor(cssH * A_SCALE));
@@ -1872,7 +1872,7 @@
 				aCanvas.style.width  = cssW + 'px';
 				aCanvas.style.height = cssH + 'px';
 				ax.setTransform(1, 0, 0, 1, 0, 0);
-				aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
+				aCanvas.style.filter = 'blur(10px) grayscale(1) brightness(38.0) saturate(0)';
 			}
 		}
 
