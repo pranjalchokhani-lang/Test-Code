@@ -450,8 +450,6 @@
 		transform-style: preserve-3d;
 	}
 	
-	/* hover:none overrides removed — mobile now matches laptop exactly */
-	
 	.box-fill {
 		position: absolute;
 		inset: 0;
@@ -688,7 +686,6 @@
 		opacity: 0.85;
 	}
 	
-	/* Selected district — always visible, black text on teal fill */
 	.lbl.on {
 		fill: #000 !important;
 		font-weight: 700;
@@ -696,7 +693,6 @@
 		filter: none;
 	}
 	
-	/* Hovered district — always visible regardless of zoom */
 	.lbl.hover-visible {
 		opacity: 1 !important;
 		fill: rgba(255, 255, 255, 1) !important;
@@ -758,7 +754,6 @@
 	
 	.rp-header {
 		flex-shrink: 0;
-		/* Top increased to 18px, Bottom reduced to 2px */
 		padding: 18px 6px 2px 10px !important;
 		display: flex;
 		flex-direction: column;
@@ -1172,7 +1167,6 @@
 		}
 		.rp-header {
 			flex-shrink: 0;
-			/* Increase top to 6px to push text down, keep bottom at 2px */
 			padding: 6px 5px 2px !important;
 		}
 		.wtag {
@@ -1371,12 +1365,6 @@
 	});
 	/* ═══════════════════════════════════════════════════════
 	   S4 — SESSION TRACKER
-	   ─────────────────────────────────────────────────────
-	   START  : first interaction after idle / session-end
-	   ALIVE  : every interaction resets the 15s countdown
-	   END    : 15s of total silence → doReset() fires once
-	   RESET  : map returns to default state; new session
-	            starts the moment user touches anything again
 	   ═══════════════════════════════════════════════════════ */
 	const SESSION = {
 		active: false, startTime: 0, lastTime: 0, interactions: 0,
@@ -1409,7 +1397,6 @@
 			doReset();
 		}
 	};
-	/* ANY interaction anywhere on page keeps session alive */
 	['mousedown','touchstart','touchmove','pointerdown','pointermove','mousemove','wheel','scroll','keydown'].forEach(evt =>
 		document.addEventListener(evt, () => SESSION.touch(evt), { passive: true })
 	);
@@ -1456,7 +1443,7 @@
 		});
 	}
 	/* ═══════════════════════════════════════════════════════
-	   S7+S8 — GeoJSON  (real Rajasthan outline, Sikar + Jaipur)
+	   S7+S8 — GeoJSON
 	   ═══════════════════════════════════════════════════════ */
 	const districtGJ = {
 		"type": "FeatureCollection",
@@ -1572,8 +1559,6 @@
 			lastDist = null, drag = false,
 			sx = 0, sy = 0, stx = 0, sty = 0;
 
-		
-
 		function playZoom() {
 			const now = Date.now();
 			if(now - lastPlayTime > 300) {
@@ -1586,7 +1571,6 @@
 			}
 		}
 
-		/* Label zoom threshold — show labels when zoomed in enough (Google Maps style) */
 		const LABEL_ZOOM_THRESHOLD = 2.0;
 
 		let _rafPending = false;
@@ -1595,10 +1579,8 @@
 			_rafPending = true;
 			requestAnimationFrame(() => {
 				_rafPending = false;
-				/* Pan/zoom via CSS transform on mover — no SVG group needed */
 				mover.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
 				mover.style.transformOrigin = '0 0';
-				/* Labels: power-scale around their own centroid */
 				const ls = Math.max(0.4, 1 / Math.pow(scale, 0.7));
 				document.querySelectorAll('.lbl').forEach(lbl => {
 					const cx = parseFloat(lbl.getAttribute('x'));
@@ -1625,7 +1607,7 @@
 			scale = ns; playZoom(); SESSION.touch('wheel'); apply();
 		}, { passive: false });
 		viewport.addEventListener('mousedown', e => {
-			e.preventDefault(); /* prevents double/triple-click text-select jitter */
+			e.preventDefault();
 			drag = true; sx = e.clientX; sy = e.clientY; stx = tx; sty = ty;
 			viewport.style.cursor = 'grabbing'; playZoom();
 		});
@@ -1677,11 +1659,9 @@
 		svg.style.textRendering = 'geometricPrecision';
 		svg.style.shapeRendering = 'geometricPrecision';
 		document.getElementById('map-mover').style.overflow = 'visible';
-		const VW = 500, VH = 520; /* SVG viewBox dimensions */
-		/* Use STATE bounding box for projection — districts must sit correctly inside state */
+		const VW = 500, VH = 520;
 		let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
 		
-		// 1. BOUNDS FROM STATE: This creates the "Frame"
 		stateGJ.features.forEach(f => {
 			const rings = f.geometry.type === 'Polygon' ? f.geometry.coordinates : f.geometry.coordinates.flat(1);
 			rings.forEach(ring => ring.forEach(([lo, la]) => {
@@ -1696,7 +1676,6 @@
 		const ox = (500 - dx * sc) / 2;
 		const oy = (520 - dy * sc) / 2;
 
-		// The ONLY projection functions used in the script
 		const px = lo => ox + (lo - x0) * sc;
 		const py = la => oy + (y1 - la) * sc;
 
@@ -1740,22 +1719,20 @@
 					if(Math.sqrt(dx * dx + dy * dy) < 10) {
 						if(e.cancelable) e.preventDefault();
 						touchHandled = true;
-						select(name); /* touch path — counted once here */
+						select(name);
 						setTimeout(() => { touchHandled = false; }, 500);
 					}
 				}
 			}, { passive: false });
 			path.addEventListener('click', e => {
-				if(touchHandled) return; /* block synthetic click after touch */
-				select(name); /* mouse path — counted once here */
+				if(touchHandled) return;
+				select(name);
 			});
 			svg.appendChild(path);
 
-			/* centroid via Shoelace formula — use largest ring for MultiPolygon */
 			const allRings = geom.type === 'MultiPolygon'
 				? geom.coordinates.map(poly => poly[0])
 				: [geom.coordinates[0]];
-			/* pick the ring with the largest absolute area */
 			let outerRing = allRings[0], bestArea = 0;
 			for(const ring of allRings) {
 				let a = 0;
@@ -1791,9 +1768,7 @@
 			t.textContent = name.toUpperCase();
 			svg.appendChild(t);
 		});
-		/* Add a clipPath so state boundary stays within the map viewBox */
 		const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-		/* District glow filter — SVG filters work inside overflow:hidden unlike CSS filters */
 		const distGlowFilter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
 		distGlowFilter.setAttribute('id', 'distGlow');
 		distGlowFilter.setAttribute('x', '-40%');
@@ -1830,7 +1805,6 @@
 			svg.appendChild(sp);
 		});
 		select(INITIAL_DISTRICT, { silent: true });
-		/* Size labels after paint — double rAF ensures SVG has real dimensions */
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			if(typeof window.mapApply === 'function') window.mapApply();
 		}));
@@ -1859,29 +1833,27 @@
 		}
 		(document.fonts ? document.fonts.ready : Promise.resolve()).then(initTicker);
 		/* ═══════════════════════════════════════════════════════
-		   S14 — AURORA (lean: tiny canvas + CSS blur/brightness)
-		   ~20× cheaper than old S14: no shadowBlur, no lighter,
-		   SCALE=0.30 canvas, one GPU blur pass via CSS filter.
+		   S14 — AURORA
 		   ═══════════════════════════════════════════════════════ */
 		const aCanvas = document.getElementById('page-aurora'),
 			ax = aCanvas.getContext('2d');
 
-		/* Touch-only detection — width-based would break narrow laptop windows */
-		const isMobile = (navigator.maxTouchPoints || 0) > 0;
-		const PAINT_ALPHA = isMobile ? 0.05 : 1.0;
+		/* ── FIXED: maxTouchPoints is unreliable on Windows (reports 1 even on non-touch laptops).
+		      Use matchMedia pointer:coarse which correctly identifies true touch-only devices. ── */
+		const isMobile = window.matchMedia('(pointer: coarse)').matches;
+		const PAINT_ALPHA = 1.0; /* Always 1.0 — CSS filter brightness(22) handles the intensity.
+		                            0.05 was making aurora invisible on Windows. */
 		let aW, aH, A_SCALE = 0.30;
+
 		function resizeAurora() {
+			const dpr = window.devicePixelRatio || 1;
+			const cssW = window.innerWidth;
 			if(isMobile) {
-				const dpr = window.devicePixelRatio || 1;
 				A_SCALE = 0.30;
-				const cssW = window.innerWidth;
 				const isLandscape = window.innerWidth > window.innerHeight;
 				const cssH = Math.floor(window.innerHeight * (isLandscape ? 0.11 : 0.18));
-				/* aW uses 0.30 scale so rScale formula works correctly.
-				   aH uses full CSS height so wave proportions match laptop. */
-				aW = Math.floor(cssW  * A_SCALE);
+				aW = Math.floor(cssW * A_SCALE);
 				aH = Math.max(20, cssH);
-				/* Physical canvas = logical dims × DPR — no CSS stretch = crisp */
 				aCanvas.width  = aW * dpr;
 				aCanvas.height = aH * dpr;
 				ax.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1890,15 +1862,20 @@
 				const blurPx = Math.max(4, Math.round(cssH * 0.13));
 				aCanvas.style.filter = `blur(${blurPx}px) grayscale(1) brightness(22.0) saturate(0)`;
 			} else {
+				/* Desktop (including Windows laptops) */
 				A_SCALE = 0.30;
-				aW = aCanvas.width  = Math.floor(window.innerWidth  * A_SCALE);
-				aH = aCanvas.height = Math.max(20, Math.floor(window.innerHeight * 0.14 * A_SCALE));
+				const cssH = Math.floor(window.innerHeight * 0.14);
+				aW = Math.floor(cssW * A_SCALE);
+				aH = Math.max(40, Math.floor(cssH * A_SCALE));
+				aCanvas.width  = aW;
+				aCanvas.height = aH;
+				aCanvas.style.width  = cssW + 'px';
+				aCanvas.style.height = cssH + 'px';
 				ax.setTransform(1, 0, 0, 1, 0, 0);
-				aCanvas.style.width  = '';
-				aCanvas.style.height = '';
 				aCanvas.style.filter = 'blur(16px) grayscale(1) brightness(22.0) saturate(0)';
 			}
 		}
+
 		resizeAurora();
 		window.addEventListener('resize', resizeAurora);
 		aCanvas.style.imageRendering = 'auto';
@@ -1916,7 +1893,6 @@
 			  terms:[ [2.2,0.50], [5.1,0.32], [11.5,0.18] ] },
 		];
 
-		/* hotspots — live glow bursts riding wave crests */
 		const aHotspots = [
 			{ nx:0.15, spd:0.0011, col:[255,255,255], sz:0.22, ph:0.0,  pSpd:0.08, wi:0 },
 			{ nx:0.42, spd:0.0008, col:[255,255,255], sz:0.18, ph:1.4,  pSpd:0.11, wi:0 },
@@ -1927,19 +1903,19 @@
 		];
 		const aSpikes = aHotspots.map(() => ({ active:false, age:0, dur:0, inten:0 }));
 
-			function aGetCrestY(wi, nx) {
-				const w = aWaves[wi];
-				const rScale = Math.min(1, aW / (900 * A_SCALE));
-				const amp   = aEnergy * w.ampMult * w.terms[0][1] * 40 * rScale;
-				const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - aEnergy));
-				const rollScale2 = Math.pow(aEnergy, 1.8);
-				const ph0 =  aT * w.speed * 8       + w.offset;
-				const ph1 = -aT * w.speed * 8 * 0.7 + w.offset * 1.5;
-				let y = 0;
-				y += Math.sin(nx * w.terms[0][0] * Math.PI + ph0) * w.terms[0][1];
-				y += Math.sin(nx * w.terms[1][0] * Math.PI + ph1) * w.terms[1][1] * rollScale2;
-				return baseY + y * amp;
-			}
+		function aGetCrestY(wi, nx) {
+			const w = aWaves[wi];
+			const rScale = Math.min(1, aW / (900 * A_SCALE));
+			const amp   = aEnergy * w.ampMult * w.terms[0][1] * 40 * rScale;
+			const baseY = aH * (0.86 + w.baseOff + 0.10 * (1 - aEnergy));
+			const rollScale2 = Math.pow(aEnergy, 1.8);
+			const ph0 =  aT * w.speed * 8       + w.offset;
+			const ph1 = -aT * w.speed * 8 * 0.7 + w.offset * 1.5;
+			let y = 0;
+			y += Math.sin(nx * w.terms[0][0] * Math.PI + ph0) * w.terms[0][1];
+			y += Math.sin(nx * w.terms[1][0] * Math.PI + ph1) * w.terms[1][1] * rollScale2;
+			return baseY + y * amp;
+		}
 
 		function aDrawWave(w) {
 			const e = aEnergy;
@@ -2031,7 +2007,6 @@
 				const cy = aGetCrestY(h.wi, h.nx);
 				const rx = aW * h.sz;
 				const [r,g,b] = h.col;
-				/* outer glow */
 				const og = ax.createRadialGradient(cx, cy, 0, cx, cy, rx * 1.8);
 				og.addColorStop(0,   `rgba(${r},${g},${b},${(inten*0.25).toFixed(3)})`);
 				og.addColorStop(0.5, `rgba(${r},${g},${b},${(inten*0.10).toFixed(3)})`);
@@ -2040,7 +2015,6 @@
 				ax.beginPath();
 				ax.ellipse(cx, cy, rx*1.8, rx*0.9, 0, 0, Math.PI*2);
 				ax.fill();
-				/* inner core */
 				const ig = ax.createRadialGradient(cx, cy, 0, cx, cy, rx*0.5);
 				ig.addColorStop(0,   `rgba(255,255,255,${(inten*0.70).toFixed(3)})`);
 				ig.addColorStop(0.4, `rgba(${r},${g},${b},${(inten*0.45).toFixed(3)})`);
@@ -2049,7 +2023,6 @@
 				ax.beginPath();
 				ax.ellipse(cx, cy, rx*0.5, rx*0.25, 0, 0, Math.PI*2);
 				ax.fill();
-				/* spike flash */
 				if(spikeB > 0.05) {
 					const fg = ax.createRadialGradient(cx, cy, 0, cx, cy, rx*0.8);
 					fg.addColorStop(0,   `rgba(255,255,255,${(spikeB*0.9).toFixed(3)})`);
@@ -2069,7 +2042,6 @@
 				aT += dt * (60 / 1000);
 			}
 			aLastTs = ts;
-			/* grow */
 			if(aGrowing) {
 				aEnergy = Math.min(1.0, aEnergy + 0.045);
 				if(aEnergy >= 1.0) aGrowing = false;
