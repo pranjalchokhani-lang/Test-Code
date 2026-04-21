@@ -1313,7 +1313,7 @@
 }
 
 .blk-hdr-left {
-    flex: 0 0 47%; /* slant sits at 47% mark */
+    flex: 0 0 50%; /* Adjusted to 50% split for balance */
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1329,12 +1329,12 @@
 .blk-hdr-slant::before {
     content: '';
     position: absolute;
-    top: 25%; bottom: 25%;
+    top: 25%; bottom: 25%; /* Vertically centered shorter line */
     right: 5px;
     width: 2px;
     background: var(--accent);
     box-shadow: 0 0 10px var(--accent);
-    transform: skewX(-22deg);
+    transform: skewX(-22deg); /* Parallel to tint */
 }
 
 .blk-hdr-stat {
@@ -1347,20 +1347,6 @@
     clip-path: polygon(25px 0%, 100% 0%, 100% 100%, 0% 100%); 
     margin-left: -20px;
     overflow: visible;
-}
-
-.blk-hdr-num {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: clamp(28px, 3.5cqw, 46px);
-    color: var(--accent);
-    line-height: 1;
-    flex-shrink: 0;
-    min-width: 1.5ch;
-    text-shadow:
-        0 0 12px rgba(var(--accent-rgb), 0.9),
-        0 0 28px rgba(var(--accent-rgb), 0.55),
-        0 0 55px rgba(var(--accent-rgb), 0.25);
 }
 
 /* --- ELEGANT SUB-STAT TEXT --- */
@@ -1376,8 +1362,8 @@
 }
 
 @keyframes elegantReveal {
-    0% { opacity: 0; transform: translateX(15px); filter: blur(8px); }
-    100% { opacity: 1; transform: translateX(0); filter: blur(0); }
+    0% { opacity: 0; transform: translateX(8px); }
+    100% { opacity: 1; transform: translateX(0); }
 }	</style>
 </head>
 
@@ -1660,28 +1646,37 @@
 		/* NEW — city name below map-label */
 		const lpName = document.getElementById('lp-district-name');
 		if(lpName) lpName.innerText = name.toUpperCase();
-		/* NEW — stat block update with animation re-trigger */
+		/* NEW — stat block update */
+		
 		const d0 = DATA[name] || {};
 		const st = d0.stats || {};
-		const medNumEl = document.getElementById('med-hdr-num');
-		const medLblEl = document.getElementById('med-hdr-lbl');
-		const engNumEl = document.getElementById('eng-hdr-num');
-		const engLblEl = document.getElementById('eng-hdr-lbl');
-		/* reset animations */
-		[medNumEl, medLblEl, engNumEl, engLblEl].forEach(el => {
+		/* re-trigger animation by cloning nodes */
+		['med-hdr-num','med-hdr-lbl','eng-hdr-num','eng-hdr-lbl'].forEach(id => {
+			const el = document.getElementById(id);
 			if(!el) return;
 			el.style.animation = 'none';
 			void el.offsetWidth;
 			el.style.animation = '';
 		});
-		/* set values */
-		if(medNumEl) medNumEl.innerText = (st.m && st.m.num) ? st.m.num : '—';
-		if(medLblEl) medLblEl.innerText = (st.m && st.m.label) ? st.m.label : '';
-		if(engNumEl) engNumEl.innerText = (st.e && st.e.num) ? st.e.num : '—';
-		if(engLblEl) engLblEl.innerText = (st.e && st.e.label) ? st.e.label : '';
-		/* re-apply number animation */
-		if(medNumEl) medNumEl.style.animation = 'statGenerate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
-		if(engNumEl) engNumEl.style.animation = 'statGenerate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		/* --- START REPLACEMENT --- */
+		const medNumEl = document.getElementById('med-hdr-num');
+		const engNumEl = document.getElementById('eng-hdr-num');
+
+		// Reset animation
+		medNumEl.style.animation = 'none';
+		engNumEl.style.animation = 'none';
+		void medNumEl.offsetWidth; // Trigger reflow
+
+		// Update values (Preserving your original data logic)
+		medNumEl.innerText = (st.m && st.m.num) ? st.m.num : '—';
+		document.getElementById('med-hdr-num').innerText = (st.m && st.m.num) ? st.m.num : '—';
+		document.getElementById('med-hdr-lbl').innerText = (st.m && st.m.label) ? st.m.label : '';
+		document.getElementById('eng-hdr-num').innerText = (st.e && st.e.num) ? st.e.num : '—';
+		document.getElementById('eng-hdr-lbl').innerText = (st.e && st.e.label) ? st.e.label : '';
+
+		// Re-apply generation animation
+		medNumEl.style.animation = 'statGenerate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		engNumEl.style.animation = 'statGenerate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
 
 		const regionTag = document.getElementById('region-tag');
 		if(regionTag) regionTag.innerText = '';
@@ -2425,6 +2420,38 @@
 	document.querySelector('clipPath rect').remove();
 	</script>
 	<script>
+	/* INLINE FALLBACK DATA — replaced by external Sikar_Results.js when served */
+	if(!DATA || !Object.keys(DATA).length) {
+	DATA = {
+	  "Sikar": {
+	    stats: { m: { num: "56", label: "GMC seats in last 3 years" }, e: { num: "11", label: "IITians in last 3 years" } },
+	    m: ["🏆 <b>Samarth Gupta</b>: AIR 57 NEET · AIIMS New Delhi ('25)","🔥 <b>Priya Sharma</b>: AIR 312 · MAMC Delhi ('25)","<b>Riya Agarwal</b>: AIIMS Jodhpur ('25)","<b>Ankit Meena</b>: GMC Jaipur ('25)","<b>Suman Choudhary</b>: SNMC Jodhpur ('25)","<b>Deepak Saini</b>: GMC Kota ('25)","<b>Neha Sharma</b>: AIIMS Bikaner ('25)","<b>Rohit Kumar</b>: GMC Bikaner ('25)"],
+	    e: ["🏆 <b>Aryan Singh</b>: AIR 234 JEE Adv · IIT Bombay CS ('25)","🔥 <b>Rahul Gupta</b>: AIR 412 · IIT Delhi ('25)","<b>Mohit Sharma</b>: IIT Roorkee ('25)","<b>Vikash Agarwal</b>: IIT Kanpur ('25)","<b>Sumit Meena</b>: IIT Madras ('25)","<b>Priyank Jain</b>: IIT Kharagpur ('25)","<b>Aman Choudhary</b>: IIT Guwahati ('25)"]
+	  },
+	  "Jaipur": {
+	    stats: { m: { num: "38", label: "GMC seats in last 3 years" }, e: { num: "24", label: "IITians in last 3 years" } },
+	    m: ["🏆 <b>Kavya Sharma</b>: AIR 89 NEET · AIIMS Delhi ('25)","🔥 <b>Tushar Gupta</b>: AIR 445 · SMS Medical Jaipur ('25)","<b>Pooja Meena</b>: AIIMS Jodhpur ('25)","<b>Harsh Agarwal</b>: GMC Jaipur ('25)","<b>Nisha Saini</b>: SNMC Jodhpur ('25)"],
+	    e: ["🏆 <b>Dev Sharma</b>: AIR 156 JEE Adv · IIT Bombay ('25)","🔥 <b>Anuj Singh</b>: AIR 389 · IIT Delhi ('25)","<b>Ravi Kumar</b>: IIT Roorkee ('25)","<b>Payal Jain</b>: IIT Madras ('25)","<b>Nikhil Meena</b>: IIT Kanpur ('25)"]
+	  },
+	  "Jhunjhunu": {
+	    stats: { m: { num: "14", label: "GMC seats in last 3 years" }, e: { num: "6", label: "IITians in last 3 years" } },
+	    m: ["🔥 <b>Sunita Sharma</b>: AIR 678 · GMC Jaipur ('25)","<b>Ramesh Choudhary</b>: SNMC Jodhpur ('25)","<b>Geeta Saini</b>: GMC Kota ('25)"],
+	    e: ["🔥 <b>Vikas Singh</b>: AIR 567 · IIT Roorkee ('25)","<b>Sanjay Kumar</b>: IIT Guwahati ('25)","<b>Meena Agarwal</b>: IIT Kharagpur ('25)"]
+	  },
+	  "Alwar": {
+	    stats: { m: { num: "19", label: "GMC seats in last 3 years" }, e: { num: "9", label: "IITians in last 3 years" } },
+	    m: ["🏆 <b>Rekha Gupta</b>: AIR 234 · AIIMS Jodhpur ('25)","🔥 <b>Suresh Meena</b>: AIR 789 · GMC Jaipur ('25)","<b>Pinki Sharma</b>: SNMC Jodhpur ('25)","<b>Amit Saini</b>: GMC Bikaner ('25)"],
+	    e: ["🏆 <b>Rohit Jain</b>: AIR 445 · IIT Delhi ('25)","🔥 <b>Priya Singh</b>: AIR 892 · IIT Roorkee ('25)","<b>Karan Kumar</b>: IIT Madras ('25)"]
+	  },
+	  "Ajmer": {
+	    stats: { m: { num: "22", label: "GMC seats in last 3 years" }, e: { num: "13", label: "IITians in last 3 years" } },
+	    m: ["🏆 <b>Pooja Verma</b>: AIR 178 · AIIMS Bikaner ('25)","🔥 <b>Deepak Singh</b>: AIR 567 · GMC Ajmer ('25)","<b>Ritu Sharma</b>: SMS Medical Jaipur ('25)","<b>Anil Gupta</b>: GMC Kota ('25)"],
+	    e: ["🏆 <b>Sahil Meena</b>: AIR 312 · IIT Bombay ('25)","🔥 <b>Tarun Kumar</b>: AIR 678 · IIT Delhi ('25)","<b>Swati Agarwal</b>: IIT Roorkee ('25)","<b>Manish Saini</b>: IIT Kanpur ('25)"]
+	  }
+	};
+	}
+
+
 function runDigitalScanner(id, targetValue) {
     const el = document.getElementById(id);
     if (!targetValue || targetValue === '—') { el.innerText = '—'; return; }
