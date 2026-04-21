@@ -731,9 +731,9 @@
 	.right-panel {
 		display: flex;
 		flex-direction: column;
-		gap: clamp(6px, 0.9cqh, 12px);
+		gap: clamp(12px, 1.8cqh, 22px);
 		min-height: 0;
-		overflow: hidden;
+		overflow: visible;
 		height: 100%;
 	}
 	
@@ -1023,7 +1023,7 @@
 			min-height: clamp(44px, 5.5cqh, 62px);
 		}
 		.right-panel {
-			gap: clamp(6px, 0.9cqh, 12px);
+			gap: clamp(12px, 1.5cqh, 18px);
 		}
 	}
 	/* ══════════════════════════════════════════════════════
@@ -1150,7 +1150,7 @@
 			gap: 16px;
 			overflow: hidden;
 		}
-		/* Map — 50:50 split */
+		/* Map — 50:50 */
 		.map-panel {
 			flex: 0 0 50%;
 			height: auto !important;
@@ -1298,9 +1298,9 @@
 		height: 100%;
 		overflow: visible;
 	}
-	/* Left always 50% so stat block starts at exactly 50% in all modes */
+	/* Left: 45% so stat starts more towards centre */
 	.blk-hdr-left {
-		flex: 0 0 50%;
+		flex: 0 0 45%;
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -1365,23 +1365,25 @@
 	/* BP4 phone portrait */
 	@media screen and (max-width: 600px) and (orientation: portrait) {
 		.blk-header { min-height: 52px !important; }
-		.blk-hdr-left { flex: 0 0 50% !important; }
+		.blk-hdr-left { flex: 0 0 45% !important; }
 		.blk-hdr-num {
 			font-size: clamp(18px, 5vw, 26px) !important;
 			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22) !important;
 		}
 		.blk-hdr-lbl { font-size: clamp(6px, 1.8vw, 8px) !important; }
 		.lp-district-name { font-size: clamp(13px, 5vw, 20px) !important; }
+		.row { font-size: clamp(11px, 2.8vw, 13px) !important; }
 	}
 	/* BP5 phone landscape */
 	@media (max-height:440px) and (orientation:landscape) {
-		.blk-hdr-left { flex: 0 0 50% !important; }
+		.blk-hdr-left { flex: 0 0 45% !important; }
 		.blk-hdr-num {
 			font-size: clamp(14px, 3.5vw, 22px) !important;
 			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22) !important;
 		}
 		.blk-hdr-lbl { font-size: clamp(5px, 1.2vw, 7px) !important; }
 		.lp-district-name { font-size: clamp(11px, 3vw, 16px) !important; padding: 0 5px 5px 6px !important; }
+		.row { font-size: clamp(7px, 1.65vw, 9px) !important; }
 	}
 	</style>
 </head>
@@ -1684,8 +1686,9 @@
 		if(medLblEl) medLblEl.innerText = (st.m && st.m.label) ? st.m.label : '';
 		if(engNumEl) engNumEl.innerText = (st.e && st.e.num) ? st.e.num : '—';
 		if(engLblEl) engLblEl.innerText = (st.e && st.e.label) ? st.e.label : '';
-		if(medNumEl) medNumEl.style.animation = 'statGenerate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
-		if(engNumEl) engNumEl.style.animation = 'statGenerate 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		/* statGenerate slowed 20%: 0.6s → 0.72s */
+		if(medNumEl) medNumEl.style.animation = 'statGenerate 0.72s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		if(engNumEl) engNumEl.style.animation = 'statGenerate 0.72s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
 		if(medLblEl) medLblEl.style.animation = 'statLblReveal 0.38s ease 0.3s both';
 		if(engLblEl) engLblEl.style.animation = 'statLblReveal 0.38s ease 0.3s both';
 
