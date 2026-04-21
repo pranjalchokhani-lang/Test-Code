@@ -1052,15 +1052,18 @@
 			height: auto !important;
 			width: 100% !important;
 		}
-		/* Map takes more height for better visibility */
+		/* Map — 30% larger than before */
 		.map-panel {
-			flex: 0 0 48% !important;
+			flex: 0 0 55% !important;
 			width: 100% !important;
 			height: auto !important;
 			padding: 6px 6px 4px !important;
 		}
 		.lbl {
-			font-size: 16px !important;
+			font-size: 21px !important;
+		}
+		.map-label {
+			font-size: clamp(10px, 3vw, 14px) !important;
 		}
 		/* Data boxes stack underneath */
 		.right-panel {
@@ -1289,7 +1292,8 @@
 		padding: 0;
 		padding-top: 8px;
 		min-height: clamp(49px, 6.3cqh, 70px);
-		border-bottom: 1px solid rgba(var(--accent-rgb), 0.05);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+		box-shadow: 0 1px 6px rgba(255, 255, 255, 0.06);
 		overflow: visible !important;
 	}
 	.blk-hdr-inner {
@@ -1308,31 +1312,47 @@
 		padding: 0 0 0 15px;
 	}
 	.blk-hdr-slant {
-		width: 40px;
-		flex-shrink: 0;
-		position: relative;
-		z-index: 3;
-	}
-	.blk-hdr-slant::before {
-		content: '';
-		position: absolute;
-		top: 25%; bottom: 25%;
-		right: 5px;
-		width: 2px;
-		background: var(--accent);
-		box-shadow: 0 0 10px var(--accent);
-		transform: skewX(-22deg);
+		display: none;
 	}
 	.blk-hdr-stat {
 		flex: 1;
 		display: flex;
 		align-items: center;
 		gap: 12px;
-		padding: 0 16px 0 30px;
-		background: rgba(var(--accent-rgb), 0.08);
-		clip-path: polygon(25px 0%, 100% 0%, 100% 100%, 0% 100%);
-		margin-left: -20px;
+		padding: 0 16px 0 24px;
+		position: relative;
+		transform: skewX(-22deg);
+		transform-origin: bottom left;
+		margin-left: 8px;
 		overflow: visible;
+	}
+	/* tint background */
+	.blk-hdr-stat::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: rgba(var(--accent-rgb), 0.08);
+		z-index: 0;
+	}
+	/* partial line — same skew inherited from parent, clipped to middle 50% */
+	.blk-hdr-stat::after {
+		content: '';
+		position: absolute;
+		top: 25%;
+		bottom: 25%;
+		left: 0;
+		width: 2px;
+		background: var(--accent);
+		box-shadow: 0 0 10px var(--accent);
+		z-index: 1;
+	}
+	/* counter-skew content to stay upright */
+	.blk-hdr-num,
+	.blk-hdr-lbl {
+		transform: skewX(22deg);
+		display: block;
+		position: relative;
+		z-index: 2;
 	}
 	/* Stat number: identical glow + color as city name */
 	.blk-hdr-num {
@@ -1386,6 +1406,13 @@
 		.blk-hdr-lbl { font-size: clamp(6px, 1.4vw, 8px) !important; max-width: 12ch !important; }
 		.lp-district-name { font-size: clamp(11px, 3vw, 16px) !important; padding: 0 5px 5px 6px !important; }
 		.row { font-size: clamp(8px, 1.8vw, 11px) !important; }
+	}
+	/* ── Larger map labels on laptop/iPad ── */
+	.map-label {
+		font-size: clamp(10px, 1.1cqw, 14px) !important;
+	}
+	.lbl {
+		font-size: 12px !important;
 	}
 	</style>
 </head>
