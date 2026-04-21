@@ -1020,7 +1020,7 @@
 			font-size: clamp(13px, 2.0cqw, 22px);
 		}
 		.blk-header {
-			min-height: clamp(44px, 5.5cqh, 62px);
+			min-height: clamp(40px, 5cqh, 56px);
 		}
 		.right-panel {
 			gap: clamp(12px, 1.5cqh, 18px);
@@ -1052,15 +1052,15 @@
 			height: auto !important;
 			width: 100% !important;
 		}
-		/* Map takes slightly less height — more space for content */
+		/* Map takes more height for better visibility */
 		.map-panel {
-			flex: 0 0 45% !important;
+			flex: 0 0 48% !important;
 			width: 100% !important;
 			height: auto !important;
 			padding: 6px 6px 4px !important;
 		}
 		.lbl {
-			font-size: 12px !important;
+			font-size: 16px !important;
 		}
 		/* Data boxes stack underneath */
 		.right-panel {
@@ -1159,17 +1159,7 @@
 			padding: 5px 6px;
 			border-radius: 16px;
 		}
-		.map-label {
-			font-size: clamp(8px, 1.8vw, 10px);
-			letter-spacing: 1px;
-			margin-bottom: 2px;
-			padding: 2px 5px;
-		}
-		.lbl,
-		.lbl.on {
-			font-size: 9px !important;
-		}
-		/* Right panel */
+		/* Right panel — overflow visible so Medical top border shows */
 		.right-panel {
 			flex: 1;
 			min-width: 0;
@@ -1178,7 +1168,7 @@
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
-			overflow: hidden;
+			overflow: visible;
 		}
 		.rp-header {
 			flex-shrink: 0;
@@ -1208,13 +1198,14 @@
 			border-radius: 16px;
 		}
 		.blk-header {
-			min-height: clamp(36px, 8vw, 48px);
+			min-height: clamp(32px, 7.2vw, 43px);
 		}
 		.blk-hdr-num {
 			font-size: clamp(14px, 3.5vw, 20px);
 		}
 		.blk-hdr-lbl {
-			font-size: clamp(5px, 1.2vw, 7px);
+			font-size: clamp(6px, 1.4vw, 8px);
+			max-width: 12ch;
 		}
 		.lp-district-name {
 			font-size: clamp(11px, 3vw, 18px);
@@ -1225,10 +1216,20 @@
 			letter-spacing: 1px;
 		}
 		.row {
-			font-size: clamp(7px, 1.5vw, 9px);
+			font-size: clamp(8px, 1.8vw, 11px);
 			line-height: 1.35;
 			padding: 1px 0;
 			white-space: nowrap;
+		}
+		.map-label {
+			font-size: clamp(9px, 2vw, 12px);
+			letter-spacing: 1px;
+			margin-bottom: 2px;
+			padding: 2px 5px;
+		}
+		.lbl,
+		.lbl.on {
+			font-size: 11px !important;
 		}
 		#med-list,
 		#eng-list {
@@ -1237,7 +1238,7 @@
 			flex: 1;
 		}
 		.loading-line {
-			font-size: clamp(7px, 1.5vw, 9px);
+			font-size: clamp(8px, 1.8vw, 10px);
 			letter-spacing: 1px;
 			padding: 2px 7px 0;
 		}
@@ -1287,7 +1288,7 @@
 		background: transparent;
 		padding: 0;
 		padding-top: 8px;
-		min-height: clamp(54px, 7cqh, 78px);
+		min-height: clamp(49px, 6.3cqh, 70px);
 		border-bottom: 1px solid rgba(var(--accent-rgb), 0.05);
 		overflow: visible !important;
 	}
@@ -1349,7 +1350,7 @@
 	/* Sub-stat slides from left exactly like content rows */
 	.blk-hdr-lbl {
 		font-family: var(--font-display);
-		font-size: clamp(7px, 0.7cqw, 9px);
+		font-size: clamp(8px, 0.85cqw, 11px);
 		color: rgba(255, 255, 255, 0.7);
 		text-transform: uppercase;
 		line-height: 1.3;
@@ -1357,6 +1358,7 @@
 		opacity: 0;
 		transform: translateX(-6px);
 		animation: statLblReveal 0.38s ease 0.3s both;
+		max-width: 12ch;
 	}
 	@keyframes statLblReveal {
 		0%   { opacity: 0; transform: translateX(-6px); }
@@ -1364,13 +1366,13 @@
 	}
 	/* BP4 phone portrait */
 	@media screen and (max-width: 600px) and (orientation: portrait) {
-		.blk-header { min-height: 52px !important; }
+		.blk-header { min-height: 47px !important; }
 		.blk-hdr-left { flex: 0 0 45% !important; }
 		.blk-hdr-num {
 			font-size: clamp(18px, 5vw, 26px) !important;
 			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22) !important;
 		}
-		.blk-hdr-lbl { font-size: clamp(6px, 1.8vw, 8px) !important; }
+		.blk-hdr-lbl { font-size: clamp(7px, 2vw, 9px) !important; max-width: 12ch !important; }
 		.lp-district-name { font-size: clamp(13px, 5vw, 20px) !important; }
 		.row { font-size: clamp(11px, 2.8vw, 13px) !important; }
 	}
@@ -1378,12 +1380,12 @@
 	@media (max-height:440px) and (orientation:landscape) {
 		.blk-hdr-left { flex: 0 0 45% !important; }
 		.blk-hdr-num {
-			font-size: clamp(14px, 3.5vw, 22px) !important;
+			font-size: clamp(14px, 3.5vw, 20px) !important;
 			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22) !important;
 		}
-		.blk-hdr-lbl { font-size: clamp(5px, 1.2vw, 7px) !important; }
+		.blk-hdr-lbl { font-size: clamp(6px, 1.4vw, 8px) !important; max-width: 12ch !important; }
 		.lp-district-name { font-size: clamp(11px, 3vw, 16px) !important; padding: 0 5px 5px 6px !important; }
-		.row { font-size: clamp(7px, 1.65vw, 9px) !important; }
+		.row { font-size: clamp(8px, 1.8vw, 11px) !important; }
 	}
 	</style>
 </head>
