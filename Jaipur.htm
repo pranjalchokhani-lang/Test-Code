@@ -32,30 +32,23 @@
 	:root {
 		--font-display: 'Chakra Petch', sans-serif;
 		--font-content: 'Inter', sans-serif;
-		--fs-s: clamp(7px, 0.70cqw, 10px);
-		--fs-m: clamp(8px, 0.85cqw, 11px);
-		--fs-l: clamp(10px, 1.30cqw, 16px);
-		--fs-xl: clamp(18px, 1.90cqw, 22px);
+		--fs-s: clamp(8px, 0.78cqw, 11px);
+		--fs-m: clamp(9px, 0.95cqw, 12.5px);
+		--fs-l: clamp(11px, 1.40cqw, 17px);
+		--fs-xl: clamp(19px, 2.05cqw, 24px);
 		--accent: #4de8b8;
 		--accent-rgb: 77, 232, 184;
 		--bg: #08090c;
 		--text: #fff;
 	}
 	/* SURGICAL FIX FOR NEON BORDER CLIPPING */
-	/* 1. Create a tiny gap between the Header and the Map/Med boxes */
-	
 	.body {
-		padding-top: 10px !important;
-		padding-bottom: 15px !important;
-		/* Safety for the very bottom Engineering glow */
+		padding-top: 12px !important;
+		padding-bottom: 12px !important;
 	}
-	/* 2. Push the Engineering box up just enough to show its bottom glow */
-	
 	.blk.eng {
-		margin-bottom: 10px !important;
+		margin-bottom: 8px !important;
 	}
-	/* 3. Ensure the inner lists don't hide the bottom border */
-	
 	#med-list,
 	#eng-list {
 		padding-bottom: 35px !important;
@@ -144,6 +137,24 @@
 		justify-content: space-between;
 	}
 	
+@keyframes statGenerate {
+    0% { 
+        opacity: 0; 
+        transform: skewX(22deg) translateY(12px) scale(0.8); 
+        filter: blur(10px) brightness(2);
+    }
+    40% {
+        opacity: 0.8;
+        transform: skewX(22deg) translateY(-2px) scale(1.05);
+        filter: blur(2px) brightness(1.2);
+    }
+    100% { 
+        opacity: 1; 
+        transform: skewX(22deg) translateY(0) scale(1); 
+        filter: blur(0) brightness(1);
+    }
+}
+
 	@keyframes glowHdr {
 		0%,
 		100% {
@@ -429,9 +440,9 @@
 	.body {
 		flex: 1;
 		display: grid;
-		grid-template-columns: 60% 40%;
+		grid-template-columns: 54% 46%;
 		min-height: 0;
-		padding: 0 10cqw;
+		padding: 0 8cqw;
 		gap: 2cqw;
 	}
 	
@@ -577,6 +588,7 @@
 		min-height: 0;
 		backdrop-filter: blur(16px);
 		-webkit-backdrop-filter: blur(16px);
+		z-index: 3;
 	}
 	
 	.blk.eng {
@@ -721,7 +733,7 @@
 		flex-direction: column;
 		gap: clamp(12px, 1.8cqh, 22px);
 		min-height: 0;
-		overflow: hidden;
+		overflow: visible;
 		height: 100%;
 	}
 	
@@ -769,30 +781,15 @@
 		flex: 1;
 	}
 	
-	.blk-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		flex-shrink: 0;
-		position: relative;
-		z-index: 2;
-		background: transparent;
-		padding: 10px 16px 10px;
-		border-bottom: 1px solid rgba(var(--accent-rgb), 0.05);
-		box-shadow: none;
-	}
-	
 	.blk-title {
-		font-family: var(--font-display);
-		font-size: clamp(10px, 1.0cqw, 13px);
-		letter-spacing: clamp(0.5px, 0.15cqw, 1.5px);
-		text-transform: uppercase;
-		font-weight: 700;
-		line-height: 1.3;
-		color: rgba(var(--accent-rgb), 0.9);
-		animation: lblGlow 2.1s ease-in-out infinite alternate;
-		text-align: left;
-	}
+    font-family: var(--font-display);
+    font-size: 15px; /* Increased from 13px */
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(var(--accent-rgb), 0.9);
+}
+
 	
 	#med-list,
 	#eng-list {
@@ -829,7 +826,7 @@
 	.row {
 		font-family: var(--font-content);
 		font-weight: 200;
-		font-size: clamp(10px, 0.85cqw, 11px);
+		font-size: clamp(11px, 0.97cqw, 12.5px);
 		line-height: 1.76;
 		color: rgba(255, 255, 255, 0.75);
 		padding: 1px 0;
@@ -863,17 +860,18 @@
 	
 	.loading-line {
 		font-family: var(--font-content) !important;
-		font-size: var(--fs-s);
-		font-weight: 400;
+		font-size: clamp(11px, 0.97cqw, 12.5px);
+		font-weight: 200;
 		color: var(--accent);
-		letter-spacing: clamp(2px, 0.35cqw, 4px);
-		text-transform: uppercase;
 		text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.9);
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		line-height: 1.76;
+		padding: 1px 0;
 		display: none;
 		overflow: hidden;
 		white-space: nowrap;
-		padding: 3px 16px 0 16px;
-		line-height: 1.76;
+		font-optical-sizing: auto;
 	}
 	
 	.loading-line.active {
@@ -961,7 +959,7 @@
 	@media screen and (min-width: 601px) and (max-width: 850px) and (orientation: portrait) {
 		.body {
 			display: grid !important;
-			grid-template-columns: calc(60% - 7.5px) calc(40% - 7.5px) !important;
+			grid-template-columns: calc(54% - 7.5px) calc(46% - 7.5px) !important;
 			height: 60dvh !important;
 			width: 96% !important;
 			margin: 0 auto !important;
@@ -1002,7 +1000,7 @@
 	
 	@media (min-width:601px) and (min-height:441px) and (max-width:1180px) and (max-height:899px) {
 		.body {
-			padding: 0 10cqw;
+			padding: 0 8cqw;
 			gap: 2cqw;
 		}
 		.hdr-title {
@@ -1012,10 +1010,7 @@
 			font-size: clamp(13px, 2.0cqw, 22px);
 		}
 		.blk-header {
-			padding: clamp(6px, 1.0cqh, 14px) 14px clamp(6px, 1.0cqh, 14px);
-		}
-		.row {
-			font-size: clamp(10px, 0.9cqw, 11px);
+			min-height: clamp(40px, 5cqh, 56px);
 		}
 		.right-panel {
 			gap: clamp(12px, 1.5cqh, 18px);
@@ -1047,15 +1042,18 @@
 			height: auto !important;
 			width: 100% !important;
 		}
-		/* Map takes top portion */
+		/* Map — 30% larger than before */
 		.map-panel {
-			flex: 0 0 50% !important;
+			flex: 0 0 55% !important;
 			width: 100% !important;
 			height: auto !important;
 			padding: 6px 6px 4px !important;
 		}
 		.lbl {
-			font-size: 12px !important;
+			font-size: 21px !important;
+		}
+		.map-label {
+			font-size: clamp(10px, 3vw, 14px) !important;
 		}
 		/* Data boxes stack underneath */
 		.right-panel {
@@ -1135,7 +1133,7 @@
 		.ticker-wrap {
 			display: none !important;
 		}
-		/* Body — 8px side padding */
+		/* Body — original padding */
 		.body {
 			flex: 1;
 			min-height: 0;
@@ -1145,26 +1143,16 @@
 			gap: 16px;
 			overflow: hidden;
 		}
-		/* Map — 50% width */
+		/* Map — 50:50 */
 		.map-panel {
-			flex: 0 0 65%;
+			flex: 0 0 50%;
 			height: auto !important;
 			max-height: 100%;
 			min-height: 0;
 			padding: 5px 6px;
 			border-radius: 16px;
 		}
-		.map-label {
-			font-size: clamp(8px, 1.8vw, 10px);
-			letter-spacing: 1px;
-			margin-bottom: 2px;
-			padding: 2px 5px;
-		}
-		.lbl,
-		.lbl.on {
-			font-size: 9px !important;
-		}
-		/* Right panel */
+		/* Right panel — overflow visible so Medical top border shows */
 		.right-panel {
 			flex: 1;
 			min-width: 0;
@@ -1173,7 +1161,7 @@
 			display: flex;
 			flex-direction: column;
 			gap: 10px;
-			overflow: hidden;
+			overflow: visible;
 		}
 		.rp-header {
 			flex-shrink: 0;
@@ -1203,17 +1191,39 @@
 			border-radius: 16px;
 		}
 		.blk-header {
-			padding: 4px 7px;
+			min-height: clamp(32px, 7.2vw, 43px);
+		}
+		.blk-hdr-num {
+			font-size: clamp(14px, 3.5vw, 20px);
+		}
+		.blk-hdr-lbl {
+			font-size: clamp(6px, 1.4vw, 8px);
+			flex: 1;
+			min-width: 0;
+		}
+		.lp-district-name {
+			font-size: clamp(11px, 3vw, 18px);
+			padding: 0px 5px 5px 6px;
 		}
 		.blk-title {
 			font-size: clamp(9px, 2.0vw, 12px);
 			letter-spacing: 1px;
 		}
 		.row {
-			font-size: clamp(7px, 1.5vw, 9px);
+			font-size: clamp(8px, 1.8vw, 11px);
 			line-height: 1.35;
 			padding: 1px 0;
 			white-space: nowrap;
+		}
+		.map-label {
+			font-size: clamp(9px, 2vw, 12px);
+			letter-spacing: 1px;
+			margin-bottom: 2px;
+			padding: 2px 5px;
+		}
+		.lbl,
+		.lbl.on {
+			font-size: 11px !important;
 		}
 		#med-list,
 		#eng-list {
@@ -1222,7 +1232,7 @@
 			flex: 1;
 		}
 		.loading-line {
-			font-size: clamp(7px, 1.5vw, 9px);
+			font-size: clamp(8px, 1.8vw, 10px);
 			letter-spacing: 1px;
 			padding: 2px 7px 0;
 		}
@@ -1242,6 +1252,160 @@
 			font-size: clamp(8px, 1.9vw, 11px);
 			letter-spacing: 2px;
 		}
+	}
+	/* ── NEW: city name below map-label ── */
+	.lp-district-name {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(16px, 2.2cqw, 28px);
+		color: var(--accent);
+		letter-spacing: clamp(2px, 0.3cqw, 4px);
+		text-transform: uppercase;
+		line-height: 1;
+		padding: 0px 8px 8px 10px;
+		position: relative;
+		z-index: 5;
+		pointer-events: none;
+		flex-shrink: 0;
+		text-shadow:
+			0 0 6px rgba(var(--accent-rgb), 0.55),
+			0 0 14px rgba(var(--accent-rgb), 0.22);
+	}
+
+	/* ── NEW: blk header with stat ── */
+	.blk-header {
+		display: flex;
+		align-items: stretch;
+		flex-shrink: 0;
+		position: relative;
+		z-index: 10;
+		background: transparent;
+		padding: 0;
+		padding-top: 8px;
+		min-height: clamp(49px, 6.3cqh, 70px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+		box-shadow: 0 1px 6px rgba(255, 255, 255, 0.06);
+		overflow: visible !important;
+	}
+	.blk-hdr-inner {
+		display: flex;
+		align-items: stretch;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
+	}
+	/* Left: 44% of header — moves separator+glass block further left */
+	.blk-hdr-left {
+		flex: 0 0 44%;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 0 0 15px;
+	}
+	.blk-hdr-slant {
+		width: 40px;
+		flex-shrink: 0;
+		position: relative;
+		z-index: 3;
+	}
+	.blk-hdr-slant::before {
+		content: '';
+		position: absolute;
+		top: 25%; bottom: 25%;
+		right: 22px;
+		width: 2px;
+		background: var(--accent);
+		box-shadow: 0 0 10px var(--accent);
+		transform: skewX(-22deg);
+	}
+	.blk-hdr-stat {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 0 16px 0 16px;
+		background: rgba(var(--accent-rgb), 0.08);
+		transform: skewX(-22deg);
+		transform-origin: bottom left;
+		margin-left: -34px;
+		overflow: visible;
+	}
+	/* Counter-skew children so text stays upright */
+	.blk-hdr-stat > * {
+		transform: skewX(22deg);
+	}
+	.blk-hdr-num,
+	.blk-hdr-lbl {
+		position: relative;
+		z-index: 1;
+	}
+	/* Stat number — same glow/color as district name */
+	.blk-hdr-num {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: clamp(22px, 2.6cqw, 36px);
+		color: var(--accent);
+		line-height: 1;
+		flex-shrink: 0;
+		min-width: 1.5ch;
+		/* skewX(22deg) counter-skew baked in so JS animation overrides don't untilt it */
+		transform: skewX(22deg);
+		text-shadow:
+			0 0 6px rgba(var(--accent-rgb), 0.55),
+			0 0 14px rgba(var(--accent-rgb), 0.22);
+	}
+	/* Sub-stat label — same simple slide-in as content rows */
+	.blk-hdr-lbl {
+		font-family: var(--font-display);
+		font-size: clamp(8px, 0.85cqw, 11px);
+		color: rgba(255, 255, 255, 0.7);
+		text-transform: uppercase;
+		line-height: 1.3;
+		letter-spacing: 0.5px;
+		opacity: 0;
+		/* skewX(22deg) counter-skew baked in */
+		transform: skewX(22deg) translateX(-6px);
+		animation: statLblReveal 0.38s ease 0.3s both;
+		flex: 1;
+		min-width: 0;
+		white-space: normal;
+		word-break: break-word;
+	}
+	@keyframes statLblReveal {
+		0%   { opacity: 0; transform: skewX(22deg) translateX(-6px); }
+		100% { opacity: 1; transform: skewX(22deg) translateX(0); }
+	}
+	/* BP4 phone portrait */
+	@media screen and (max-width: 600px) and (orientation: portrait) {
+		.blk-header { min-height: 47px !important; }
+		.blk-hdr-left { flex: 0 0 44% !important; }
+		.blk-hdr-stat { margin-left: -34px !important; }
+		.blk-hdr-num {
+			font-size: clamp(18px, 5vw, 26px) !important;
+			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22) !important;
+		}
+		.blk-hdr-lbl { font-size: clamp(7px, 2vw, 9px) !important; flex: 1 !important; min-width: 0 !important; }
+		.lp-district-name { font-size: clamp(13px, 5vw, 20px) !important; }
+		.row { font-size: clamp(11px, 2.8vw, 13px) !important; }
+	}
+	/* BP5 phone landscape */
+	@media (max-height:440px) and (orientation:landscape) {
+		.blk-hdr-left { flex: 0 0 44% !important; }
+		.blk-hdr-stat { margin-left: -34px !important; }
+		.blk-hdr-num {
+			font-size: clamp(14px, 3.5vw, 20px) !important;
+			text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.55), 0 0 14px rgba(var(--accent-rgb), 0.22) !important;
+		}
+		.blk-hdr-lbl { font-size: clamp(6px, 1.4vw, 8px) !important; flex: 1 !important; min-width: 0 !important; }
+		.lp-district-name { font-size: clamp(11px, 3vw, 16px) !important; padding: 0 5px 5px 6px !important; }
+		.row { font-size: clamp(8px, 1.8vw, 11px) !important; }
+	}
+	/* ── Larger map labels on laptop/iPad ── */
+	.map-label {
+		font-size: clamp(10px, 1.1cqw, 14px) !important;
+	}
+	.lbl {
+		font-size: 12px !important;
 	}
 	</style>
 </head>
@@ -1266,11 +1430,13 @@
 					</div>
 				</div>
 				<div class="body">
+					<span id="ctag" style="display:none"></span>
 					<div class="map-panel">
 						<div class="box-fill"></div>
 						<div class="box-scan"></div>
 						<div class="map-label">
-							<div class="bdot"></div>Select your city </div>
+							<div class="bdot"></div>Selected city </div>
+						<div class="lp-district-name" id="lp-district-name">—</div>
 						<div class="map-viewport" id="map-viewport">
 							<div class="map-glow"></div>
 							<div id="map-mover">
@@ -1282,20 +1448,25 @@
 						<div class="box-specular"></div>
 					</div>
 					<div class="right-panel">
-						<div class="rp-header">
-							<div class="wtag"><span data-brand></span> LEGENDS FROM:</div>
-							<div class="ctag"><span id="ctag">SELECT A DISTRICT</span></div>
-						</div>
+
 						<div class="blk">
 							<div class="box-fill"></div>
 							<div class="box-bar"></div>
 							<div class="box-scan"></div>
 							<div class="blk-header">
-								<div class="blk-title">Medical</div>
-								<div class="status-dot"></div>
+								<div class="blk-hdr-inner">
+									<div class="blk-hdr-left">
+										<div class="status-dot"></div>
+										<div class="blk-title">Medical</div>
+									</div>
+									<div class="blk-hdr-slant"></div>
+									<div class="blk-hdr-stat">
+										<div class="blk-hdr-num" id="med-hdr-num">—</div>
+										<div class="blk-hdr-lbl" id="med-hdr-lbl"></div>
+									</div>
+								</div>
 							</div>
-							<div class="loading-line" id="med-loading">// ACCESSING MEDICAL DATA...</div>
-							<div id="med-list"></div>
+							<div id="med-list"><div class="loading-line" id="med-loading">// ACCESSING MEDICAL DATA...</div></div>
 							<div class="box-noise"></div>
 							<div class="box-edge"></div>
 							<div class="box-specular"></div>
@@ -1305,11 +1476,19 @@
 							<div class="box-bar"></div>
 							<div class="box-scan"></div>
 							<div class="blk-header">
-								<div class="blk-title">Engineering</div>
-								<div class="status-dot"></div>
+								<div class="blk-hdr-inner">
+									<div class="blk-hdr-left">
+										<div class="status-dot"></div>
+										<div class="blk-title">Engineering</div>
+									</div>
+									<div class="blk-hdr-slant"></div>
+									<div class="blk-hdr-stat">
+										<div class="blk-hdr-num" id="eng-hdr-num">—</div>
+										<div class="blk-hdr-lbl" id="eng-hdr-lbl"></div>
+									</div>
+								</div>
 							</div>
-							<div class="loading-line" id="eng-loading">// ACCESSING ENGINEERING DATA...</div>
-							<div id="eng-list"></div>
+							<div id="eng-list"><div class="loading-line" id="eng-loading">// ACCESSING ENGINEERING DATA...</div></div>
 							<div class="box-noise"></div>
 							<div class="box-edge"></div>
 							<div class="box-specular"></div>
@@ -1536,6 +1715,34 @@
 		currentToken++;
 		const myToken = currentToken;
 		document.getElementById('ctag').innerText = name.toUpperCase();
+		/* NEW — city name below map-label */
+		const lpName = document.getElementById('lp-district-name');
+		if(lpName) lpName.innerText = name.toUpperCase();
+		/* NEW — stat block: reset + set + animate */
+		const d0 = DATA[name] || {};
+		const st = d0.stats || {};
+		const medNumEl = document.getElementById('med-hdr-num');
+		const medLblEl = document.getElementById('med-hdr-lbl');
+		const engNumEl = document.getElementById('eng-hdr-num');
+		const engLblEl = document.getElementById('eng-hdr-lbl');
+		[medNumEl, medLblEl, engNumEl, engLblEl].forEach(el => {
+			if(!el) return;
+			el.style.animation = 'none';
+			el.style.opacity = '0';
+			void el.offsetWidth;
+			el.style.animation = '';
+			el.style.opacity = '';
+		});
+		if(medNumEl) medNumEl.innerText = (st.m && st.m.num) ? st.m.num : '—';
+		if(medLblEl) medLblEl.innerText = (st.m && st.m.label) ? st.m.label : '';
+		if(engNumEl) engNumEl.innerText = (st.e && st.e.num) ? st.e.num : '—';
+		if(engLblEl) engLblEl.innerText = (st.e && st.e.label) ? st.e.label : '';
+		/* statGenerate slowed 20%: 0.6s → 0.72s */
+		if(medNumEl) medNumEl.style.animation = 'statGenerate 0.72s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		if(engNumEl) engNumEl.style.animation = 'statGenerate 0.72s cubic-bezier(0.175, 0.885, 0.32, 1.275) both';
+		if(medLblEl) medLblEl.style.animation = 'statLblReveal 0.38s ease 0.3s both';
+		if(engLblEl) engLblEl.style.animation = 'statLblReveal 0.38s ease 0.3s both';
+
 		const regionTag = document.getElementById('region-tag');
 		if(regionTag) regionTag.innerText = '';
 		document.querySelectorAll('.dist').forEach(p => {
@@ -1551,8 +1758,10 @@
 		const lblEl = document.getElementById('l-' + name.replace(/\s/g, '_'));
 		if(lblEl) lblEl.classList.add('on');
 		if(centroids[name]) addPulse(centroids[name].cx, centroids[name].cy);
-		document.getElementById('med-list').innerHTML = '';
-		document.getElementById('eng-list').innerHTML = '';
+		/* Clear only .row children — loading-line lives inside the list and must be preserved */
+		['med-list','eng-list'].forEach(id => {
+			document.querySelectorAll('#' + id + ' .row').forEach(r => r.remove());
+		});
 		const mL = document.getElementById('med-loading'),
 			eL = document.getElementById('eng-loading');
 		[mL, eL].forEach(lo => {
@@ -2274,7 +2483,29 @@
 		clearTimeout(_bgResizeTimer);
 		_bgResizeTimer = setTimeout(() => requestAnimationFrame(initCanvas), 120);
 	});
-	document.querySelector('clipPath rect').remove();
+	const _cpRect = document.querySelector('clipPath rect');
+	if(_cpRect) _cpRect.remove();
+	</script>
+	<script>
+function runDigitalScanner(id, targetValue) {
+    const el = document.getElementById(id);
+    if (!targetValue || targetValue === '—') { el.innerText = '—'; return; }
+    
+    const final = parseInt(targetValue);
+    const duration = 600; 
+    const startTime = performance.now();
+
+    function update(now) {
+        const elapsed = now - startTime;
+        if (elapsed < duration) {
+            el.innerText = Math.floor(Math.random() * 99); // Rapidly flicker random digits
+            requestAnimationFrame(update);
+        } else {
+            el.innerText = final; // Snap to the actual result
+        }
+    }
+    requestAnimationFrame(update);
+}
 	</script>
 	<script async src="tracker.js" onerror="void 0"></script>
 </body>
